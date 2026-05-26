@@ -146,3 +146,38 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
   .content-box { padding: 25px; width: 95%; }
   .box-title { font-size: 24px !important; }
 }
+
+/* ==========================================================================
+   TAMBAHAN KHUSUS UNTUK HALAMAN LAPORAN KEUANGAN
+   ========================================================================== */
+.finance-page-wrapper { padding: 140px 0 60px; display: flex; justify-content: center; }
+
+/* Komponen Struktur Kotak Ringkasan Informasi Saldo (Card Box) */
+.summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; width: 100%; }
+.card-box { flex: 1; min-width: 220px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.card-box h4 { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: normal; }
+.card-box .amount { font-size: 22px; font-weight: 800; }
+
+/* Pewarnaan Indikator Nilai Utama Kas */
+.card-box.masuk .amount { color: #2e7d32; }  /* Hijau untuk Total Masuk */
+.card-box.keluar .amount { color: #E53935; } /* Merah untuk Total Keluar */
+.card-box.saldo .amount { color: #1565c0; }  /* Biru untuk Saldo Akhir */
+
+/* Penyelaras Baris Komponen Filter Dropdown Pencarian */
+.filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; transition: 0.3s; }
+.filter-box:focus { border-color: #E53935; } /* Merah menyala saat aktif klik */
+
+/* Pengatur Responsivitas Sisi Lebar Tabel Kas */
+.table-responsive { width: 100%; overflow-x: auto; background: #fff; border-radius: 8px; }
+.finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.finance-table th { background-color: #E53935; color: white; padding: 12px 15px; white-space: nowrap; }
+.finance-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+.finance-table tr:nth-child(even) { background-color: #fafafa; } /* Pola baris belang */
+.finance-table tr:hover { background-color: #f1f1f1; }           /* Sorot baris hidup */
+
+/* Penyesuaian Lebar Khusus Layout Mobile Tampilan HP */
+@media screen and (max-width: 768px) {
+    .filter-container { justify-content: center; }
+    .filter-box { width: 100% !important; }
+}
