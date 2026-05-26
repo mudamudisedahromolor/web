@@ -147,3 +147,15 @@ function renderTabel() {
 
 window.nav = (dir) => { halamanSaatIni += dir; renderTabel(); };
 function formatRupiah(a) { return 'Rp ' + Math.abs(a).toLocaleString('id-ID'); }
+
+// --- KODE UNTUK TOMBOL MENU MOBILE ---
+document.addEventListener("DOMContentLoaded", () => {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mainNavbar = document.querySelector('.main-navbar');
+
+    if (mobileMenuBtn && mainNavbar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mainNavbar.classList.toggle('aktif');
+        });
+    }
+});
