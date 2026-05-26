@@ -1,8 +1,7 @@
 /* ==========================================================================
-   LOGIKA OPERASIONAL KEUANGAN & NAVBAR - MUDA MUDI SEDAHROMO LOR
+   LOGIKA OPERASIONAL KEUANGAN DINAMIS (ANTI GESER KOLOM)
    ========================================================================== */
 
-// Amankan eksekusi hamburger menu setelah DOM selesai dimuat browser
 document.addEventListener("DOMContentLoaded", () => {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     if (mobileMenuBtn) {
@@ -10,12 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector('.main-navbar').classList.toggle('aktif');
         });
     }
-    
-    // Jalankan penarikan database otomatis jika fungsi tersedia
     loadKeuanganDariDrive();
 });
 
-// Tautan database Google Sheets hasil Google Form (format TSV)
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
 
 let dataKeuanganGlobal = [];
@@ -27,26 +23,43 @@ async function loadKeuanganDariDrive() {
         const teksData = await response.text();
         
         const baris = teksData.split("\n").map(b => b.trim());
+        if (baris.length < 2) return;
+
+        // DETEKSI INDEKS KOLOM SECARA DINAMIS BERDASARKAN HEADER SPREADSHEET
+        const headers = baris[0].split("\t").map(h => h.trim().toLowerCase());
+        
+        // Cari posisi indeks kolom secara otomatis berdasarkan nama judulnya
+        const idxTanggal = headers.findIndex(h => h.includes("tanggal"));
+        const idxKeterangan = headers.findIndex(h => h.includes("keterangan"));
+        const idxJenis = headers.findIndex(h => h.includes("pilih salah satu") || h.includes("jenis") || h.includes("tipe"));
+        const idxJumlah = headers.findIndex(h => h.includes("jumlah") || h.includes("uang") || h.includes("rp"));
+
+        // Jika pencarian dinamis gagal, gunakan default backup urutan foto terakhir
+        const colTanggal = idxTanggal !== -1 ? idxTanggal : 1;
+        const colKeterangan = idxKeterangan !== -1 ? idxKeterangan : 2;
+        const colJenis = idxJenis !== -1 ? idxJenis : 3;
+        const colJumlah = idxJumlah !== -1 ? idxJumlah : 4;
+
         dataKeuanganGlobal = [];
         let daftarTahun = new Set();
         let daftarBulan = new Set();
 
-        // LOOP MEMBACA DATA SPREADSHEET SESUAI STRUKTUR FORM BARU
         for(let i = 1; i < baris.length; i++) {
             if (baris[i] === "") continue; 
             
             const kolom = baris[i].split("\t").map(k => k.trim());
             
-            if(kolom.length >= 5) {
-                let teksTanggal = kolom[1] || "";     // Kolom B: Tanggal Transaksi
-                let keterangan = kolom[2] || "-";    // Kolom C: Keterangan Transaksi
-                let jenisTransaksi = kolom[3] ? kolom[3].toLowerCase() : ""; // Kolom D: Jenis Transaksi
-                let jumlahUang = kolom[4] || "0";     // Kolom E: Jumlah
+            // Validasi data aman
+            if(kolom.length > Math.max(colTanggal, colKeterangan, colJenis, colJumlah)) {
+                let teksTanggal = kolom[colTanggal] || "";     
+                let keterangan = kolom[colKeterangan] || "-";    
+                let jenisTransaksi = kolom[colJenis] ? kolom[colJenis].toLowerCase() : ""; 
+                let jumlahUang = kolom[colJumlah] || "0";     
 
                 let statusTipe = "keluar"; 
-                if (jenisTransaksi.includes("masuk") || jenisTransaksi === "pemasukkan") {
+                if (jenisTransaksi.includes("masuk")) {
                     statusTipe = "masuk";
-                } else if (jenisTransaksi.includes("keluar") || jenisTransaksi === "pengeluaran") {
+                } else if (jenisTransaksi.includes("keluar")) {
                     statusTipe = "keluar";
                 }
 
@@ -86,7 +99,6 @@ async function loadKeuanganDariDrive() {
             }
         }
 
-        // Cek keberadaan elemen filter agar tidak crash saat script dipanggil di halaman profile/beranda
         if (document.getElementById('filter-tahun') && document.getElementById('filter-bulan')) {
             isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
             const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
@@ -174,26 +186,3 @@ function renderTabelKeuangan(data) {
         let tanggalTampil = item.tanggal;
         if (tanggalTampil.includes("-")) {
             const p = tanggalTampil.split("-");
-            if(p[0].length === 4) tanggalTampil = `${p[2]}-${p[1]}-${p[0]}`; 
-        }
-
-        let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
-
-        html += `
-            <tr>
-                <td>${tanggalTampil}</td>
-                <td>${item.keterangan}</td>
-                <td style="${warnaKategori}">${iconKategori}</td>
-                <td><strong>${angkaTampil}</strong></td>
-            </tr>
-        `;
-    });
-    tbody.innerHTML = html;
-}
-
-function formatRupiah(angka) { 
-    if (angka < 0) {
-        return '-Rp ' + Math.abs(angka).toLocaleString('id-ID');
-    }
-    return 'Rp ' + angka.toLocaleString('id-ID'); 
-}
