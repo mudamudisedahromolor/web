@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LOGIKA OPERASIONAL KEUANGAN DINAMIS (ANTI GESER KOLOM)
+   LOGIKA OPERASIONAL KEUANGAN DINAMIS - MUDA MUDI SEDAHROMO LOR
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPlPHmeUoPwwNbheBuCOwP0T3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
+// Tautan Google Sheets Baru Anda yang Valid
+const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPIPHmeUoPwwNbheBuCOwPOT3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
 
 let dataKeuanganGlobal = [];
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -25,16 +26,15 @@ async function loadKeuanganDariDrive() {
         const baris = teksData.split("\n").map(b => b.trim());
         if (baris.length < 2) return;
 
-        // DETEKSI INDEKS KOLOM SECARA DINAMIS BERDASARKAN HEADER SPREADSHEET
+        // Deteksi posisi indeks kolom secara dinamis berdasarkan baris pertama (Header)
         const headers = baris[0].split("\t").map(h => h.trim().toLowerCase());
         
-        // Cari posisi indeks kolom secara otomatis berdasarkan nama judulnya
         const idxTanggal = headers.findIndex(h => h.includes("tanggal"));
         const idxKeterangan = headers.findIndex(h => h.includes("keterangan"));
         const idxJenis = headers.findIndex(h => h.includes("pilih salah satu") || h.includes("jenis") || h.includes("tipe"));
         const idxJumlah = headers.findIndex(h => h.includes("jumlah") || h.includes("uang") || h.includes("rp"));
 
-        // Jika pencarian dinamis gagal, gunakan default backup urutan foto terakhir
+        // Cadangan manual jika nama kolom tidak pas
         const colTanggal = idxTanggal !== -1 ? idxTanggal : 1;
         const colKeterangan = idxKeterangan !== -1 ? idxKeterangan : 2;
         const colJenis = idxJenis !== -1 ? idxJenis : 3;
@@ -49,7 +49,6 @@ async function loadKeuanganDariDrive() {
             
             const kolom = baris[i].split("\t").map(k => k.trim());
             
-            // Validasi data aman
             if(kolom.length > Math.max(colTanggal, colKeterangan, colJenis, colJumlah)) {
                 let teksTanggal = kolom[colTanggal] || "";     
                 let keterangan = kolom[colKeterangan] || "-";    
@@ -57,9 +56,9 @@ async function loadKeuanganDariDrive() {
                 let jumlahUang = kolom[colJumlah] || "0";     
 
                 let statusTipe = "keluar"; 
-                if (jenisTransaksi.includes("masuk")) {
+                if (jenisTransaksi.includes("masuk") || jenisTransaksi.includes("pemasukkan")) {
                     statusTipe = "masuk";
-                } else if (jenisTransaksi.includes("keluar")) {
+                } else if (jenisTransaksi.includes("keluar") || jenisTransaksi.includes("pengeluaran")) {
                     statusTipe = "keluar";
                 }
 
@@ -186,3 +185,26 @@ function renderTabelKeuangan(data) {
         let tanggalTampil = item.tanggal;
         if (tanggalTampil.includes("-")) {
             const p = tanggalTampil.split("-");
+            if(p[0].length === 4) tanggalTampil = `${p[2]}-${p[1]}-${p[0]}`; 
+        }
+
+        let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
+
+        html += `
+            <tr>
+                <td>${tanggalTampil}</td>
+                <td>${item.keterangan}</td>
+                <td style="${warnaKategori}">${iconKategori}</td>
+                <td><strong>${angkaTampil}</strong></td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+function formatRupiah(angka) { 
+    if (angka < 0) {
+        return '-Rp ' + Math.abs(angka).toLocaleString('id-ID');
+    }
+    return 'Rp ' + angka.toLocaleString('id-ID'); 
+}
