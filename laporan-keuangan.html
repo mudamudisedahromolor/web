@@ -8,6 +8,34 @@
     <link rel="icon" href="images/mms.png" type="image/png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* TAMBAHAN KHUSUS UNTUK HALAMAN KEUANGAN ASLI MAS ARDYAN */
+        body { background-color: #f4f4f4; }
+        .finance-page-wrapper { padding-top: 140px; padding-bottom: 60px; }
+        
+        /* Kotak Ringkasan Saldo */
+        .summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .card-box { flex: 1; min-width: 200px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card-box h4 { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: normal; }
+        .card-box .amount { font-size: 22px; font-weight: 800; }
+        .card-box.masuk .amount { color: #2e7d32; }
+        .card-box.keluar .amount { color: #E53935; }
+        .card-box.saldo .amount { color: #1565c0; }
+
+        /* Filter & Pencarian */
+        .filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
+        .filter-box:focus { border-color: #E53935; }
+
+        /* Tabel Keuangan */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        .finance-table th { background-color: #E53935; color: white; padding: 12px 15px; white-space: nowrap; }
+        .finance-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        .finance-table tr:nth-child(even) { background-color: #fafafa; }
+        .finance-table tr:hover { background-color: #f1f1f1; }
+    </style>
 </head>
 <body> 
     
@@ -107,7 +135,7 @@
                     <tbody id="data-tabel-keuangan">
                         <tr>
                             <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database Real-time...
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database...
                             </td>
                         </tr>
                     </tbody>
@@ -116,6 +144,145 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Logika Hamburger Menu asli
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.querySelector('.main-navbar').classList.toggle('aktif');
+        });
+
+        // Tautan database Google Sheets hasil Google Form Anda (format TSV)
+        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlusSwGSyc6ifldllucBWSv3w3_6KI7-zcS4yqPERnkeM1KKNva9ffuU8D_vDeCkWoSQ9VPiZ6bk4s/pub?output=tsv";
+        
+        let dataKeuanganGlobal = [];
+
+        async function loadKeuanganDariDrive() {
+            try {
+                const response = await fetch(linkTsvKeuangan);
+                const teksData = await response.text();
+                
+                const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
+                dataKeuanganGlobal = [];
+                let daftarTahun = new Set();
+                let daftarBulan = new Set();
+
+                // LOOP MEMBACA FORMAT BARU GOOGLE FORM ANDA
+                for(let i = 1; i < baris.length; i++) {
+                    const kolom = baris[i].split("\t").map(k => k.trim());
+                    
+                    // Memastikan kolom lengkap sampai indeks ke-7 (Kolom Jumlah Uang)
+                    if(kolom.length >= 8) {
+                        let jenisTransaksi = kolom[1].toLowerCase(); 
+                        let statusTipe = "keluar"; // Default pengaman
+
+                        // Deteksi keyword input Form: Pemasukkan / Pengeluaran
+                        if (jenisTransaksi === "pemasukkan" || jenisTransaksi.includes("masuk")) {
+                            statusTipe = "masuk";
+                        } else if (jenisTransaksi === "pengeluaran" || jenisTransaksi.includes("keluar")) {
+                            statusTipe = "keluar";
+                        }
+
+                        dataKeuanganGlobal.push({
+                            tanggal: kolom[2] || "",    // Kolom Tanggal (Pertanyaan 2)
+                            bulan: kolom[3] || "",      // Kolom Bulan (Pertanyaan 3)
+                            tahun: kolom[4] || "",      // Kolom Tahun (Pertanyaan 4)
+                            keterangan: kolom[5] || "", // Kolom Keterangan Manual (Pertanyaan 5)
+                            kategori: kolom[6] || "",   // Kolom Kategori Dropdown (Pertanyaan 6)
+                            tipe: statusTipe, 
+                            jumlah: kolom[7] || "0"    // Kolom Jumlah Uang Rp (Pertanyaan 7)
+                        });
+
+                        if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
+                        if(kolom[3] && kolom[3].length > 2) daftarBulan.add(kolom[3]); 
+                    }
+                }
+
+                // Inject ke Dropdown Filter secara dinamis
+                isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
+                const urutanBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                const bulanTersedia = Array.from(daftarBulan).sort((a, b) => urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
+                isiDropdownFilter('filter-bulan', bulanTersedia);
+
+                // Jalankan filter perdana
+                terapkanFilter();
+
+            } catch (error) {
+                document.getElementById('data-tabel-keuangan').innerHTML = 
+                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive.</td></tr>";
+            }
+        }
+
+        function isiDropdownFilter(idElemen, dataArray) {
+            const elemen = document.getElementById(idElemen);
+            while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
+            
+            dataArray.forEach(item => {
+                if(item) {
+                    let opsi = document.createElement("option");
+                    opsi.value = item; opsi.text = item;
+                    elemen.appendChild(opsi);
+                }
+            });
+        }
+
+        function terapkanFilter() {
+            const tahunDipilih = document.getElementById('filter-tahun').value;
+            const bulanDipilih = document.getElementById('filter-bulan').value;
+            const keywordCari = document.getElementById('input-cari').value.toLowerCase();
+
+            const dataTersaring = dataKeuanganGlobal.filter(item => {
+                const cocokTahun = (tahunDipilih === "Semua") || (item.tahun === tahunDipilih);
+                const cocokBulan = (bulanDipilih === "Semua") || (item.bulan === bulanDipilih);
+                const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || 
+                                     item.kategori.toLowerCase().includes(keywordCari) || 
+                                     item.tanggal.toLowerCase().includes(keywordCari);
+                return cocokTahun && cocokBulan && cocokKetikan;
+            });
+
+            hitungDanTampilkanUang(dataTersaring);
+            renderTabelKeuangan(dataTersaring);
+        }
+
+        function hitungDanTampilkanUang(data) {
+            let totalMasuk = 0; let totalKeluar = 0;
+            data.forEach(item => {
+                let angkaBersih = parseInt(item.jumlah.replace(/[^0-9]/g, '')) || 0;
+                if(item.tipe === 'masuk') { totalMasuk += angkaBersih; } 
+                else if(item.tipe === 'keluar') { totalKeluar += angkaBersih; }
+            });
+            document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
+            document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
+            document.getElementById('saldo-akhir').innerText = formatRupiah(totalMasuk - totalKeluar);
+        }
+
+        function renderTabelKeuangan(data) {
+            const tbody = document.getElementById('data-tabel-keuangan');
+            if(data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan.</td></tr>";
+                return;
+            }
+
+            let html = "";
+            data.forEach(item => {
+                const isMasuk = (item.tipe === 'masuk');
+                const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
+                const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i>' : '<i class="fa-solid fa-arrow-up"></i>';
+                let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
+
+                html += `
+                    <tr>
+                        <td>${item.tanggal}</td>
+                        <td>${item.keterangan}</td>
+                        <td style="${warnaKategori}">${iconKategori} ${item.kategori}</td>
+                        <td><strong>${angkaTampil}</strong></td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function formatRupiah(angka) { return 'Rp ' + angka.toLocaleString('id-ID'); }
+
+        loadKeuanganDariDrive();
+    </script>
 </body>
 </html>
