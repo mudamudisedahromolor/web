@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LOGIKA OPERASIONAL KEUANGAN INSTAN 0 DETIK (METODE ID EXPORT)
+   LOGIKA OPERASIONAL KEUANGAN DINAMIS & REAL-TIME - MUDA MUDI SEDAHROMO LOR
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,42 +12,41 @@ document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-
-
-// Sistem otomatis merangkai URL anti-delay (Jangan diubah)
-const baseLinkSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?output=tsv";
+// Tautan Google Sheets Resmi dari Web Share Anda
+const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=2096971781&single=true&output=tsv";
 
 let dataKeuanganGlobal = [];
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 async function loadKeuanganDariDrive() {
     const tbody = document.getElementById('data-tabel-keuangan');
-    if (!tbody) return; 
-    
-    try {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 30px; color: #1565c0;'><i class='fa-solid fa-spinner fa-spin'></i> Menarik data instan dari Google Sheets...</td></tr>";
+    if (!tbody) return;
 
-        // Memaksa browser selalu ambil data terbaru detik ini juga
-        const realTimeLink = baseLinkSheets + "&_bypass=" + new Date().getTime();
+    try {
+        // Tampilkan status loading awal
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 30px; color: #1565c0;'><i class='fa-solid fa-spinner fa-spin'></i> Menghubungkan ke Database Real-time...</td></tr>";
+
+        // Bypass cache browser agar data selalu paling baru (Real-time)
+        const realTimeLink = linkTsvKeuangan + "&_cb=" + new Date().getTime();
         const response = await fetch(realTimeLink);
         
-        if (!response.ok) throw new Error("Gagal terhubung. Pastikan Spreadsheet sudah di-Share 'Anyone with the link'.");
+        if (!response.ok) throw new Error("Gagal mengambil data. Status HTTP: " + response.status);
         
         const teksData = await response.text();
 
-        // Deteksi jika Google Sheets meminta login (Akses belum dibuka)
+        // DETEKSI ERROR: Jika Google malah mengirim halaman web login/error (HTML) bukan tabel mentah
         if (teksData.trim().startsWith("<") || teksData.toLowerCase().includes("<!doctype html>")) {
-            throw new Error("Akses ditolak oleh Google. Pastikan Anda sudah mengklik tombol 'Share' dan memilih 'Anyone with the link'.");
+            throw new Error("Google Sheets mengembalikan halaman error/login HTML, bukan data tabel. Mohon pastikan setelan 'Publish to Web' diatur ke 'Tab-separated values (.tsv)' dan bukan 'Halaman Web'.");
         }
 
         const baris = teksData.split("\n").map(b => b.trim());
         
-        if (baris.length < 2) {
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Tabel berhasil terhubung, namun data di Google Sheets Anda masih kosong.</td></tr>";
-            return;
+        if (baris.length < 2 || !teksData.includes("\t")) {
+            throw new Error("Koneksi sukses, tetapi tidak ada baris transaksi yang ditemukan di spreadsheet Anda.");
         }
 
-        // Penguncian Kolom Sesuai Foto Spreadsheet
+        // Kunci Urutan Kolom Pasti Berdasarkan Form Anda (Anti Meleset):
+        // Index 0 = Timestamp | Index 1 = Jenis | Index 2 = Tanggal | Index 3 = Keterangan | Index 4 = Jumlah
         const colJenis = 1;
         const colTanggal = 2;
         const colKeterangan = 3;
@@ -57,12 +56,13 @@ async function loadKeuanganDariDrive() {
         let daftarTahun = new Set();
         let daftarBulan = new Set();
 
-        for(let i = 1; i < baris.length; i++) {
-            if (baris[i] === "") continue; 
+        for (let i = 1; i < baris.length; i++) {
+            if (baris[i] === "") continue;
             
             const kolom = baris[i].split("\t").map(k => k.trim());
             
-            if(kolom.length >= 3) {
+            // Validasi Pasti: Pastikan baris data memiliki minimal 5 kolom utuh
+            if (kolom.length >= 5) {
                 let teksTanggal = kolom[colTanggal] || "";     
                 let keterangan = kolom[colKeterangan] || "-";    
                 let jenisTransaksi = kolom[colJenis] ? kolom[colJenis].toLowerCase() : ""; 
@@ -107,6 +107,7 @@ async function loadKeuanganDariDrive() {
             }
         }
 
+        // Inject data tahun & bulan ke dropdown filter secara otomatis
         if (document.getElementById('filter-tahun') && document.getElementById('filter-bulan')) {
             isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
             const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
@@ -119,8 +120,8 @@ async function loadKeuanganDariDrive() {
         console.error("Detail Error:", error);
         if (tbody) {
             tbody.innerHTML = `<tr><td colspan='4' style='text-align: center; padding: 30px; color: #E53935; font-weight: bold;'>
-                <i class='fa-solid fa-triangle-exclamation' style='font-size: 24px; margin-bottom: 10px; display: block;'></i> 
-                ${error.message}
+                <i class='fa-solid fa-triangle-exclamation' style='font-size: 26px; margin-bottom: 10px; display: block;'></i> 
+                Error Koneksi: ${error.message}
             </td></tr>`;
         }
     }
@@ -182,7 +183,7 @@ function renderTabelKeuangan(data) {
     if (!tbody) return; 
 
     if(data.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Tabel berhasil terhubung, namun tidak ada transaksi untuk filter tersebut.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Tidak ada data transaksi kas yang cocok dengan filter.</td></tr>";
         return;
     }
 
