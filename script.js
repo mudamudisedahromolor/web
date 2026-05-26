@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LOGIKA OPERASIONAL KEUANGAN DINAMIS - MUDA MUDI SEDAHROMO LOR
+   LOGIKA OPERASIONAL KEUANGAN DINAMIS & REAL-TIME - MUDA MUDI SEDAHROMO LOR
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,36 +12,37 @@ document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-// Tautan Google Sheets Resmi Milik Anda (Menggunakan ID Asli dari Screenshot Komitmen Anda)
+// Link Google Sheets dari Web Share Anda
 const baseLinkSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?output=tsv";
 
 let dataKeuanganGlobal = [];
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 async function loadKeuanganDariDrive() {
+    const tbody = document.getElementById('data-tabel-keuangan');
+    
     try {
-        // OPTIMASI REAL-TIME: Tambahkan parameter tanggal unik di ujung tautan agar browser tidak melakukan caching data lama
-        const realTimeLink = baseLinkSheets + "&t=" + new Date().getTime();
-        
+        // Trik bypass cache paling kuat agar data real-time instan
+        const realTimeLink = baseLinkSheets + "&_nocache=" + new Date().getTime();
         const response = await fetch(realTimeLink);
+        
+        if (!response.ok) throw new Error("Koneksi ditolak oleh Google");
+        
         const teksData = await response.text();
-        
         const baris = teksData.split("\n").map(b => b.trim());
-        if (baris.length < 2) return;
 
-        // Deteksi posisi indeks kolom secara otomatis berdasarkan judul (Header) di baris pertama
-        const headers = baris[0].split("\t").map(h => h.trim().toLowerCase());
-        
-        const idxTanggal = headers.findIndex(h => h.includes("tanggal"));
-        const idxKeterangan = headers.findIndex(h => h.includes("keterangan"));
-        const idxJenis = headers.findIndex(h => h.includes("pilih salah satu") || h.includes("jenis") || h.includes("tipe"));
-        const idxJumlah = headers.findIndex(h => h.includes("jumlah") || h.includes("uang") || h.includes("rp"));
+        // SOLUSI LOADING TERUS: Beri tahu tabel jika data kosong / link salah format
+        if (baris.length < 2 || !teksData.includes("\t")) {
+            if (tbody) tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: #E53935; padding: 20px;'>Data belum tersedia atau format Spreadsheet salah.</td></tr>";
+            return;
+        }
 
-        // Cadangan manual (fallbacks) sesuai urutan form terakhir Anda
-        const colTanggal = idxTanggal !== -1 ? idxTanggal : 2;
-        const colKeterangan = idxKeterangan !== -1 ? idxKeterangan : 3;
-        const colJenis = idxJenis !== -1 ? idxJenis : 1;
-        const colJumlah = idxJumlah !== -1 ? idxJumlah : 4;
+        // Penguncian Kolom Sesuai Foto Spreadsheet Anda (Anti Meleset)
+        // A(0)=Timestamp, B(1)=Tipe, C(2)=Tanggal, D(3)=Keterangan, E(4)=Jumlah
+        const colJenis = 1;
+        const colTanggal = 2;
+        const colKeterangan = 3;
+        const colJumlah = 4;
 
         dataKeuanganGlobal = [];
         let daftarTahun = new Set();
@@ -52,7 +53,8 @@ async function loadKeuanganDariDrive() {
             
             const kolom = baris[i].split("\t").map(k => k.trim());
             
-            if(kolom.length > Math.max(colTanggal, colKeterangan, colJenis, colJumlah)) {
+            // Menggunakan >= 3 agar jika kolom ujung (jumlah) kosong, web tetap tidak crash
+            if(kolom.length >= 3) {
                 let teksTanggal = kolom[colTanggal] || "";     
                 let keterangan = kolom[colKeterangan] || "-";    
                 let jenisTransaksi = kolom[colJenis] ? kolom[colJenis].toLowerCase() : ""; 
@@ -68,6 +70,7 @@ async function loadKeuanganDariDrive() {
                 let teksBulan = "Semua";
                 let teksTahun = "Semua";
 
+                // Membaca tanggal komplit langsung dari form (Format DD/MM/YYYY)
                 let pemisah = teksTanggal.includes("-") ? "-" : "/";
                 if (teksTanggal.includes(pemisah)) {
                     const partTanggal = teksTanggal.split(pemisah);
@@ -75,13 +78,11 @@ async function loadKeuanganDariDrive() {
                     if (pemisah === "-") {
                         let tahunExtracted = partTanggal[0];
                         let indeksBulan = parseInt(partTanggal[1], 10) - 1;
-                        
                         if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
                         if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
                     } else {
                         let indeksBulan = parseInt(partTanggal[1], 10) - 1;
                         let tahunExtracted = partTanggal[2].split(" ")[0];
-                        
                         if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
                         if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
                     }
@@ -111,9 +112,8 @@ async function loadKeuanganDariDrive() {
 
     } catch (error) {
         console.error("Detail Error:", error);
-        const tBody = document.getElementById('data-tabel-keuangan');
-        if (tBody) {
-            tBody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive. Silakan refresh halaman beberapa saat lagi.</td></tr>";
+        if (tbody) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: #E53935; padding: 20px;'><i class='fa-solid fa-triangle-exclamation'></i> Gagal memuat data. Spreadsheet mungkin belum dipublikasikan (Publish to Web).</td></tr>";
         }
     }
 }
@@ -175,7 +175,7 @@ function renderTabelKeuangan(data) {
     if (!tbody) return; 
 
     if(data.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan atau tidak cocok dengan filter.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Data transaksi belum tersedia untuk filter tersebut.</td></tr>";
         return;
     }
 
@@ -205,7 +205,7 @@ function renderTabelKeuangan(data) {
     tbody.innerHTML = html;
 }
 
-// Format Angka Rupiah Standar Bank Nasional Indonesia
+// Format Angka Rupiah Standar
 function formatRupiah(angka) { 
     if (angka < 0) {
         return '-Rp ' + Math.abs(angka).toLocaleString('id-ID');
