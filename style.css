@@ -25,7 +25,7 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
 .search-box button:hover { color: #E53935; }
 .header-socials { display: flex; gap: 15px; }
 .header-socials a { color: #555; font-size: 18px; text-decoration: none; transition: 0.2s; }
-.header-socials a:hover { transform: scale(1.15); color: #E53935; } 
+.header-socials a:hover { transform: scale(1.15); color: #E53935; } /* Hover seragam warna merah */
 
 /* Baris Merah (Navbar) */
 .main-navbar { background-color: #E53935; padding: 0 40px; }
@@ -41,18 +41,21 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
 .nav-item:hover .submenu { display: block; }
 
 /* ==========================================================================
-   2. HERO SECTION (Foto Full Screen Beranda)
+   2. HERO SECTION (Foto Full Screen)
    ========================================================================== */
 .hero-container {
   position: relative; width: 100%; min-height: 100vh;
-  background-image: url('images/mms-foto-bersama2025.jpg'); 
+  background-image: url('images/mms-foto-bersama2025.jpg'); /* FOTO BACKGROUND */
   background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; padding-top: 100px;
 }
 .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1; }
 .hero-content { position: relative; z-index: 2; text-align: center; color: #fff; padding: 20px; max-width: 800px; }
+
+/* Modul Logo & Judul Berdampingan */
 .hero-title-box { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 5px; }
 .hero-title-logo { width: 60px; height: auto; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6)); }
 .hero-title-box h1 { font-size: 38px; font-weight: 800; text-shadow: 2px 2px 5px rgba(0,0,0,0.7); }
+
 .hero-content h2 { font-size: 26px; font-weight: 600; color: #FFD700; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(0,0,0,0.7); }
 .hero-description { font-size: 16px; line-height: 1.8; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
 
@@ -64,20 +67,25 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
   border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10; overflow: hidden;
 }
 .slide { display: none; animation: fadeEffect 1s; }
-.slide.aktif { display: flex; } 
+.slide.aktif { display: flex; } /* Tampilan Desktop: Kiri Gambar, Kanan Teks */
 @keyframes fadeEffect { from { opacity: 0.4; } to { opacity: 1; } }
+
 .slide-img { width: 50%; min-height: 300px; object-fit: cover; }
 .slide-content { width: 50%; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
 .slide-content h3 { font-size: 24px; color: #333; margin-bottom: 15px; }
 .slide-content p { font-size: 15px; color: #666; line-height: 1.6; }
+
 .slider-dots { text-align: center; padding: 20px 0; background-color: #fff; }
 .dot { cursor: pointer; height: 12px; width: 12px; margin: 0 5px; background-color: #ccc; border-radius: 50%; display: inline-block; transition: 0.3s; }
 .dot.aktif, .dot:hover { background-color: #E53935; }
+
 
 /* ==========================================================================
    4. TAMPILAN RESPONSIVE (HP) - Lebar maksimal 768px
    ========================================================================== */
 @media screen and (max-width: 768px) {
+  
+  /* Header & Menu HP */
   .top-header { flex-direction: column; padding: 15px 20px; position: relative; }
   .header-logo-area { margin-bottom: 15px; }
   .header-right-stuff { flex-direction: column; gap: 15px; width: 100%; }
@@ -90,14 +98,16 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
   .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.1); }
   .submenu { position: static; box-shadow: none; padding-left: 15px; }
 
+  /* Hero Section HP */
   .hero-title-box { flex-direction: column; gap: 5px; }
   .hero-title-logo { width: 50px; }
   .hero-title-box h1 { font-size: 28px; text-align: center; }
   .hero-content h2 { font-size: 18px; }
   .hero-description { font-size: 14px; }
 
+  /* Slider HP */
   .slider-wrapper { margin: -40px 20px 40px; }
-  .slide.aktif { flex-direction: column; } 
+  .slide.aktif { flex-direction: column; } /* Gambar Atas, Teks Bawah */
   .slide-img { width: 100%; height: 200px; min-height: auto; }
   .slide-content { width: 100%; padding: 25px; }
   .slide-content h3 { font-size: 20px; }
@@ -107,14 +117,12 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
    5. TAMPILAN RESPONSIVE (LAPTOP) - Lebar minimal 769px
    ========================================================================== */
 @media screen and (min-width: 769px) {
-  .menu-toggle { display: none; } 
+  .menu-toggle { display: none; } /* Sembunyikan icon hamburger di PC */
 }
 
 /* ==========================================================================
-   6. DESAIN KOTAK PUTIH HALAMAN DALAM & STRUKTUR KAS KEUANGAN
+   6. DESAIN KOTAK PUTIH HALAMAN DALAM
    ========================================================================== */
-.finance-page-wrapper { padding-top: 140px; padding-bottom: 60px; }
-
 .content-box {
   position: relative; z-index: 2; background-color: #ffffff;
   width: 90%; max-width: 800px; padding: 40px 50px; border-radius: 12px;
