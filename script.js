@@ -104,8 +104,8 @@ function renderTabel() {
             <td>${i.tanggal}</td>
             <td>${i.keterangan}</td>
             <td style="font-weight:bold;">
-                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-up"></i> Pemasukan</span>' 
-                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-down"></i> Pengeluaran</span>'}
+                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' 
+                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
             </td>
             <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
         </tr>
@@ -118,11 +118,11 @@ function renderTabel() {
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
 
         if (halamanSaatIni === 1) {
-            // Halaman 1 (Data Terbaru): Tombol ke data lebih lama di KANAN
-            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya (Data Lama) <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            // Halaman 1: Tombol ke data lebih lama di KANAN
+            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
-            // Halaman Terakhir (Data Lama): Tombol ke data lebih baru di KIRI
-            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya (Data Baru)</button></div>`;
+            // Halaman Terakhir: Tombol ke data lebih baru di KIRI
+            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
         } else {
             // Halaman Tengah: Keduanya
             tombolNav = `<div style="display:flex; justify-content:space-between;">
