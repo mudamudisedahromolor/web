@@ -76,6 +76,22 @@ function hitungTotalKeseluruhan() {
     document.getElementById('total-keluar').innerText = formatRupiah(k);
 }
 
+// 1. FUNGSI TOTAL FIX (TIDAK BERUBAH)
+function hitungTotalKeseluruhan() {
+    let m = 0, k = 0;
+    dataKeuanganGlobal.forEach(i => {
+        let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
+        i.tipe === 'masuk' ? m += n : k += n;
+    });
+    // Mengupdate card atas dengan TOTAL KESELURUHAN (Fix)
+    document.getElementById('total-masuk').innerText = formatRupiah(m);
+    document.getElementById('total-keluar').innerText = formatRupiah(k);
+    
+    // Angka ini sekarang jadi SALDO TOTAL KESELURUHAN (Fix)
+    document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
+}
+
+// 2. FUNGSI FILTER (TIDAK MENGUBAH TOTAL DI ATAS)
 window.terapkanFilter = function() {
     const thn = document.getElementById('filter-tahun').value;
     const bln = document.getElementById('filter-bulan').value;
@@ -89,13 +105,9 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
-    let m = 0, k = 0;
-    dataTersaringGlobal.forEach(i => {
-        let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
-        i.tipe === 'masuk' ? m += n : k += n;
-    });
-    document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
-
+    // PENTING: Kita hapus perhitungan saldo dari sini 
+    // agar angka di atas (saldo-akhir) tidak berubah-ubah saat difilter.
+    
     halamanSaatIni = 1;
     renderTabel();
 }
