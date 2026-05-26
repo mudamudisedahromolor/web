@@ -71,18 +71,24 @@ function isiDropdown(id, dataArray) {
 window.terapkanFilter = function() {
     const thn = document.getElementById('filter-tahun').value;
     const bln = document.getElementById('filter-bulan').value;
+    // --- BARIS BARU UNTUK KATEGORI ---
+    const kat = document.getElementById('filter-kategori').value; 
     const cari = document.getElementById('input-cari').value.toLowerCase();
 
     dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
-        return (thn === "Semua" || item.tahun === thn) && (bln === "Semua" || item.bulan === bln) && 
-               (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
+        const cocokTahun = (thn === "Semua" || item.tahun === thn);
+        const cocokBulan = (bln === "Semua" || item.bulan === bln);
+        // --- LOGIKA FILTER KATEGORI ---
+        const cocokKategori = (kat === "Semua" || item.tipe === kat); 
+        const cocokKetikan = (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
+        
+        return cocokTahun && cocokBulan && cocokKategori && cocokKetikan;
     });
 
     halamanSaatIni = 1;
     hitungSaldo(dataTersaringGlobal);
     renderTabel();
 }
-
 function hitungSaldo(data) {
     let m = 0, k = 0;
     data.forEach(i => {
