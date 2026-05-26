@@ -84,20 +84,23 @@
                 </div>
             </div>
 
-            <div class="filter-container">
-                <select id="filter-kategori" onchange="terapkanFilter()">
-                    <option value="Semua">Semua Kategori</option>
-                    <option value="masuk">Pemasukan</option>
-                    <option value="keluar">Pengeluaran</option>
-                </select>
-                <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
-                    <option value="Semua">Semua Tahun</option>
-                </select>
-                <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
-                    <option value="Semua">Semua Bulan</option>
-                </select>
-                <input type="text" id="input-cari" class="filter-box" style="width: 200px;" placeholder="Cari transaksi..." onkeyup="terapkanFilter()">
-            </div>
+           <div class="filter-container">
+    <select id="filter-kategori" class="filter-box" onchange="terapkanFilter()">
+        <option value="Semua">Semua Kategori</option>
+        <option value="masuk">Pemasukan</option>
+        <option value="keluar">Pengeluaran</option>
+    </select>
+    
+    <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
+        <option value="Semua">Semua Tahun</option>
+    </select>
+    
+    <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
+        <option value="Semua">Semua Bulan</option>
+    </select>
+    
+    <input type="text" id="input-cari" class="filter-box" style="width: 200px;" placeholder="Cari transaksi..." onkeyup="terapkanFilter()">
+</div>
 
             <div class="table-responsive">
                 <table class="finance-table">
