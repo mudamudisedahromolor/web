@@ -1,12 +1,18 @@
 /* ==========================================================================
-   SISTEM KEUANGAN MUDA-MUDI (FIXED COLUMN INDEX)
+   LOGIKA KEUANGAN: PAGINATION (10 BARIS) + DESAIN MERAH PROFESIONAL
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            document.querySelector('.main-navbar').classList.toggle('aktif');
+        });
+    }
     loadKeuanganDariDrive();
 });
 
-const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=2096971781&single=true&output=tsv";
+const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?output=tsv";
 
 let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
@@ -19,36 +25,31 @@ async function loadKeuanganDariDrive() {
     if (!tbody) return;
 
     try {
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 30px;'><i class='fa-solid fa-spinner fa-spin'></i> Memuat data...</td></tr>";
         const response = await fetch(linkTsvKeuangan + "&_cb=" + new Date().getTime());
         const teksData = await response.text();
         const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
         
+        const headers = baris[0].split("\t").map(h => h.trim().toLowerCase());
+        const cJenis = 1; const cTanggal = 2; const cKeterangan = 3; const cJumlah = 4;
+
         dataKeuanganGlobal = [];
-        // Mulai dari 1 untuk melewati header
         for (let i = 1; i < baris.length; i++) {
             const kolom = baris[i].split("\t").map(k => k.trim());
-            // Berdasarkan TSV: [0]Timestamp, [1]Jenis, [2]Tanggal, [3]Keterangan, [4]Jumlah
             if (kolom.length < 5) continue;
 
-            let statusTipe = kolom[1].toLowerCase().includes("masuk") ? "masuk" : "keluar";
-            let tglRaw = kolom[2]; // Format DD/MM/YYYY
-            let thn = tglRaw.split("/")[2] || "2026";
-            let bln = namaBulanIndo[parseInt(tglRaw.split("/")[1], 10) - 1] || "Semua";
+            let statusTipe = kolom[cJenis].toLowerCase().includes("masuk") ? "masuk" : "keluar";
+            let tgl = kolom[cTanggal].split("-");
+            let thn = tgl[0];
+            let bln = namaBulanIndo[parseInt(tgl[1], 10) - 1] || "Semua";
 
-            dataKeuanganGlobal.push({ 
-                tanggal: tglRaw, 
-                bulan: bln, 
-                tahun: thn, 
-                keterangan: kolom[3], 
-                tipe: statusTipe, 
-                jumlah: kolom[4] 
-            });
+            dataKeuanganGlobal.push({ tanggal: kolom[cTanggal], bulan: bln, tahun: thn, keterangan: kolom[cKeterangan], tipe: statusTipe, jumlah: kolom[cJumlah] });
         }
 
-        dataKeuanganGlobal.reverse(); 
+        dataKeuanganGlobal.reverse(); // Data terbaru di atas
         terapkanFilter();
     } catch (e) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Error Load Data.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal memuat data.</td></tr>";
     }
 }
 
@@ -94,12 +95,13 @@ function renderTabel() {
         </tr>
     `).join('');
 
+    // Tombol Navigasi Merah
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
         tbody.innerHTML += `<tr><td colspan="4" style="text-align:center; padding:10px;">
-            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Sebelumnya</button>
-            <span style="margin:0 15px; font-weight:bold;">${halamanSaatIni} / ${totalHal}</span>
-            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Selanjutnya</button>
+            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px;">Sebelumnya</button>
+            <span style="margin:0 15px;">${halamanSaatIni} / ${totalHal}</span>
+            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px;">Selanjutnya</button>
         </td></tr>`;
     }
 }
