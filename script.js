@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Tautan Google Sheets Resmi Milik Anda (Menggunakan ID Asli dari Screenshot Komitmen Anda)
 const baseLinkSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPIPHmeUoPwwNbheBuCOwPOT3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
+const baseLinkSheets = "https://docs.google.com/spreadsheets/d/1vQgjFSc953Gb2e53JTQwdKjnU4iCPIPHmeUoPwwNbheBuCOwPOT3Z5csHt2ZcyM3Kx1arstWuDpiB1v/export?format=tsv";
 
 let dataKeuanganGlobal = [];
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
