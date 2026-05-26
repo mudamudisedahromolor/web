@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEM KEUANGAN: FORCE DATA SYNC & PAGINATION
+   SISTEM KEUANGAN: PAGINATION + ICON + LABEL TEKS
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,20 +19,20 @@ async function loadKeuanganDariDrive() {
     if (!tbody) return;
 
     try {
-        // Menambahkan timestamp unik agar browser tidak mengambil cache lama
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
         const teksData = await response.text();
-        const baris = teksData.split("\n"); // Mengambil semua baris tanpa .trim() awal
+        const baris = teksData.split("\n");
         
         dataKeuanganGlobal = [];
-        
-        // Loop dari baris 1 sampai akhir
+        let daftarTahun = new Set();
+        let daftarBulan = new Set();
+
         for (let i = 1; i < baris.length; i++) {
             const barisBersih = baris[i].trim();
-            if (!barisBersih) continue; // Lewati baris kosong
+            if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            if (kolom.length < 5) continue; // Pastikan kolom lengkap
+            if (kolom.length < 5) continue;
 
             let statusTipe = kolom[1].toLowerCase().includes("masuk") ? "masuk" : "keluar";
             let tglRaw = kolom[2]; 
@@ -40,24 +40,35 @@ async function loadKeuanganDariDrive() {
             let thn = tglSplit[2] || "2026";
             let bln = namaBulanIndo[parseInt(tglSplit[1], 10) - 1] || "Semua";
 
+            daftarTahun.add(thn);
+            daftarBulan.add(bln);
+
             dataKeuanganGlobal.push({ 
-                tanggal: tglRaw, 
-                bulan: bln, 
-                tahun: thn, 
-                keterangan: kolom[3], 
-                tipe: statusTipe, 
-                jumlah: kolom[4] || "0" 
+                tanggal: tglRaw, bulan: bln, tahun: thn, keterangan: kolom[3], tipe: statusTipe, jumlah: kolom[4] || "0" 
             });
         }
+
+        isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
+        isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b)=>namaBulanIndo.indexOf(a)-namaBulanIndo.indexOf(b)));
 
         dataKeuanganGlobal.reverse();
         terapkanFilter();
     } catch (e) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Gagal memuat data. Periksa koneksi.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='color:red;'>Gagal memuat.</td></tr>";
     }
 }
 
-function terapkanFilter() {
+function isiDropdown(id, dataArray) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    dataArray.forEach(item => {
+        let opt = document.createElement("option");
+        opt.value = item; opt.text = item;
+        el.appendChild(opt);
+    });
+}
+
+window.terapkanFilter = function() {
     const thn = document.getElementById('filter-tahun').value;
     const bln = document.getElementById('filter-bulan').value;
     const cari = document.getElementById('input-cari').value.toLowerCase();
@@ -92,8 +103,9 @@ function renderTabel() {
         <tr>
             <td>${i.tanggal}</td>
             <td>${i.keterangan}</td>
-            <td style="color:${i.tipe==='masuk'?'#2e7d32':'#E53935'}; font-weight:bold;">
-                ${i.tipe==='masuk'?'<i class="fa-solid fa-arrow-down"></i>':'<i class="fa-solid fa-arrow-up"></i>'}
+            <td style="font-weight:bold;">
+                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-up"></i> Pemasukan</span>' 
+                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-down"></i> Pengeluaran</span>'}
             </td>
             <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
         </tr>
@@ -102,9 +114,9 @@ function renderTabel() {
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
         html += `<tr><td colspan="4" style="text-align:center; padding:15px; background:#f9f9f9;">
-            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:8px 16px; background:#E53935; color:white; border:none; border-radius:5px; cursor:pointer;">Sebelumnya</button>
+            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:5px 12px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Sebelumnya</button>
             <span style="margin:0 15px; font-weight:bold;">${halamanSaatIni} / ${totalHal}</span>
-            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:8px 16px; background:#E53935; color:white; border:none; border-radius:5px; cursor:pointer;">Selanjutnya</button>
+            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:5px 12px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Selanjutnya</button>
         </td></tr>`;
     }
     tbody.innerHTML = html;
