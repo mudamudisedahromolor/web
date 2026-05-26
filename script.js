@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LOGIKA OPERASIONAL KEUANGAN DINAMIS & REAL-TIME - MUDA MUDI SEDAHROMO LOR
+   LOGIKA OPERASIONAL KEUANGAN DINAMIS (ANTI GAGAL & AUTO-DETEKSI)
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-// Tautan Google Sheets Resmi dari Web Share Anda
+// Link Google Sheets dari Web Share Anda (Biarkan Utuh)
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=2096971781&single=true&output=tsv";
 
 let dataKeuanganGlobal = [];
@@ -23,10 +23,9 @@ async function loadKeuanganDariDrive() {
     if (!tbody) return;
 
     try {
-        // Tampilkan status loading awal
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 30px; color: #1565c0;'><i class='fa-solid fa-spinner fa-spin'></i> Menghubungkan ke Database Real-time...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 30px; color: #1565c0;'><i class='fa-solid fa-spinner fa-spin'></i> Sinkronisasi dengan Google Sheets...</td></tr>";
 
-        // Bypass cache browser agar data selalu paling baru (Real-time)
+        // Bypass cache super kuat
         const realTimeLink = linkTsvKeuangan + "&_cb=" + new Date().getTime();
         const response = await fetch(realTimeLink);
         
@@ -34,80 +33,95 @@ async function loadKeuanganDariDrive() {
         
         const teksData = await response.text();
 
-        // DETEKSI ERROR: Jika Google malah mengirim halaman web login/error (HTML) bukan tabel mentah
         if (teksData.trim().startsWith("<") || teksData.toLowerCase().includes("<!doctype html>")) {
-            throw new Error("Google Sheets mengembalikan halaman error/login HTML, bukan data tabel. Mohon pastikan setelan 'Publish to Web' diatur ke 'Tab-separated values (.tsv)' dan bukan 'Halaman Web'.");
+            throw new Error("Format salah: Google mengirim halaman HTML. Pastikan Anda sudah mempublikasikan sebagai TSV/CSV.");
         }
 
-        const baris = teksData.split("\n").map(b => b.trim());
+        // Memecah baris data dan membuang baris kosong
+        const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
         
-        if (baris.length < 2 || !teksData.includes("\t")) {
-            throw new Error("Koneksi sukses, tetapi tidak ada baris transaksi yang ditemukan di spreadsheet Anda.");
+        if (baris.length < 2) {
+            throw new Error("Spreadsheet terhubung, tapi tidak ada data transaksi (kosong).");
         }
 
-        // Kunci Urutan Kolom Pasti Berdasarkan Form Anda (Anti Meleset):
-        // Index 0 = Timestamp | Index 1 = Jenis | Index 2 = Tanggal | Index 3 = Keterangan | Index 4 = Jumlah
-        const colJenis = 1;
-        const colTanggal = 2;
-        const colKeterangan = 3;
-        const colJumlah = 4;
+        // --- 1. FITUR AUTO-DETEKSI PEMISAH KARAKTER DARI GOOGLE ---
+        let delimiter = "\t"; // Default Tab
+        if (!baris[0].includes("\t") && baris[0].includes(",")) delimiter = ",";
+        else if (!baris[0].includes("\t") && baris[0].includes(";")) delimiter = ";";
+
+        // --- 2. FITUR AUTO-PENCARIAN NAMA KOLOM ---
+        const headers = baris[0].split(delimiter).map(h => h.trim().toLowerCase());
+        
+        let cJenis = headers.findIndex(h => h.includes("salah satu") || h.includes("jenis") || h.includes("tipe"));
+        let cTanggal = headers.findIndex(h => h.includes("tanggal") || h.includes("waktu"));
+        let cKeterangan = headers.findIndex(h => h.includes("keterangan") || h.includes("deskripsi"));
+        let cJumlah = headers.findIndex(h => h.includes("jumlah") || h.includes("nominal") || h.includes("uang"));
+
+        // Jika judul kolom diganti dan tidak ketemu, gunakan urutan default foto spreadsheet
+        if (cJenis === -1) cJenis = 1;
+        if (cTanggal === -1) cTanggal = 2;
+        if (cKeterangan === -1) cKeterangan = 3;
+        if (cJumlah === -1) cJumlah = 4;
 
         dataKeuanganGlobal = [];
         let daftarTahun = new Set();
         let daftarBulan = new Set();
 
         for (let i = 1; i < baris.length; i++) {
-            if (baris[i] === "") continue;
+            const kolom = baris[i].split(delimiter).map(k => k.trim());
             
-            const kolom = baris[i].split("\t").map(k => k.trim());
-            
-            // Validasi Pasti: Pastikan baris data memiliki minimal 5 kolom utuh
-            if (kolom.length >= 5) {
-                let teksTanggal = kolom[colTanggal] || "";     
-                let keterangan = kolom[colKeterangan] || "-";    
-                let jenisTransaksi = kolom[colJenis] ? kolom[colJenis].toLowerCase() : ""; 
-                let jumlahUang = kolom[colJumlah] || "0";     
+            // Hapus syarat panjang kolom. Ambil data secara paksa apa adanya!
+            let teksTanggal = kolom[cTanggal] || "";     
+            let keterangan = kolom[cKeterangan] || "-";    
+            let jenisTransaksi = (kolom[cJenis] || "").toLowerCase(); 
+            let jumlahUang = kolom[cJumlah] || "0";     
 
-                let statusTipe = "keluar"; 
-                if (jenisTransaksi.includes("masuk") || jenisTransaksi.includes("pemasukkan")) {
-                    statusTipe = "masuk";
-                } else if (jenisTransaksi.includes("keluar") || jenisTransaksi.includes("pengeluaran")) {
-                    statusTipe = "keluar";
-                }
+            // Lewati baris yang benar-benar tidak ada tanggal dan deskripsinya
+            if (!teksTanggal && keterangan === "-") continue;
 
-                let teksBulan = "Semua";
-                let teksTahun = "Semua";
-
-                let pemisah = teksTanggal.includes("-") ? "-" : "/";
-                if (teksTanggal.includes(pemisah)) {
-                    const partTanggal = teksTanggal.split(pemisah);
-                    if (pemisah === "-") {
-                        let tahunExtracted = partTanggal[0];
-                        let indeksBulan = parseInt(partTanggal[1], 10) - 1;
-                        if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
-                        if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
-                    } else {
-                        let indeksBulan = parseInt(partTanggal[1], 10) - 1;
-                        let tahunExtracted = partTanggal[2].split(" ")[0];
-                        if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
-                        if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
-                    }
-                    if (teksBulan !== "Semua") daftarBulan.add(teksBulan);
-                    if (teksTahun !== "Semua") daftarTahun.add(teksTahun);
-                }
-
-                dataKeuanganGlobal.push({
-                    tanggal: teksTanggal,  
-                    bulan: teksBulan,
-                    tahun: teksTahun,
-                    keterangan: keterangan,
-                    tipe: statusTipe, 
-                    jumlah: jumlahUang
-                });
+            let statusTipe = "keluar"; 
+            if (jenisTransaksi.includes("masuk") || jenisTransaksi.includes("pemasukkan")) {
+                statusTipe = "masuk";
+            } else if (jenisTransaksi.includes("keluar") || jenisTransaksi.includes("pengeluaran")) {
+                statusTipe = "keluar";
             }
+
+            let teksBulan = "Semua";
+            let teksTahun = "Semua";
+
+            let pemisahTanggal = teksTanggal.includes("-") ? "-" : (teksTanggal.includes("/") ? "/" : "");
+            if (pemisahTanggal !== "") {
+                const partTanggal = teksTanggal.split(pemisahTanggal);
+                if (pemisahTanggal === "-") {
+                    let tahunExtracted = partTanggal[0];
+                    let indeksBulan = parseInt(partTanggal[1], 10) - 1;
+                    if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
+                    if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
+                } else {
+                    let indeksBulan = parseInt(partTanggal[1], 10) - 1;
+                    let tahunExtracted = partTanggal[2].split(" ")[0];
+                    if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
+                    if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
+                }
+                if (teksBulan !== "Semua") daftarBulan.add(teksBulan);
+                if (teksTahun !== "Semua") daftarTahun.add(teksTahun);
+            }
+
+            dataKeuanganGlobal.push({
+                tanggal: teksTanggal,  
+                bulan: teksBulan,
+                tahun: teksTahun,
+                keterangan: keterangan,
+                tipe: statusTipe, 
+                jumlah: jumlahUang
+            });
         }
 
-        // Inject data tahun & bulan ke dropdown filter secara otomatis
+        // --- 3. SISTEM INTELIJEN: DETEKSI AKAR MASALAH JIKA MASIH KOSONG ---
+        if (dataKeuanganGlobal.length === 0) {
+            throw new Error(`Koneksi Sukses, tetapi data Anda tidak terbaca oleh script.<br><br><b>INFO DIAGNOSA UNTUK DEVELOPER:</b><br>Pemisah terdeteksi: <b>[ ${delimiter === "\t" ? "TAB" : delimiter} ]</b><br>Cuplikan Baris 1: <i style="color:#555;">${baris[1]}</i>`);
+        }
+
         if (document.getElementById('filter-tahun') && document.getElementById('filter-bulan')) {
             isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
             const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
@@ -119,9 +133,9 @@ async function loadKeuanganDariDrive() {
     } catch (error) {
         console.error("Detail Error:", error);
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan='4' style='text-align: center; padding: 30px; color: #E53935; font-weight: bold;'>
-                <i class='fa-solid fa-triangle-exclamation' style='font-size: 26px; margin-bottom: 10px; display: block;'></i> 
-                Error Koneksi: ${error.message}
+            tbody.innerHTML = `<tr><td colspan='4' style='text-align: center; padding: 30px; color: #E53935; font-weight: normal; line-height:1.6;'>
+                <i class='fa-solid fa-triangle-exclamation' style='font-size: 24px; margin-bottom: 10px; display: block;'></i> 
+                ${error.message}
             </td></tr>`;
         }
     }
@@ -183,7 +197,7 @@ function renderTabelKeuangan(data) {
     if (!tbody) return; 
 
     if(data.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Tidak ada data transaksi kas yang cocok dengan filter.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:30px; color: #666;'>Tidak ada data transaksi kas yang cocok dengan filter tersebut.</td></tr>";
         return;
     }
 
