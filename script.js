@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEM KEUANGAN FINAL - TOTAL FIX & FILTER DINAMIS
+   SISTEM KEUANGAN FINAL - TOTAL FIX (ID HTML: total-keluar)
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -71,9 +71,9 @@ function hitungTotalKeseluruhan() {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
-    // Pastikan ID ini sesuai dengan yang ada di HTML Anda
+    // Menggunakan ID HTML: 'total-masuk' dan 'total-keluar'
     document.getElementById('total-masuk').innerText = formatRupiah(m);
-    document.getElementById('total-pengeluaran').innerText = formatRupiah(k);
+    document.getElementById('total-keluar').innerText = formatRupiah(k);
 }
 
 window.terapkanFilter = function() {
@@ -118,20 +118,15 @@ function renderTabel() {
     `).join('');
 
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
-    
     if (totalHal > 1) {
         let tombolNav = "";
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
-
         if (halamanSaatIni === 1) {
             tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
             tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
         } else {
-            tombolNav = `<div style="display:flex; justify-content:space-between;">
-                            <button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button>
-                            <button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button>
-                         </div>`;
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
         html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
