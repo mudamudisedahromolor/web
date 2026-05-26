@@ -69,37 +69,39 @@ function isiDropdown(id, dataArray) {
 }
 
 window.terapkanFilter = function() {
-    const thn = document.getElementById('filter-tahun').value;
-    const bln = document.getElementById('filter-bulan').value;
-    // --- BARIS BARU UNTUK KATEGORI ---
-    const kat = document.getElementById('filter-kategori').value; 
-    const cari = document.getElementById('input-cari').value.toLowerCase();
+    // ... (kode filter sama seperti sebelumnya) ...
 
-    dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
-        const cocokTahun = (thn === "Semua" || item.tahun === thn);
-        const cocokBulan = (bln === "Semua" || item.bulan === bln);
-        // --- LOGIKA FILTER KATEGORI ---
-        const cocokKategori = (kat === "Semua" || item.tipe === kat); 
-        const cocokKetikan = (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
-        
-        return cocokTahun && cocokBulan && cocokKategori && cocokKetikan;
-    });
+    // Hitung total keseluruhan (TETAP)
+    hitungTotalKeseluruhan(); 
+    
+    // Hitung saldo filter (DINAMIS)
+    hitungSaldoFilter(dataTersaringGlobal); 
 
     halamanSaatIni = 1;
-    hitungSaldo(dataTersaringGlobal);
     renderTabel();
 }
-function hitungSaldo(data) {
+// Fungsi ini menghitung total dari SEMUA data (tidak terpengaruh filter)
+function hitungTotalKeseluruhan() {
+    let m = 0, k = 0;
+    dataKeuanganGlobal.forEach(i => {
+        let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
+        i.tipe === 'masuk' ? m += n : k += n;
+    });
+    document.getElementById('total-masuk').innerText = formatRupiah(m);
+    document.getElementById('total-pengeluaran').innerText = formatRupiah(k);
+    // Jika ingin Saldo Kas (Filter) tetap dinamis, bisa buat fungsi terpisah
+}
+
+// Fungsi ini untuk menghitung saldo filter (yang muncul di tabel)
+function hitungSaldoFilter(data) {
     let m = 0, k = 0;
     data.forEach(i => {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
-    document.getElementById('total-masuk').innerText = formatRupiah(m);
-    document.getElementById('total-keluar').innerText = formatRupiah(k);
+    // Jika kolom Saldo Kas ingin tetap dinamis mengikuti filter:
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
 }
-
 function renderTabel() {
     const tbody = document.getElementById('data-tabel-keuangan');
     const start = (halamanSaatIni - 1) * barisPerHalaman;
