@@ -1,12 +1,12 @@
 /* ==========================================================================
-   SISTEM KEUANGAN: PAGINATION + ICON + LABEL TEKS
+   SISTEM KEUANGAN FINAL - TOTAL FIX & FILTER DINAMIS
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=988078683&single=true&output=tsv";
+const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=2096971781&single=true&output=tsv";
 
 let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
@@ -15,9 +15,6 @@ const barisPerHalaman = 10;
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 async function loadKeuanganDariDrive() {
-    const tbody = document.getElementById('data-tabel-keuangan');
-    if (!tbody) return;
-
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
         const teksData = await response.text();
@@ -51,10 +48,10 @@ async function loadKeuanganDariDrive() {
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
         isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b)=>namaBulanIndo.indexOf(a)-namaBulanIndo.indexOf(b)));
 
-        dataKeuanganGlobal.reverse();
+        hitungTotalKeseluruhan();
         terapkanFilter();
     } catch (e) {
-        tbody.innerHTML = "<tr><td colspan='4' style='color:red;'>Gagal memuat.</td></tr>";
+        console.error("Gagal memuat data", e);
     }
 }
 
@@ -68,40 +65,41 @@ function isiDropdown(id, dataArray) {
     });
 }
 
-window.terapkanFilter = function() {
-    // ... (kode filter sama seperti sebelumnya) ...
-
-    // Hitung total keseluruhan (TETAP)
-    hitungTotalKeseluruhan(); 
-    
-    // Hitung saldo filter (DINAMIS)
-    hitungSaldoFilter(dataTersaringGlobal); 
-
-    halamanSaatIni = 1;
-    renderTabel();
-}
-// Fungsi ini menghitung total dari SEMUA data (tidak terpengaruh filter)
 function hitungTotalKeseluruhan() {
     let m = 0, k = 0;
     dataKeuanganGlobal.forEach(i => {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
+    // Pastikan ID ini sesuai dengan yang ada di HTML Anda
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-pengeluaran').innerText = formatRupiah(k);
-    // Jika ingin Saldo Kas (Filter) tetap dinamis, bisa buat fungsi terpisah
 }
 
-// Fungsi ini untuk menghitung saldo filter (yang muncul di tabel)
-function hitungSaldoFilter(data) {
+window.terapkanFilter = function() {
+    const thn = document.getElementById('filter-tahun').value;
+    const bln = document.getElementById('filter-bulan').value;
+    const kat = document.getElementById('filter-kategori').value;
+    const cari = document.getElementById('input-cari').value.toLowerCase();
+
+    dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
+        return (thn === "Semua" || item.tahun === thn) && 
+               (bln === "Semua" || item.bulan === bln) && 
+               (kat === "Semua" || item.tipe === kat) && 
+               (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
+    });
+
     let m = 0, k = 0;
-    data.forEach(i => {
+    dataTersaringGlobal.forEach(i => {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
-    // Jika kolom Saldo Kas ingin tetap dinamis mengikuti filter:
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
+
+    halamanSaatIni = 1;
+    renderTabel();
 }
+
 function renderTabel() {
     const tbody = document.getElementById('data-tabel-keuangan');
     const start = (halamanSaatIni - 1) * barisPerHalaman;
@@ -126,19 +124,15 @@ function renderTabel() {
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
 
         if (halamanSaatIni === 1) {
-            // Halaman 1: Tombol ke data lebih lama di KANAN
             tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
-            // Halaman Terakhir: Tombol ke data lebih baru di KIRI
             tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
         } else {
-            // Halaman Tengah: Keduanya
             tombolNav = `<div style="display:flex; justify-content:space-between;">
                             <button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button>
                             <button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button>
                          </div>`;
         }
-
         html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
     tbody.innerHTML = html;
