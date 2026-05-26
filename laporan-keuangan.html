@@ -116,68 +116,73 @@
         </div>
     </div>
 
-    <script>
-        // Fungsi pemicu tombol hamburger menu HP saat diklik
+        <script>
         document.getElementById('mobile-menu-btn').addEventListener('click', () => {
             document.querySelector('.main-navbar').classList.toggle('aktif');
         });
 
-        // Link basis data Google Sheets berformat TSV (Tab Separated Values) milik Anda
+        // Link basis data Google Sheets berformat TSV milik Anda
         const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
-        
-        // Penampung data array global agar bisa difilter berulang kali tanpa download ulang
         let dataKeuanganGlobal = [];
 
-        // Fungsi utama penarik database cloud dari Google Drive
         async function loadKeuanganDariDrive() {
             try {
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // Pecah teks per baris baru, hilangkan baris kosong pembawa bug
+                // Pecah teks per baris baru, hilangkan baris kosong
                 const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
                 let daftarBulan = new Set();
 
-                // Loop dimulai dari indeks i=1 (Baris ke-2), karena baris 1 adalah Header (Judul Kolom)
+                // Loop dimulai dari indeks i=1 (Baris ke-2), karena baris 1 adalah Header Judul Kolom
                 for(let i = 1; i < baris.length; i++) {
-                    const kolom = baris[i].split("\t"); // Pisahkan isi sel berdasarkan karakter tab (\t)
+                    const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // Struktur kolom array: 0=Tanggal, 1=Bulan, 2=Tahun, 3=Keterangan, 4=Kategori, 5=Jumlah
-                    if(kolom.length >= 6) {
+                    // Memastikan jumlah kolom mencukupi (minimal sampai kolom Jumlah / indeks ke-6)
+                    if(kolom.length >= 7) {
+                        let jenisMutasi = kolom[5].toLowerCase(); // Mengambil data kolom F (Pemasukkan / Pengeluaran)
+                        let statusTipe = "keluar"; // Default jika tidak cocok
+
+                        if (jenisMutasi === "pemasukkan" || jenisMutasi.includes("masuk")) {
+                            statusTipe = "masuk";
+                        } else if (jenisMutasi === "pengeluaran" || jenisMutasi.includes("keluar")) {
+                            statusTipe = "keluar";
+                        }
+
                         dataKeuanganGlobal.push({
-                            tanggal: kolom[0].trim(),
-                            bulan: kolom[1].trim(),
-                            tahun: kolom[2].trim(),
-                            keterangan: kolom[3].trim(),
-                            kategori: kolom[4].trim(), // .trim() memastikan spasi hantu hilang bersih
-                            jumlah: kolom[5].trim()
+                            tanggal: kolom[0] || "",
+                            bulan: kolom[1] || "",
+                            tahun: kolom[2] || "",
+                            keterangan: kolom[3] || "", 
+                            kategori: kolom[4] || "", // Isinya Kas, Pembelian, Donasi dll (Kolom E)
+                            tipe: statusTipe,        // Status internal 'masuk' atau 'keluar'
+                            jumlah: kolom[6] || "0"   // Mengambil data nominal uang di Kolom G
                         });
-                        if(kolom[2]) daftarTahun.add(kolom[2].trim()); 
-                        if(kolom[1]) daftarBulan.add(kolom[1].trim()); 
+
+                        if(kolom[2] && kolom[2].length === 4) daftarTahun.add(kolom[2]); 
+                        if(kolom[1] && kolom[1].length > 2) daftarBulan.add(kolom[1]); 
                     }
                 }
 
-                // Masukkan daftar tahun & bulan yang terdeteksi ke dalam elemen dropdown filter di web
                 isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
                 const urutanBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 const bulanTersedia = Array.from(daftarBulan).sort((a, b) => urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
                 isiDropdownFilter('filter-bulan', bulanTersedia);
 
-                // Jalankan render data awal ke layar komputer
                 terapkanFilter();
 
             } catch (error) {
-                // Notifikasi kegagalan jika internet mati atau setelan publikasi link sheets terputus
                 document.getElementById('data-tabel-keuangan').innerHTML = 
                     "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Database Google Drive.</td></tr>";
             }
         }
 
-        // Fungsi bantu untuk membuat tag <option> baru di dalam komponen select filter
         function isiDropdownFilter(idElemen, dataArray) {
             const elemen = document.getElementById(idElemen);
+            while (elemen.options.length > 1) { elemen.remove(1); }
+            
             dataArray.forEach(item => {
                 if(item) {
                     let opsi = document.createElement("option");
@@ -187,50 +192,45 @@
             });
         }
 
-        // Fungsi untuk menyaring baris data berdasarkan masukan filter waktu atau keyword pencarian
         function terapkanFilter() {
             const tahunDipilih = document.getElementById('filter-tahun').value;
             const bulanDipilih = document.getElementById('filter-bulan').value;
             const keywordCari = document.getElementById('input-cari').value.toLowerCase();
 
-            // Jalankan proses penyaringan array data global
             const dataTersaring = dataKeuanganGlobal.filter(item => {
                 const cocokTahun = (tahunDipilih === "Semua") || (item.tahun === tahunDipilih);
                 const cocokBulan = (bulanDipilih === "Semua") || (item.bulan === bulanDipilih);
-                const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || item.tanggal.toLowerCase().includes(keywordCari);
+                const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || 
+                                     item.kategori.toLowerCase().includes(keywordCari) || 
+                                     item.tanggal.toLowerCase().includes(keywordCari);
                 return cocokTahun && cocokBulan && cocokKetikan;
             });
 
-            // Hitung nilai nominal saldo baru dan render cetak baris tabelnya ke layar web
             hitungDanTampilkanUang(dataTersaring);
             renderTabelKeuangan(dataTersaring);
         }
 
-        // Fungsi kalkulator matematika kas utama halaman web
         function hitungDanTampilkanUang(data) {
             let totalMasuk = 0; 
             let totalKeluar = 0;
 
             data.forEach(item => {
-                // Bersihkan teks mata uang (misal: "Rp 150.000" menjadi angka murni 150000 agar bisa ditotal secara matematika)
+                // Konversi string nominal uang (misal "Rp 150.000") menjadi nomor integer biasa
                 let angkaBersih = parseInt(item.jumlah.replace(/[^0-9]/g, '')) || 0;
                 
-                // Cari kata kategori secara lowercase (aman dari typo huruf kapital)
-                let kat = item.kategori.toLowerCase();
-                if(kat.includes('masuk')) { 
-                    totalMasuk += angkaBersih; 
-                } else if(kat.includes('keluar')) { 
-                    totalKeluar += angkaBersih; 
+                if (item.tipe === "masuk") {
+                    totalMasuk += angkaBersih;
+                } else {
+                    totalKeluar += angkaBersih;
                 }
             });
 
-            // Cetak hasil penjumlahan matematika ke dalam komponen card box atas halaman web
+            // Perbarui teks nominal di 3 Box Widget Atas
             document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
             document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
             document.getElementById('saldo-akhir').innerText = formatRupiah(totalMasuk - totalKeluar);
         }
 
-        // Fungsi untuk menggambar baris <tr> <td> data kas ke dalam tabel HTML web Anda
         function renderTabelKeuangan(data) {
             const tbody = document.getElementById('data-tabel-keuangan');
             if(data.length === 0) {
@@ -240,36 +240,31 @@
 
             let html = "";
             data.forEach(item => {
-                // PERBAIKAN LOGIKA WARNA DAN ARAH PANAH (DIJAMIN AMAN & TIDAK TERBALIK):
-                let kat = item.kategori.toLowerCase();
-                let isMasuk = kat.includes('masuk');
+                let isMasuk = (item.tipe === "masuk");
                 
-                // Jika Pemasukan = Hijau (#2e7d32) & Panah Bawah (arrow-down)
-                // Jika Pengeluaran = Merah (#E53935) & Panah Atas (arrow-up)
+                // JIKA PEMASUKKAN = HIJAU PANAH BAWAH
+                // JIKA PENGELUARAN = MERAH PANAH ATAS
                 const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
                 const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i>' : '<i class="fa-solid fa-arrow-up"></i>';
                 
-                // Validasi format penulisan angka rupiah di tabel agar selalu rapi menggunakan titik pembagi
                 let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
 
                 html += `
                     <tr>
                         <td>${item.tanggal}</td>
-                        <td>${item.keterangan}</td>
-                        <td style="${warnaKategori}">${iconKategori} ${item.kategori}</td>
+                        <td>${item.keterangan} (${item.kategori})</td>
+                        <td style="${warnaKategori}">${iconKategori} ${isMasuk ? 'Pemasukkan' : 'Pengeluaran'}</td>
                         <td><strong>${angkaTampil}</strong></td>
                     </tr>
                 `;
             });
-            tbody.innerHTML = html; // Suntikkan string html terkumpul ke dalam dom tabel utama
+            tbody.innerHTML = html;
         }
 
-        // Fungsi pengubah format nomor angka integer biasa menjadi format Rupiah Indonesia (Contoh: 750000 -> Rp 750.000)
         function formatRupiah(angka) { 
             return 'Rp ' + angka.toLocaleString('id-ID'); 
         }
 
-        // Trigger perintah eksekusi penarikan basis data saat pertama kali file html terbuka oleh browser
         loadKeuanganDariDrive();
     </script>
 </body>
