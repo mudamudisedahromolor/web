@@ -216,3 +216,13 @@ body { background-color: #f4f4f4; }
     font-size: 13px;
     text-transform: uppercase;
 }
+
+.hierarki-row { display: flex; justify-content: center; margin-bottom: 20px; }
+.ketua-card { transform: scale(1.1); border: 2px solid #FFD700; } /* Ketua lebih menonjol */
+
+.hierarki-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 kolom untuk Sek/Ben */
+    gap: 15px;
+    margin-top: 20px;
+}
