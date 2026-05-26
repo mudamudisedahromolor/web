@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEM KEUANGAN: FORCE DATA SYNC & PAGINATION
+   SISTEM KEUANGAN MUDA-MUDI (FIXED COLUMN INDEX)
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,26 +19,21 @@ async function loadKeuanganDariDrive() {
     if (!tbody) return;
 
     try {
-        // Menambahkan timestamp unik agar browser tidak mengambil cache lama
-        const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
+        const response = await fetch(linkTsvKeuangan + "&_cb=" + new Date().getTime());
         const teksData = await response.text();
-        const baris = teksData.split("\n"); // Mengambil semua baris tanpa .trim() awal
+        const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
         
         dataKeuanganGlobal = [];
-        
-        // Loop dari baris 1 sampai akhir
+        // Mulai dari 1 untuk melewati header
         for (let i = 1; i < baris.length; i++) {
-            const barisBersih = baris[i].trim();
-            if (!barisBersih) continue; // Lewati baris kosong
-            
-            const kolom = barisBersih.split("\t");
-            if (kolom.length < 5) continue; // Pastikan kolom lengkap
+            const kolom = baris[i].split("\t").map(k => k.trim());
+            // Berdasarkan TSV: [0]Timestamp, [1]Jenis, [2]Tanggal, [3]Keterangan, [4]Jumlah
+            if (kolom.length < 5) continue;
 
             let statusTipe = kolom[1].toLowerCase().includes("masuk") ? "masuk" : "keluar";
-            let tglRaw = kolom[2]; 
-            let tglSplit = tglRaw.split("/");
-            let thn = tglSplit[2] || "2026";
-            let bln = namaBulanIndo[parseInt(tglSplit[1], 10) - 1] || "Semua";
+            let tglRaw = kolom[2]; // Format DD/MM/YYYY
+            let thn = tglRaw.split("/")[2] || "2026";
+            let bln = namaBulanIndo[parseInt(tglRaw.split("/")[1], 10) - 1] || "Semua";
 
             dataKeuanganGlobal.push({ 
                 tanggal: tglRaw, 
@@ -46,14 +41,14 @@ async function loadKeuanganDariDrive() {
                 tahun: thn, 
                 keterangan: kolom[3], 
                 tipe: statusTipe, 
-                jumlah: kolom[4] || "0" 
+                jumlah: kolom[4] 
             });
         }
 
-        dataKeuanganGlobal.reverse();
+        dataKeuanganGlobal.reverse(); 
         terapkanFilter();
     } catch (e) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Gagal memuat data. Periksa koneksi.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Error Load Data.</td></tr>";
     }
 }
 
@@ -88,7 +83,7 @@ function renderTabel() {
     const start = (halamanSaatIni - 1) * barisPerHalaman;
     const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
     
-    let html = pageData.map(i => `
+    tbody.innerHTML = pageData.map(i => `
         <tr>
             <td>${i.tanggal}</td>
             <td>${i.keterangan}</td>
@@ -101,13 +96,12 @@ function renderTabel() {
 
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
-        html += `<tr><td colspan="4" style="text-align:center; padding:15px; background:#f9f9f9;">
-            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:8px 16px; background:#E53935; color:white; border:none; border-radius:5px; cursor:pointer;">Sebelumnya</button>
+        tbody.innerHTML += `<tr><td colspan="4" style="text-align:center; padding:10px;">
+            <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Sebelumnya</button>
             <span style="margin:0 15px; font-weight:bold;">${halamanSaatIni} / ${totalHal}</span>
-            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:8px 16px; background:#E53935; color:white; border:none; border-radius:5px; cursor:pointer;">Selanjutnya</button>
+            <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Selanjutnya</button>
         </td></tr>`;
     }
-    tbody.innerHTML = html;
 }
 
 window.nav = (dir) => { halamanSaatIni += dir; renderTabel(); };
