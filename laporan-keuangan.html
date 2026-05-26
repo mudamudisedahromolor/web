@@ -160,7 +160,7 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // FIX UTAMA: Memotong baris secara aman dari karakter \r\n milik Google Sheets
+                // MENGGUNAKAN INDEKS INTERNAL AMAN AGAR TIDAK ERROR JIKA ADA STRING MAC/WINDOWS LINE BREAK
                 const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
@@ -170,10 +170,10 @@
                 for(let i = 1; i < baris.length; i++) {
                     const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // Memastikan kolom lengkap sampai indeks ke-6 (Kolom Jumlah Uang G)
+                    // Memastikan kolom lengkap sampai indeks ke-6 (Kolom G - Jumlah Nominal)
                     if(kolom.length >= 7) {
-                        let jenisTransaksi = kolom[1] || ""; 
-                        let statusTipe = "keluar"; // Pengaman dasar
+                        let jenisTransaksi = kolom[1] || ""; // Kolom B: Jenis Transaksi
+                        let statusTipe = "keluar"; // Default pengaman
 
                         // Penyetaraan string Dropdown Form Anda murni ("Pemasukan" / "Pengeluaran")
                         if (jenisTransaksi.toLowerCase().includes("masuk")) {
@@ -189,7 +189,7 @@
                             keterangan: kolom[5] || "", // Kolom F (Keterangan Singkat)
                             kategori: jenisTransaksi,   // Kolom B (Teks Dropdown Asli)
                             tipe: statusTipe, 
-                            jumlah: kolom[6] || "0"    // Kolom G (Jumlah Nominal)
+                            jumlah: kolom[6] || "0"    // MENGUNCI URUTAN BARU: Kolom G (Jumlah Nominal)
                         });
 
                         if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
