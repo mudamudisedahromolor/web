@@ -150,7 +150,7 @@
             document.querySelector('.main-navbar').classList.toggle('aktif');
         });
 
-        // Tautan database Google Sheets hasil Google Form Anda (format TSV)
+        // Tautan database TSV Google Sheets Anda
         const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTRQ-zDapFTl4UySfnTpWZDF4LmM-KXhNLEtxGXYsEjknUtzGbWyRg3tIFvlxvNzp0O0Tfk9KJdRl94/pub?output=tsv";
         
         let dataKeuanganGlobal = [];
@@ -160,61 +160,94 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // Perbaikan pemotongan baris: Dibersihkan ujung spasi hantunya secara menyeluruh
+                // Pemisahan baris aman terhadap spasi hantu di sekelilingnya
                 const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
+                if (baris.length <= 1) {
+                    tampilkanPesanError("Spreadsheet terdeteksi kosong.");
+                    return;
+                }
+
+                // STRATEGI SAKTI: Baca baris indeks 0 (Header) untuk memetakan indeks kolom secara otomatis
+                const headers = baris[0].split("\t").map(h => h.toLowerCase().trim());
+                
+                // Mencari posisi index kolom dinamis berdasarkan keyword nama teks headernya murni
+                const idxJenis = headers.findIndex(h => h.includes("jenis") || h.includes("transaksi"));
+                const idxTanggal = headers.findIndex(h => h.includes("tanggal"));
+                const idxBulan = headers.findIndex(h => h.includes("bulan"));
+                const idxTahun = headers.findIndex(h => h.includes("tahun"));
+                const idxKeterangan = headers.findIndex(h => h.includes("keterangan") || h.includes("singkat"));
+                const idxJumlah = headers.findIndex(h => h.includes("jumlah") || h.includes("nominal"));
+
+                // Jika kolom-kolom utama tidak terdeteksi sama sekali akibat format tsv hancur, pakai fallback index default Anda
+                const fbkJenis = idxJenis !== -1 ? idxJenis : 1;
+                const fbkTanggal = idxTanggal !== -1 ? idxTanggal : 2;
+                const fbkBulan = idxBulan !== -1 ? idxBulan : 3;
+                const fbkTahun = idxTahun !== -1 ? idxTahun : 4;
+                const fbkKeterangan = idxKeterangan !== -1 ? idxKeterangan : 5;
+                const fbkJumlah = idxJumlah !== -1 ? idxJumlah : 6;
+
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
                 let daftarBulan = new Set();
 
-                // LOOP MEMBACA FORMAT BARU GOOGLE FORM ANDA (7 KOLOM NYATA)
+                // Loop membaca data baris murni (Mulai indeks ke-1)
                 for(let i = 1; i < baris.length; i++) {
                     const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // PERBAIKAN TOLERANSI: Diubah ke >= 6 agar jika kolom jumlah di ujung ada spasi kosong tetap lolos pembacaan
-                    if(kolom.length >= 6) {
-                        let jenisTransaksi = kolom[1] || ""; // Kolom B: Jenis Transaksi
-                        let statusTipe = "keluar"; // Default pengaman
+                    // Kita pastikan baris memiliki data murni yang cukup panjang
+                    if(kolom.length > Math.max(fbkJeneris = fbkJenis, fbkTanggal, fbkKeterangan, fbkJumlah)) {
+                        let jenisTransaksi = kolom[fbkJenis] || ""; 
+                        let tglTransaksi = kolom[fbkTanggal] || "";
+                        let namaBulan = kolom[fbkBulan] || "";
+                        let namaTahun = kolom[fbkTahun] || "";
+                        let keterangan = kolom[fbkKeterangan] || "";
+                        let jumlahUang = kolom[fbkJumlah] || "0";
 
-                        // Penyetaraan string Dropdown Form Anda murni ("Pemasukan" / "Pengeluaran")
+                        let statusTipe = "keluar"; 
                         if (jenisTransaksi.toLowerCase().includes("masuk")) {
                             statusTipe = "masuk";
-                        } else if (jenisTransaksi.toLowerCase().includes("keluar")) {
-                            statusTipe = "keluar";
+                        }
+
+                        if (namaBulan) {
+                            namaBulan = namaBulan.charAt(0).toUpperCase() + namaBulan.slice(1).toLowerCase();
                         }
 
                         dataKeuanganGlobal.push({
-                            tanggal: kolom[2] || "-",    // Kolom C (Tanggal)
-                            bulan: kolom[3] || "-",      // Kolom D (Bulan)
-                            tahun: kolom[4] || "-",      // Kolom E (Tahun)
-                            keterangan: kolom[5] || "-", // Kolom F (Keterangan Singkat)
-                            kategori: jenisTransaksi || "Umum", // Kolom B (Teks Dropdown Asli)
+                            tanggal: tglTransaksi || "-",
+                            bulan: namaBulan || "-",
+                            tahun: namaTahun || "-",
+                            keterangan: keterangan || "-",
+                            kategori: jenisTransaksi || "Umum",
                             tipe: statusTipe, 
-                            jumlah: kolom[6] || "0"    // Kolom G (Jumlah Nominal)
+                            jumlah: jumlahUang
                         });
 
-                        if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
-                        if(kolom[3] && kolom[3].length > 2) daftarBulan.add(kolom[3]); 
+                        if(namaTahun && namaTahun.length === 4) daftarTahun.add(namaTahun);
+                        if(namaBulan && namaBulan.length > 2) daftarBulan.add(namaBulan);
                     }
                 }
 
-                // Inject ke Dropdown Filter secara dinamis
+                // Pasang Dropdown Filter secara dinamis
                 isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
                 const urutanBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 const bulanTersedia = Array.from(daftarBulan).sort((a, b) => urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
                 isiDropdownFilter('filter-bulan', bulanTersedia);
 
-                // Jalankan filter perdana
                 terapkanFilter();
 
             } catch (error) {
-                document.getElementById('data-tabel-keuangan').innerHTML = 
-                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive atau format data salah.</td></tr>";
+                tampilkanPesanError("Gagal memproses data database Google Drive.");
             }
+        }
+
+        function tampilkanPesanError(pesan) {
+            document.getElementById('data-tabel-keuangan').innerHTML = 
+                `<tr><td colspan='4' style='text-align: center; color: #E53935; font-weight: bold; padding: 20px;'>${pesan}</td></tr>`;
         }
 
         function isiDropdownFilter(idElemen, dataArray) {
             const elemen = document.getElementById(idElemen);
-            while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
+            while (elemen.options.length > 1) { elemen.remove(1); }
             
             dataArray.forEach(item => {
                 if(item) {
