@@ -114,22 +114,20 @@ function renderTabel() {
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     
     if (totalHal > 1) {
-        // Logika Tombol Cerdas:
-        // Halaman 1: Cuma muncul tombol "Selanjutnya" di KANAN
-        // Halaman Terakhir: Cuma muncul tombol "Sebelumnya" di KIRI
-        // Halaman Tengah: Muncul keduanya
-        
         let tombolNav = "";
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
 
         if (halamanSaatIni === 1) {
-            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            // Halaman 1 (Data Terbaru): Tombol ke data lebih lama di KANAN
+            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya (Data Lama) <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
-            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button></div>`;
+            // Halaman Terakhir (Data Lama): Tombol ke data lebih baru di KIRI
+            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya (Data Baru)</button></div>`;
         } else {
+            // Halaman Tengah: Keduanya
             tombolNav = `<div style="display:flex; justify-content:space-between;">
-                            <button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
-                            <button onclick="nav(1)" style="${styleBtn}">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button>
+                            <button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button>
+                            <button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button>
                          </div>`;
         }
 
