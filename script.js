@@ -1,12 +1,11 @@
 /* ==========================================================================
-   SISTEM KEUANGAN MUDA-MUDI: PAGINATION & RESPONSIVE UI
+   SISTEM KEUANGAN MUDA-MUDI (FIXED COLUMN INDEX)
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-// Link Google Sheets Anda
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=2096971781&single=true&output=tsv";
 
 let dataKeuanganGlobal = [];
@@ -20,28 +19,36 @@ async function loadKeuanganDariDrive() {
     if (!tbody) return;
 
     try {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; padding: 20px;'>Memuat data...</td></tr>";
         const response = await fetch(linkTsvKeuangan + "&_cb=" + new Date().getTime());
         const teksData = await response.text();
         const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
         
         dataKeuanganGlobal = [];
+        // Mulai dari 1 untuk melewati header
         for (let i = 1; i < baris.length; i++) {
             const kolom = baris[i].split("\t").map(k => k.trim());
-            if (kolom.length < 4) continue;
+            // Berdasarkan TSV: [0]Timestamp, [1]Jenis, [2]Tanggal, [3]Keterangan, [4]Jumlah
+            if (kolom.length < 5) continue;
 
             let statusTipe = kolom[1].toLowerCase().includes("masuk") ? "masuk" : "keluar";
-            let tglPart = kolom[2].split("-");
-            let thn = tglPart[0];
-            let bln = namaBulanIndo[parseInt(tglPart[1], 10) - 1] || "Semua";
+            let tglRaw = kolom[2]; // Format DD/MM/YYYY
+            let thn = tglRaw.split("/")[2] || "2026";
+            let bln = namaBulanIndo[parseInt(tglRaw.split("/")[1], 10) - 1] || "Semua";
 
-            dataKeuanganGlobal.push({ tanggal: kolom[2], bulan: bln, tahun: thn, keterangan: kolom[3], tipe: statusTipe, jumlah: kolom[4] || "0" });
+            dataKeuanganGlobal.push({ 
+                tanggal: tglRaw, 
+                bulan: bln, 
+                tahun: thn, 
+                keterangan: kolom[3], 
+                tipe: statusTipe, 
+                jumlah: kolom[4] 
+            });
         }
 
         dataKeuanganGlobal.reverse(); 
         terapkanFilter();
     } catch (e) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Gagal memuat data.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align: center; color: red;'>Error Load Data.</td></tr>";
     }
 }
 
@@ -89,7 +96,7 @@ function renderTabel() {
 
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
-        tbody.innerHTML += `<tr><td colspan="4" style="text-align:center; padding:15px; border-top:1px solid #ddd;">
+        tbody.innerHTML += `<tr><td colspan="4" style="text-align:center; padding:10px;">
             <button ${halamanSaatIni===1?'disabled':''} onclick="nav(-1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Sebelumnya</button>
             <span style="margin:0 15px; font-weight:bold;">${halamanSaatIni} / ${totalHal}</span>
             <button ${halamanSaatIni===totalHal?'disabled':''} onclick="nav(1)" style="padding:5px 15px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;">Selanjutnya</button>
