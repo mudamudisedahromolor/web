@@ -8,6 +8,34 @@
     <link rel="icon" href="images/mms.png" type="image/png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* TAMBAHAN KHUSUS UNTUK HALAMAN KEUANGAN ASLI MAS ARDYAN */
+        body { background-color: #f4f4f4; }
+        .finance-page-wrapper { padding-top: 140px; padding-bottom: 60px; }
+        
+        /* Kotak Ringkasan Saldo */
+        .summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .card-box { flex: 1; min-width: 200px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card-box h4 { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: normal; }
+        .card-box .amount { font-size: 22px; font-weight: 800; }
+        .card-box.masuk .amount { color: #2e7d32; }
+        .card-box.keluar .amount { color: #E53935; }
+        .card-box.saldo .amount { color: #1565c0; }
+
+        /* Filter & Pencarian */
+        .filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
+        .filter-box:focus { border-color: #E53935; }
+
+        /* Tabel Keuangan */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        .finance-table th { background-color: #E53935; color: white; padding: 12px 15px; white-space: nowrap; }
+        .finance-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        .finance-table tr:nth-child(even) { background-color: #fafafa; }
+        .finance-table tr:hover { background-color: #f1f1f1; }
+    </style>
 </head>
 <body> 
     
@@ -123,7 +151,7 @@
         });
 
         // Tautan database Google Sheets hasil Google Form Anda (format TSV)
-        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPlPHmeUoPwwNbheBuCOwP0T3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
+        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
         
         let dataKeuanganGlobal = [];
 
@@ -132,41 +160,35 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // Memisahkan baris data secara aman dari character \r bawaan Windows/Mac
-                const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
+                const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
                 let daftarBulan = new Set();
 
-                // LOOP MEMBACA 7 KOLOM SPREADSHEET BARU ANDA (A-G)
+                // LOOP MEMBACA FORMAT BARU GOOGLE FORM ANDA
                 for(let i = 1; i < baris.length; i++) {
                     const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // Validasi dikunci ke >= 7 agar pas membaca total kolom A-G Anda
-                    if(kolom.length >= 7) {
-                        let jenisTransaksi = kolom[1] || ""; 
+                    // Memastikan kolom lengkap sampai indeks ke-7 (Kolom Jumlah Uang)
+                    if(kolom.length >= 8) {
+                        let jenisTransaksi = kolom[1].toLowerCase(); 
                         let statusTipe = "keluar"; // Default pengaman
 
-                        // Deteksi kata kunci Pemasukan / Pengeluaran secara akurat
-                        if (jenisTransaksi.toLowerCase().includes("masuk") || jenisTransaksi.toLowerCase().includes("pemasukan")) {
+                        // Deteksi keyword input Form: Pemasukkan / Pengeluaran
+                        if (jenisTransaksi === "pemasukkan" || jenisTransaksi.includes("masuk")) {
                             statusTipe = "masuk";
-                        } else if (jenisTransaksi.toLowerCase().includes("keluar") || jenisTransaksi.toLowerCase().includes("pengeluaran")) {
+                        } else if (jenisTransaksi === "pengeluaran" || jenisTransaksi.includes("keluar")) {
                             statusTipe = "keluar";
                         }
 
-                        let namaBulan = kolom[3] || "";
-                        if (namaBulan) {
-                            namaBulan = namaBulan.charAt(0).toUpperCase() + namaBulan.slice(1).toLowerCase();
-                        }
-
                         dataKeuanganGlobal.push({
-                            tanggal: kolom[2] || "-",    // Kolom C (Tanggal Transaksi)
-                            bulan: namaBulan || "-",    // Kolom D (Bulan)
-                            tahun: kolom[4] || "-",      // Kolom E (Tahun)
-                            keterangan: kolom[5] || "-", // Kolom F (Keterangan Singkat)
-                            kategori: jenisTransaksi || (statusTipe === "masuk" ? "Pemasukan" : "Pengeluaran"), // Kolom B
+                            tanggal: kolom[2] || "",    // Kolom Tanggal (Pertanyaan 2)
+                            bulan: kolom[3] || "",      // Kolom Bulan (Pertanyaan 3)
+                            tahun: kolom[4] || "",      // Kolom Tahun (Pertanyaan 4)
+                            keterangan: kolom[5] || "", // Kolom Keterangan Manual (Pertanyaan 5)
+                            kategori: kolom[6] || "",   // Kolom Kategori Dropdown (Pertanyaan 6)
                             tipe: statusTipe, 
-                            jumlah: kolom[6] || "0"     // Kolom G (Jumlah Nominal)
+                            jumlah: kolom[7] || "0"    // Kolom Jumlah Uang Rp (Pertanyaan 7)
                         });
 
                         if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
