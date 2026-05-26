@@ -146,3 +146,31 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
   .content-box { padding: 25px; width: 95%; }
   .box-title { font-size: 24px !important; }
 }
+
+/* ==========================================================================
+   X. ATURAN TAMBAHAN HALAMAN KEUANGAN ASLI
+   ========================================================================== */
+body { background-color: #f4f4f4; }
+.finance-page-wrapper { padding-top: 140px; padding-bottom: 60px; }
+
+/* Kotak Ringkasan Saldo */
+.summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+.card-box { flex: 1; min-width: 200px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.card-box h4 { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: normal; }
+.card-box .amount { font-size: 22px; font-weight: 800; }
+.card-box.masuk .amount { color: #2e7d32; }
+.card-box.keluar .amount { color: #E53935; }
+.card-box.saldo .amount { color: #1565c0; }
+
+/* Filter & Pencarian */
+.filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
+.filter-box:focus { border-color: #E53935; }
+
+/* Tabel Keuangan */
+.table-responsive { width: 100%; overflow-x: auto; }
+.finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.finance-table th { background-color: #E53935; color: white; padding: 12px 15px; white-space: nowrap; }
+.finance-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+.finance-table tr:nth-child(even) { background-color: #fafafa; }
+.finance-table tr:hover { background-color: #f1f1f1; }
