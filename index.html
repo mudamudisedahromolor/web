@@ -3,43 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan - Muda Mudi Sedahromo Lor</title>
+    <title>Muda Mudi Sedahromo Lor</title>
     
     <link rel="icon" href="images/mms.png" type="image/png">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
-    <style>
-        /* TAMBAHAN KHUSUS UNTUK HALAMAN KEUANGAN ASLI MAS ARDYAN */
-        body { background-color: #f4f4f4; }
-        .finance-page-wrapper { padding-top: 140px; padding-bottom: 60px; }
-        
-        /* Kotak Ringkasan Saldo */
-        .summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-        .card-box { flex: 1; min-width: 200px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .card-box h4 { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: normal; }
-        .card-box .amount { font-size: 22px; font-weight: 800; }
-        .card-box.masuk .amount { color: #2e7d32; }
-        .card-box.keluar .amount { color: #E53935; }
-        .card-box.saldo .amount { color: #1565c0; }
-
-        /* Filter & Pencarian */
-        .filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
-        .filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
-        .filter-box:focus { border-color: #E53935; }
-
-        /* Tabel Keuangan */
-        .table-responsive { width: 100%; overflow-x: auto; }
-        .finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        .finance-table th { background-color: #E53935; color: white; padding: 12px 15px; white-space: nowrap; }
-        .finance-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
-        .finance-table tr:nth-child(even) { background-color: #fafafa; }
-        .finance-table tr:hover { background-color: #f1f1f1; }
-    </style>
 </head>
 <body> 
     
     <header class="site-header">
+        
         <div class="top-header">
             <div class="header-logo-area">
                 <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
@@ -48,247 +22,148 @@
                     <span class="brand-subtitle">Sedahromo Lor 05</span>
                 </div>
             </div>
+
             <div class="header-right-stuff">
                 <form class="search-box" action="#" method="GET">
                     <input type="text" placeholder="Cari informasi..." name="search">
                     <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
+
                 <div class="header-socials">
                     <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
                     <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
                     <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
                 </div>
+
                 <button class="menu-toggle" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div> 
         </div> 
+     
         <nav class="main-navbar">
             <ul class="nav-list">
-                <li class="nav-item"><a href="index.html">BERANDA</a></li>
+                <li class="nav-item"><a href="#">BERANDA</a></li>
                 <li class="nav-item">
                     <a href="#">PROFIL</a>
                     <ul class="submenu">
                         <li class="submenu-item"><a href="struktur.html">STRUKTUR KEANGGOTAAN</a></li>
                         <li class="submenu-item"><a href="visi-misi.html">VISI & MISI</a></li>
+
                     </ul>
                 </li>
+  
                 <li class="nav-item">
                     <a href="#">KEGIATAN</a>
                     <ul class="submenu">
                         <li class="submenu-item"><a href="#">RAPAT BULANAN</a></li>
                     </ul>
                 </li>
-                <li class="nav-item">
+                              <li class="nav-item">
                     <a href="#">LAPORAN</a>
                     <ul class="submenu">
                         <li class="submenu-item"><a href="laporan-keuangan.html">KEUANGAN</a></li>
                         <li class="submenu-item"><a href="#">PERTANGGUNG JAWABAN</a></li>
+
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <div class="finance-page-wrapper">
-        <div class="content-box" style="max-width: 1000px; width: 95%;">
-            <h2 class="box-title">TRANSPARANSI KAS</h2>
-            <hr class="box-divider">
-            <p style="text-align: center; margin-bottom: 30px;">Berikut adalah rincian laporan keuangan bulanan dan tahunan organisasi Muda Mudi Sedahromo Lor 05.</p>
 
-            <div class="summary-cards">
-                <div class="card-box masuk">
-                    <h4><i class="fa-solid fa-arrow-down"></i> Total Pemasukan</h4>
-                    <div class="amount" id="total-masuk">Rp 0</div>
-                </div>
-                <div class="card-box keluar">
-                    <h4><i class="fa-solid fa-arrow-up"></i> Total Pengeluaran</h4>
-                    <div class="amount" id="total-keluar">Rp 0</div>
-                </div>
-                <div class="card-box saldo">
-                    <h4><i class="fa-solid fa-wallet"></i> Saldo Kas (Filter)</h4>
-                    <div class="amount" id="saldo-akhir">Rp 0</div>
-                </div>
+    <div class="hero-container">
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content">
+            <div class="hero-title-box">
+                <!--bila ingin menambahkan logo besar di tengah, uncomment bagian ini dan tambahkan gambar di folder yang sama dengan nama "logo-besar.png"> -->
+                <!-- <img src="logo-besar.png" alt="Logo Besar" class="hero-title-logo"> -->
+                <h1>MUDA MUDI</h1>
             </div>
-
-            <div class="filter-container">
-                <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
-                    <option value="Semua">Semua Tahun</option>
-                </select>
-                <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
-                    <option value="Semua">Semua Bulan</option>
-                </select>
-                <input type="text" id="input-cari" class="filter-box" style="width: 200px;" placeholder="Cari transaksi..." onkeyup="terapkanFilter()">
-            </div>
-
-            <div class="table-responsive">
-                <table class="finance-table">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Keterangan Transaksi</th>
-                            <th>Kategori</th>
-                            <th>Jumlah (Rp)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-tabel-keuangan">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <h2>Sedahromo Lor RT.05, Kartasura</h2>
+            <p class="hero-description">
+                Website ini merupakan sumber informasi resmi mengenai kegiatan, profil, dan laporan keuangan organisasi Muda Mudi Sedahromo Lor. Kami berkomitmen untuk transparansi dan kemajuan bersama demi mewujudkan pemuda desa yang aktif, kreatif, dan mandiri.
+            </p>
         </div>
     </div>
 
+
+    <div class="slider-wrapper">
+        <div id="slider-container"></div>
+        <div class="slider-dots" id="dots-container"></div>
+    </div>
+
+
     <script>
-        // Logika Hamburger Menu asli
+        // --- A. DATA KEGIATAN (EDIT DI SINI TIAP MINGGU) ---
+        const kegiatanData = [
+            {
+                gambar: "images/foto-tirakatan.jpg", 
+                judul: "Malam Tirakatan 17 Agustus 2025",
+                deskripsi: "Kegiatan rutin tahunan untuk memperingati Hari Kemerdekaan Indonesia. Warga berkumpul di madrasah dinniyah untuk doa bersama, refleksi perjuangan para pahlawan bangsa."
+            },
+            {
+                gambar: "images/foto-lomba.jpg",
+                judul: "Lomba Agustusan Tahun 2025",
+                deskripsi: "Salah satu lomba anak yaitu pindah air dengan sendok untuk memperingati hari ulang tahun kemerdekaan Indonesia.yang ke-80 Tahun"
+            },
+            {
+                gambar: "images/momen-kebersamaan.jpg",
+                judul: "Momen Kebersamaan di Evaluasi Kegiatan",
+                deskripsi: "Momen indah di mana seluruh anggota organisasi berkumpul untuk mengevaluasi kegiatan dalam memperingati HUT-RI yang ke 80 tahun dari persiapan, eksekusi acara, serta harapan kedepannya"
+            }
+        ];
+
+        // --- B. MESIN SLIDER OTOMATIS ---
+        const sliderContainer = document.getElementById('slider-container');
+        const dotsContainer = document.getElementById('dots-container');
+        let slideIndex = 1, slideTimer;
+
+        // Mencetak HTML Slider dari Data
+        function renderSlider() {
+            let slidesHTML = "", dotsHTML = "";
+            kegiatanData.forEach((item, index) => {
+                slidesHTML += `
+                    <div class="slide ${index === 0 ? 'aktif' : ''}">
+                        <img src="${item.gambar}" alt="${item.judul}" class="slide-img">
+                        <div class="slide-content">
+                            <h3>${item.judul}</h3><p>${item.deskripsi}</p>
+                        </div>
+                    </div>`;
+                dotsHTML += `<span class="dot ${index === 0 ? 'aktif' : ''}" onclick="currentSlide(${index + 1})"></span>`;
+            });
+            sliderContainer.innerHTML = slidesHTML;
+            dotsContainer.innerHTML = dotsHTML;
+        }
+
+        // Logika Pergeseran Slide
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) slideIndex = 1;    
+            if (n < 1) slideIndex = slides.length;
+            Array.from(slides).forEach(s => s.classList.remove("aktif"));
+            Array.from(dots).forEach(d => d.classList.remove("aktif"));
+            if (slides.length > 0) {
+                slides[slideIndex-1].classList.add("aktif");  
+                dots[slideIndex-1].classList.add("aktif");
+            }
+        }
+
+        function autoSlide() {
+            slideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, 5000);
+        }
+        function currentSlide(n) { showSlides(slideIndex = n); clearInterval(slideTimer); autoSlide(); }
+
+        // --- C. MESIN MENU HAMBURGER HP ---
         document.getElementById('mobile-menu-btn').addEventListener('click', () => {
             document.querySelector('.main-navbar').classList.toggle('aktif');
         });
 
-        // Tautan database Google Sheets hasil Google Form Anda (format TSV)
-        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTRQ-zDapFTl4UySfnTpWZDF4LmM-KXhNLEtxGXYsEjknUtzGbWyRg3tIFvlxvNzp0O0Tfk9KJdRl94/pub?output=tsv";
-        
-        let dataKeuanganGlobal = [];
-
-        async function loadKeuanganDariDrive() {
-            try {
-                const response = await fetch(linkTsvKeuangan);
-                const teksData = await response.text();
-                
-                // MENGUBAH CARA SPLIT BARIS AGAR AMAN DARI CHARACTER HANTU SPREADSHEET
-                const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
-                dataKeuanganGlobal = [];
-                let daftarTahun = new Set();
-                let daftarBulan = new Set();
-
-                // LOOP MEMBACA FORMAT BARU GOOGLE FORM ANDA (7 KOLOM NYATA)
-                for(let i = 1; i < baris.length; i++) {
-                    const kolom = baris[i].split("\t").map(k => k.trim());
-                    
-                    // Memastikan kolom lengkap sampai indeks ke-6 (Kolom G)
-                    if(kolom.length >= 7) {
-                        let jenisTransaksi = kolom[1] || ""; 
-                        let statusTipe = "keluar"; // Default pengaman
-
-                        // Deteksi kata kunci Pemasukan / Pengeluaran secara presisi
-                        if (jenisTransaksi.toLowerCase().includes("masuk") || jenisTransaksi.toLowerCase().includes("pemasukan")) {
-                            statusTipe = "masuk";
-                        } else if (jenisTransaksi.toLowerCase().includes("keluar") || jenisTransaksi.toLowerCase().includes("pengeluaran")) {
-                            statusTipe = "keluar";
-                        }
-
-                        let namaBulan = kolom[3] || "";
-                        if (namaBulan) {
-                            namaBulan = namaBulan.charAt(0).toUpperCase() + namaBulan.slice(1).toLowerCase();
-                        }
-
-                        dataKeuanganGlobal.push({
-                            tanggal: kolom[2] || "-",    // Kolom C (Tanggal Transaksi)
-                            bulan: namaBulan || "-",    // Kolom D (Bulan)
-                            tahun: kolom[4] || "-",      // Kolom E (Tahun)
-                            keterangan: kolom[5] || "-", // Kolom F (Keterangan Singkat)
-                            kategori: jenisTransaksi,   // Kolom B (Teks Dropdown Asli: Pemasukan/Pengeluaran)
-                            tipe: statusTipe, 
-                            jumlah: kolom[6] || "0"     // Kolom G (Jumlah Nominal)
-                        });
-
-                        if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
-                        if(kolom[3] && kolom[3].length > 2) daftarBulan.add(kolom[3]); 
-                    }
-                }
-
-                // Inject ke Dropdown Filter secara dinamis
-                isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
-                const urutanBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                const bulanTersedia = Array.from(daftarBulan).sort((a, b) => urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
-                isiDropdownFilter('filter-bulan', bulanTersedia);
-
-                // Jalankan filter perdana
-                terapkanFilter();
-
-            } catch (error) {
-                document.getElementById('data-tabel-keuangan').innerHTML = 
-                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive.</td></tr>";
-            }
-        }
-
-        function isiDropdownFilter(idElemen, dataArray) {
-            const elemen = document.getElementById(idElemen);
-            while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
-            
-            dataArray.forEach(item => {
-                if(item) {
-                    let opsi = document.createElement("option");
-                    opsi.value = item; opsi.text = item;
-                    elemen.appendChild(opsi);
-                }
-            });
-        }
-
-        function terapkanFilter() {
-            const tahunDipilih = document.getElementById('filter-tahun').value;
-            const bulanDipilih = document.getElementById('filter-bulan').value;
-            const keywordCari = document.getElementById('input-cari').value.toLowerCase();
-
-            const dataTersaring = dataKeuanganGlobal.filter(item => {
-                const cocokTahun = (tahunDipilih === "Semua") || (item.tahun === tahunDipilih);
-                const cocokBulan = (bulanDipilih === "Semua") || (item.bulan === bulanDipilih);
-                const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || 
-                                     item.kategori.toLowerCase().includes(keywordCari) || 
-                                     item.tanggal.toLowerCase().includes(keywordCari);
-                return cocokTahun && cocokBulan && cocokKetikan;
-            });
-
-            hitungDanTampilkanUang(dataTersaring);
-            renderTabelKeuangan(dataTersaring);
-        }
-
-        function hitungDanTampilkanUang(data) {
-            let totalMasuk = 0; let totalKeluar = 0;
-            data.forEach(item => {
-                let angkaBersih = parseInt(item.jumlah.replace(/[^0-9]/g, '')) || 0;
-                if(item.tipe === 'masuk') { totalMasuk += angkaBersih; } 
-                else if(item.tipe === 'keluar') { totalKeluar += angkaBersih; }
-            });
-            document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
-            document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
-            document.getElementById('saldo-akhir').innerText = formatRupiah(totalMasuk - totalKeluar);
-        }
-
-        function renderTabelKeuangan(data) {
-            const tbody = document.getElementById('data-tabel-keuangan');
-            if(data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan.</td></tr>";
-                return;
-            }
-
-            let html = "";
-            data.forEach(item => {
-                const isMasuk = (item.tipe === 'masuk');
-                const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
-                const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i>' : '<i class="fa-solid fa-arrow-up"></i>';
-                let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
-
-                html += `
-                    <tr>
-                        <td>${item.tanggal}</td>
-                        <td>${item.keterangan}</td>
-                        <td style="${warnaKategori}">${iconKategori} ${item.kategori}</td>
-                        <td><strong>${angkaTampil}</strong></td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function formatRupiah(angka) { return 'Rp ' + angka.toLocaleString('id-ID'); }
-
-        loadKeuanganDariDrive();
+        // Jalankan semua fungsi saat web dibuka
+        renderSlider(); showSlides(slideIndex); autoSlide();
     </script>
 </body>
 </html>
