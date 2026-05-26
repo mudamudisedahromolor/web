@@ -160,7 +160,8 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
+                // FIX UTAMA: Memotong baris secara aman dari karakter \r\n milik Google Sheets
+                const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
                 let daftarBulan = new Set();
