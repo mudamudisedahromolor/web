@@ -160,7 +160,7 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // MENGGUNAKAN INDEKS INTERNAL AMAN AGAR TIDAK ERROR JIKA ADA STRING MAC/WINDOWS LINE BREAK
+                // Perbaikan pemotongan baris: Dibersihkan ujung spasi hantunya secara menyeluruh
                 const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
@@ -170,8 +170,8 @@
                 for(let i = 1; i < baris.length; i++) {
                     const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // Memastikan kolom lengkap sampai indeks ke-6 (Kolom G - Jumlah Nominal)
-                    if(kolom.length >= 7) {
+                    // PERBAIKAN TOLERANSI: Diubah ke >= 6 agar jika kolom jumlah di ujung ada spasi kosong tetap lolos pembacaan
+                    if(kolom.length >= 6) {
                         let jenisTransaksi = kolom[1] || ""; // Kolom B: Jenis Transaksi
                         let statusTipe = "keluar"; // Default pengaman
 
@@ -183,13 +183,13 @@
                         }
 
                         dataKeuanganGlobal.push({
-                            tanggal: kolom[2] || "",    // Kolom C (Tanggal)
-                            bulan: kolom[3] || "",      // Kolom D (Bulan)
-                            tahun: kolom[4] || "",      // Kolom E (Tahun)
-                            keterangan: kolom[5] || "", // Kolom F (Keterangan Singkat)
-                            kategori: jenisTransaksi,   // Kolom B (Teks Dropdown Asli)
+                            tanggal: kolom[2] || "-",    // Kolom C (Tanggal)
+                            bulan: kolom[3] || "-",      // Kolom D (Bulan)
+                            tahun: kolom[4] || "-",      // Kolom E (Tahun)
+                            keterangan: kolom[5] || "-", // Kolom F (Keterangan Singkat)
+                            kategori: jenisTransaksi || "Umum", // Kolom B (Teks Dropdown Asli)
                             tipe: statusTipe, 
-                            jumlah: kolom[6] || "0"    // MENGUNCI URUTAN BARU: Kolom G (Jumlah Nominal)
+                            jumlah: kolom[6] || "0"    // Kolom G (Jumlah Nominal)
                         });
 
                         if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
@@ -208,7 +208,7 @@
 
             } catch (error) {
                 document.getElementById('data-tabel-keuangan').innerHTML = 
-                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive.</td></tr>";
+                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive atau format data salah.</td></tr>";
             }
         }
 
