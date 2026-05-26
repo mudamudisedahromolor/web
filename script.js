@@ -12,14 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadKeuanganDariDrive();
 });
 
-// ------------------------------------------------------------------
-// 1. TEMPEL (PASTE) ID SPREADSHEET ASLI ANDA DI DALAM TANDA KUTIP DI BAWAH INI
-// Contoh: const SPREADSHEET_ID = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms";
-// ------------------------------------------------------------------
-const SPREADSHEET_ID = "1A7saqtNtoB6GiQSeEldiXP0WGUnRF1eec8lHtwbtXRs";
+
 
 // Sistem otomatis merangkai URL anti-delay (Jangan diubah)
-const baseLinkSheets = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=tsv`;
+const baseLinkSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?output=tsv";
 
 let dataKeuanganGlobal = [];
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
