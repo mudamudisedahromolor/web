@@ -151,7 +151,7 @@
         });
 
         // Tautan database Google Sheets hasil Google Form Anda (format TSV)
-        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPlPHmeUoPwwNbheBuCOwP0T3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
+        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTRQ-zDapFTl4UySfnTpWZDF4LmM-KXhNLEtxGXYsEjknUtzGbWyRg3tIFvlxvNzp0O0Tfk9KJdRl94/pub?output=tsv";
         
         let dataKeuanganGlobal = [];
 
@@ -160,7 +160,7 @@
                 const response = await fetch(linkTsvKeuangan);
                 const teksData = await response.text();
                 
-                // MENGUBAH CARA SPLIT BARIS AGAR AMAN DARI CHARACTER HANTU SPREADSHEET
+                // FIX 1: Potong baris secara aman menggunakan regex agar tidak hancur dibaca browser HP/Laptop
                 const baris = teksData.split(/\r?\n/).map(b => b.trim()).filter(b => b !== "");
                 dataKeuanganGlobal = [];
                 let daftarTahun = new Set();
@@ -170,12 +170,12 @@
                 for(let i = 1; i < baris.length; i++) {
                     const kolom = baris[i].split("\t").map(k => k.trim());
                     
-                    // Memastikan kolom lengkap sampai indeks ke-6 (Kolom G)
+                    // FIX 2: Validasi diturunkan ke >= 7 (karena total kolom A-G adalah 7 buah)
                     if(kolom.length >= 7) {
                         let jenisTransaksi = kolom[1] || ""; 
                         let statusTipe = "keluar"; // Default pengaman
 
-                        // Deteksi kata kunci Pemasukan / Pengeluaran secara presisi
+                        // FIX 3: Pencarian kata diperluas agar toleran terhadap satu 'k' atau dua 'k'
                         if (jenisTransaksi.toLowerCase().includes("masuk") || jenisTransaksi.toLowerCase().includes("pemasukan")) {
                             statusTipe = "masuk";
                         } else if (jenisTransaksi.toLowerCase().includes("keluar") || jenisTransaksi.toLowerCase().includes("pengeluaran")) {
@@ -192,7 +192,7 @@
                             bulan: namaBulan || "-",    // Kolom D (Bulan)
                             tahun: kolom[4] || "-",      // Kolom E (Tahun)
                             keterangan: kolom[5] || "-", // Kolom F (Keterangan Singkat)
-                            kategori: jenisTransaksi,   // Kolom B (Teks Dropdown Asli: Pemasukan/Pengeluaran)
+                            kategori: jenisTransaksi || (statusTipe === "masuk" ? "Pemasukan" : "Pengeluaran"), // Kolom B
                             tipe: statusTipe, 
                             jumlah: kolom[6] || "0"     // Kolom G (Jumlah Nominal)
                         });
