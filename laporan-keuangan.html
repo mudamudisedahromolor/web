@@ -149,8 +149,8 @@
         document.querySelector('.main-navbar').classList.toggle('aktif');
     });
 
-    // MASUKKAN LINK TSV HASIL PUBLISH ULANG DI SINI
-    const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgjFSc953Gb2e53JTQwdKjnU4iCPlPHmeUoPwwNbheBuCOwP0T3Z5csHt2ZcyM3Kx1arstWuDpiB1v/pub?output=tsv";
+    // Tautan database Google Sheets hasil Google Form Anda (format TSV)
+    const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
     
     let dataKeuanganGlobal = [];
     const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -160,81 +160,89 @@
             const response = await fetch(linkTsvKeuangan);
             const teksData = await response.text();
             
-            // Pecah berdasarkan baris
             const baris = teksData.split("\n").map(b => b.trim());
             dataKeuanganGlobal = [];
             let daftarTahun = new Set();
             let daftarBulan = new Set();
 
-            // Loop dimulai dari indeks 1 (melewati baris judul/header)
+            // LOOP MEMBACA KOLOM SESUAI GAMBAR TERBARU
             for(let i = 1; i < baris.length; i++) {
-                if (baris[i] === "") continue; // Lewati jika ada baris kosong
+                if (baris[i] === "") continue; // Lewati baris kosong
                 
                 const kolom = baris[i].split("\t").map(k => k.trim());
                 
-                // Validasi: Pastikan minimal kolom tanggal, keterangan, dan jumlah ada isi dasarnya
-                if(kolom.length >= 5 && kolom[2] !== "") {
-                    let tipeTransaksi = kolom[1] ? kolom[1].toLowerCase() : ""; 
-                    let statusTipe = "keluar"; // Default jika tidak terdeteksi
+                // Pastikan baris memiliki minimal sampai kolom Jumlah (Indeks 4)
+                if(kolom.length >= 5) {
+                    let teksTanggal = kolom[1] || "";     // Kolom B: Tanggal Transaksi
+                    let keterangan = kolom[2] || "-";    // Kolom C: Keterangan Transaksi
+                    let jenisTransaksi = kolom[3] ? kolom[3].toLowerCase() : ""; // Kolom D: Jenis Transaksi
+                    let jumlahUang = kolom[4] || "0";     // Kolom E: Jumlah
 
-                    // Deteksi Jenis Transaksi dari Kolom B
-                    if (tipeTransaksi.includes("masuk") || tipeTransaksi === "pemasukkan") {
+                    let statusTipe = "keluar"; // Default pengaman
+                    if (jenisTransaksi.includes("masuk") || jenisTransaksi === "pemasukkan") {
                         statusTipe = "masuk";
-                    } else if (tipeTransaksi.includes("keluar") || tipeTransaksi === "pengeluaran") {
+                    } else if (jenisTransaksi.includes("keluar") || jenisTransaksi === "pengeluaran") {
                         statusTipe = "keluar";
                     }
 
-                    // Ekstrak Bulan dan Tahun dari string Tanggal (Format: DD/MM/YYYY)
-                    let teksTanggal = kolom[2] || "";
+                    // Logika Ekstraksi Bulan dan Tahun untuk Filter Dropdown
                     let teksBulan = "Semua";
                     let teksTahun = "Semua";
 
-                    if (teksTanggal.includes("/")) {
-                        const partTanggal = teksTanggal.split("/");
-                        if (partTanggal.length >= 3) {
-                            let indeksBulan = parseInt(partTanggal[1], 10) - 1; 
-                            let tahunExtracted = partTanggal[2].trim().split(" ")[0]; // Mengantisipasi jika ada format jam bawaan google form
-
-                            if (indeksBulan >= 0 && indeksBulan <= 11) {
-                                teksBulan = namaBulanIndo[indeksBulan];
-                                daftarBulan.add(teksBulan);
-                            }
-                            if (tahunExtracted.length === 4) {
-                                teksTahun = tahunExtracted;
-                                daftarTahun.add(teksTahun);
-                            }
+                    // Mengatasi format tanggal strip (YYYY-MM-DD) atau garing (DD/MM/YYYY)
+                    let pemisah = teksTanggal.includes("-") ? "-" : "/";
+                    if (teksTanggal.includes(pemisah)) {
+                        const partTanggal = teksTanggal.split(pemisah);
+                        
+                        if (pemisah === "-") {
+                            // Format YYYY-MM-DD (Bawaan HTML/Google)
+                            let tahunExtracted = partTanggal[0];
+                            let indeksBulan = parseInt(partTanggal[1], 10) - 1;
+                            
+                            if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
+                            if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
+                        } else {
+                            // Format DD/MM/YYYY
+                            let indeksBulan = parseInt(partTanggal[1], 10) - 1;
+                            let tahunExtracted = partTanggal[2].split(" ")[0];
+                            
+                            if (indeksBulan >= 0 && indeksBulan <= 11) teksBulan = namaBulanIndo[indeksBulan];
+                            if (tahunExtracted.length === 4) teksTahun = tahunExtracted;
                         }
+
+                        if (teksBulan !== "Semua") daftarBulan.add(teksBulan);
+                        if (teksTahun !== "Semua") daftarTahun.add(teksTahun);
                     }
 
                     dataKeuanganGlobal.push({
-                        tanggal: teksTanggal,
+                        tanggal: teksTanggal,  // Mengambil tanggal lengkap asli (Format YYYY-MM-DD atau DD/MM/YYYY)
                         bulan: teksBulan,
                         tahun: teksTahun,
-                        keterangan: kolom[3] || "-",
+                        keterangan: keterangan,
                         tipe: statusTipe, 
-                        jumlah: kolom[4] || "0"
+                        jumlah: jumlahUang
                     });
                 }
             }
 
-            // Inject ke Dropdown Filter secara dinamis
+            // Atur Dropdown Filter secara otomatis
             isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
             const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
             isiDropdownFilter('filter-bulan', bulanTersedia);
 
-            // Tampilkan ke tabel
+            // Render ke tabel utama
             terapkanFilter();
 
         } catch (error) {
             console.error("Detail Error:", error);
             document.getElementById('data-tabel-keuangan').innerHTML = 
-                "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive. Pastikan spreadsheet sudah di-Publish as TSV.</td></tr>";
+                "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive.</td></tr>";
         }
     }
 
     function isiDropdownFilter(idElemen, dataArray) {
         const elemen = document.getElementById(idElemen);
-        while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown
+        while (elemen.options.length > 1) { elemen.remove(1); }
         
         dataArray.forEach(item => {
             if(item) {
@@ -286,11 +294,19 @@
             const isMasuk = (item.tipe === 'masuk');
             const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
             const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i> Pemasukkan' : '<i class="fa-solid fa-arrow-up"></i> Pengeluaran';
+            
+            // Format ulang tampilan tanggal ke format Indonesia yang rapi (DD-MM-YYYY) jika aslinya YYYY-MM-DD
+            let tanggalTampil = item.tanggal;
+            if (tanggalTampil.includes("-")) {
+                const p = tanggalTampil.split("-");
+                if(p[0].length === 4) tanggalTampil = `${p[2]}-${p[1]}-${p[0]}`; // Ubah ke DD-MM-YYYY
+            }
+
             let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
 
             html += `
                 <tr>
-                    <td>${item.tanggal}</td>
+                    <td>${tanggalTampil}</td>
                     <td>${item.keterangan}</td>
                     <td style="${warnaKategori}">${iconKategori}</td>
                     <td><strong>${angkaTampil}</strong></td>
@@ -307,7 +323,6 @@
         return 'Rp ' + angka.toLocaleString('id-ID'); 
     }
 
-    // Jalankan sistem
     loadKeuanganDariDrive();
 </script>
 </body>
