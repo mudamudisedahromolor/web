@@ -143,146 +143,170 @@
             </div>
         </div>
     </div>
+<script>
+    // Logika Hamburger Menu asli
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        document.querySelector('.main-navbar').classList.toggle('aktif');
+    });
 
-    <script>
-        // Logika Hamburger Menu asli
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.querySelector('.main-navbar').classList.toggle('aktif');
+    // Tautan database Google Sheets hasil Google Form Anda (format TSV)
+    const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
+    
+    let dataKeuanganGlobal = [];
+    const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+    async function loadKeuanganDariDrive() {
+        try {
+            const response = await fetch(linkTsvKeuangan);
+            const teksData = await response.text();
+            
+            const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
+            dataKeuanganGlobal = [];
+            let daftarTahun = new Set();
+            let daftarBulan = new Set();
+
+            // LOOP MEMBACA FORMAT BARU SESUAI FOTO SPREADSHEET
+            for(let i = 1; i < baris.length; i++) {
+                const kolom = baris[i].split("\t").map(k => k.trim());
+                
+                // Memastikan data minimal terisi sampai kolom Jumlah (Indeks 4)
+                if(kolom.length >= 5) {
+                    let tipeTransaksi = kolom[1] ? kolom[1].toLowerCase() : ""; 
+                    let statusTipe = "keluar"; // Default pengaman
+
+                    // Deteksi Jenis Transaksi dari Kolom B (Pilih Salah Satu)
+                    if (tipeTransaksi === "pemasukkan" || tipeTransaksi.includes("masuk")) {
+                        statusTipe = "masuk";
+                    } else if (tipeTransaksi === "pengeluaran" || tipeTransaksi.includes("keluar")) {
+                        statusTipe = "keluar";
+                    }
+
+                    // Ekstrak Bulan dan Tahun dari string Tanggal (Format: DD/MM/YYYY)
+                    let teksTanggal = kolom[2] || "";
+                    let teksBulan = "Semua";
+                    let teksTahun = "Semua";
+
+                    if (teksTanggal.includes("/")) {
+                        const partTanggal = teksTanggal.split("/");
+                        if (partTanggal.length >= 3) {
+                            let indeksBulan = parseInt(partTanggal[1], 10) - 1; // Ubah "05" -> 4
+                            let tahunExtracted = partTanggal[2].trim();
+
+                            if (indeksBulan >= 0 && indeksBulan <= 11) {
+                                teksBulan = namaBulanIndo[indeksBulan];
+                                daftarBulan.add(teksBulan);
+                            }
+                            if (tahunExtracted.length === 4) {
+                                teksTahun = tahunExtracted;
+                                daftarTahun.add(teksTahun);
+                            }
+                        }
+                    }
+
+                    dataKeuanganGlobal.push({
+                        tanggal: teksTanggal,            // Kolom C (Tanggal)
+                        bulan: teksBulan,                // Hasil Ekstraksi Nama Bulan
+                        tahun: teksTahun,                // Hasil Ekstraksi Tahun
+                        keterangan: kolom[3] || "",       // Kolom D (Keterangan Transaksi)
+                        kategori: kolom[3] || "",         // Karena tidak ada kolom kategori, kita tampilkan keterangan sebagai nama kategori visual
+                        tipe: statusTipe, 
+                        jumlah: kolom[4] || "0"          // Kolom E (Jumlah)
+                    });
+                }
+            }
+
+            // Inject ke Dropdown Filter secara dinamis
+            isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
+            const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
+            isiDropdownFilter('filter-bulan', bulanTersedia);
+
+            // Jalankan filter perdana
+            terapkanFilter();
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('data-tabel-keuangan').innerHTML = 
+                "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive atau data kosong.</td></tr>";
+        }
+    }
+
+    function isiDropdownFilter(idElemen, dataArray) {
+        const elemen = document.getElementById(idElemen);
+        while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
+        
+        dataArray.forEach(item => {
+            if(item) {
+                let opsi = document.createElement("option");
+                opsi.value = item; opsi.text = item;
+                elemen.appendChild(opsi);
+            }
+        });
+    }
+
+    function terapkanFilter() {
+        const tahunDipilih = document.getElementById('filter-tahun').value;
+        const bulanDipilih = document.getElementById('filter-bulan').value;
+        const keywordCari = document.getElementById('input-cari').value.toLowerCase();
+
+        const dataTersaring = dataKeuanganGlobal.filter(item => {
+            const cocokTahun = (tahunDipilih === "Semua") || (item.tahun === tahunDipilih);
+            const cocokBulan = (bulanDipilih === "Semua") || (item.bulan === bulanDipilih);
+            const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || 
+                                 item.tanggal.toLowerCase().includes(keywordCari);
+            return cocokTahun && cocokBulan && cocokKetikan;
         });
 
-        // Tautan database Google Sheets hasil Google Form Anda (format TSV)
-        const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
-        
-        let dataKeuanganGlobal = [];
+        hitungDanTampilkanUang(dataTersaring);
+        renderTabelKeuangan(dataTersaring);
+    }
 
-        async function loadKeuanganDariDrive() {
-            try {
-                const response = await fetch(linkTsvKeuangan);
-                const teksData = await response.text();
-                
-                const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
-                dataKeuanganGlobal = [];
-                let daftarTahun = new Set();
-                let daftarBulan = new Set();
+    function hitungDanTampilkanUang(data) {
+        let totalMasuk = 0; let totalKeluar = 0;
+        data.forEach(item => {
+            let angkaBersih = parseInt(item.jumlah.replace(/[^0-9]/g, '')) || 0;
+            if(item.tipe === 'masuk') { totalMasuk += angkaBersih; } 
+            else if(item.tipe === 'keluar') { totalKeluar += angkaBersih; }
+        });
+        document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
+        document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
+        document.getElementById('saldo-akhir').innerText = formatRupiah(totalMasuk - totalKeluar);
+    }
 
-                // LOOP MEMBACA FORMAT BARU GOOGLE FORM ANDA
-                for(let i = 1; i < baris.length; i++) {
-                    const kolom = baris[i].split("\t").map(k => k.trim());
-                    
-                    // Memastikan kolom lengkap sampai indeks ke-7 (Kolom Jumlah Uang)
-                    if(kolom.length >= 8) {
-                        let jenisTransaksi = kolom[1].toLowerCase(); 
-                        let statusTipe = "keluar"; // Default pengaman
-
-                        // Deteksi keyword input Form: Pemasukkan / Pengeluaran
-                        if (jenisTransaksi === "pemasukkan" || jenisTransaksi.includes("masuk")) {
-                            statusTipe = "masuk";
-                        } else if (jenisTransaksi === "pengeluaran" || jenisTransaksi.includes("keluar")) {
-                            statusTipe = "keluar";
-                        }
-
-                        dataKeuanganGlobal.push({
-                            tanggal: kolom[2] || "",    // Kolom Tanggal (Pertanyaan 2)
-                            bulan: kolom[3] || "",      // Kolom Bulan (Pertanyaan 3)
-                            tahun: kolom[4] || "",      // Kolom Tahun (Pertanyaan 4)
-                            keterangan: kolom[5] || "", // Kolom Keterangan Manual (Pertanyaan 5)
-                            kategori: kolom[6] || "",   // Kolom Kategori Dropdown (Pertanyaan 6)
-                            tipe: statusTipe, 
-                            jumlah: kolom[7] || "0"    // Kolom Jumlah Uang Rp (Pertanyaan 7)
-                        });
-
-                        if(kolom[4] && kolom[4].length === 4) daftarTahun.add(kolom[4]); 
-                        if(kolom[3] && kolom[3].length > 2) daftarBulan.add(kolom[3]); 
-                    }
-                }
-
-                // Inject ke Dropdown Filter secara dinamis
-                isiDropdownFilter('filter-tahun', Array.from(daftarTahun).sort().reverse());
-                const urutanBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                const bulanTersedia = Array.from(daftarBulan).sort((a, b) => urutanBulan.indexOf(a) - urutanBulan.indexOf(b));
-                isiDropdownFilter('filter-bulan', bulanTersedia);
-
-                // Jalankan filter perdana
-                terapkanFilter();
-
-            } catch (error) {
-                document.getElementById('data-tabel-keuangan').innerHTML = 
-                    "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive.</td></tr>";
-            }
+    function renderTabelKeuangan(data) {
+        const tbody = document.getElementById('data-tabel-keuangan');
+        if(data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan.</td></tr>";
+            return;
         }
 
-        function isiDropdownFilter(idElemen, dataArray) {
-            const elemen = document.getElementById(idElemen);
-            while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
-            
-            dataArray.forEach(item => {
-                if(item) {
-                    let opsi = document.createElement("option");
-                    opsi.value = item; opsi.text = item;
-                    elemen.appendChild(opsi);
-                }
-            });
+        let html = "";
+        data.forEach(item => {
+            const isMasuk = (item.tipe === 'masuk');
+            const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
+            const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i> Pemasukkan' : '<i class="fa-solid fa-arrow-up"></i> Pengeluaran';
+            let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
+
+            html += `
+                <tr>
+                    <td>${item.tanggal}</td>
+                    <td>${item.keterangan}</td>
+                    <td style="${warnaKategori}">${iconKategori}</td>
+                    <td><strong>${angkaTampil}</strong></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function formatRupiah(angka) { 
+        if (angka < 0) {
+            return '-Rp ' + Math.abs(angka).toLocaleString('id-ID');
         }
+        return 'Rp ' + angka.toLocaleString('id-ID'); 
+    }
 
-        function terapkanFilter() {
-            const tahunDipilih = document.getElementById('filter-tahun').value;
-            const bulanDipilih = document.getElementById('filter-bulan').value;
-            const keywordCari = document.getElementById('input-cari').value.toLowerCase();
-
-            const dataTersaring = dataKeuanganGlobal.filter(item => {
-                const cocokTahun = (tahunDipilih === "Semua") || (item.tahun === tahunDipilih);
-                const cocokBulan = (bulanDipilih === "Semua") || (item.bulan === bulanDipilih);
-                const cocokKetikan = item.keterangan.toLowerCase().includes(keywordCari) || 
-                                     item.kategori.toLowerCase().includes(keywordCari) || 
-                                     item.tanggal.toLowerCase().includes(keywordCari);
-                return cocokTahun && cocokBulan && cocokKetikan;
-            });
-
-            hitungDanTampilkanUang(dataTersaring);
-            renderTabelKeuangan(dataTersaring);
-        }
-
-        function hitungDanTampilkanUang(data) {
-            let totalMasuk = 0; let totalKeluar = 0;
-            data.forEach(item => {
-                let angkaBersih = parseInt(item.jumlah.replace(/[^0-9]/g, '')) || 0;
-                if(item.tipe === 'masuk') { totalMasuk += angkaBersih; } 
-                else if(item.tipe === 'keluar') { totalKeluar += angkaBersih; }
-            });
-            document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
-            document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
-            document.getElementById('saldo-akhir').innerText = formatRupiah(totalMasuk - totalKeluar);
-        }
-
-        function renderTabelKeuangan(data) {
-            const tbody = document.getElementById('data-tabel-keuangan');
-            if(data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan.</td></tr>";
-                return;
-            }
-
-            let html = "";
-            data.forEach(item => {
-                const isMasuk = (item.tipe === 'masuk');
-                const warnaKategori = isMasuk ? 'color: #2e7d32; font-weight:bold;' : 'color: #E53935; font-weight:bold;';
-                const iconKategori = isMasuk ? '<i class="fa-solid fa-arrow-down"></i>' : '<i class="fa-solid fa-arrow-up"></i>';
-                let angkaTampil = item.jumlah.includes("Rp") ? item.jumlah : formatRupiah(parseInt(item.jumlah) || 0);
-
-                html += `
-                    <tr>
-                        <td>${item.tanggal}</td>
-                        <td>${item.keterangan}</td>
-                        <td style="${warnaKategori}">${iconKategori} ${item.kategori}</td>
-                        <td><strong>${angkaTampil}</strong></td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function formatRupiah(angka) { return 'Rp ' + angka.toLocaleString('id-ID'); }
-
-        loadKeuanganDariDrive();
-    </script>
+    // Eksekusi load data saat halaman dibuka
+    loadKeuanganDariDrive();
+</script>
 </body>
 </html>
