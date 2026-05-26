@@ -149,7 +149,7 @@
         document.querySelector('.main-navbar').classList.toggle('aktif');
     });
 
-    // Tautan database Google Sheets hasil Google Form Anda (format TSV)
+    // MASUKKAN LINK TSV HASIL PUBLISH ULANG DI SINI
     const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7JNQ9Rd19EmuN4V565QZqx9u-BhSx7LdUheBYE7MjRpZ046fkS97pX60GYDsZSAv84XP1gGisMMgm/pub?output=tsv";
     
     let dataKeuanganGlobal = [];
@@ -160,24 +160,27 @@
             const response = await fetch(linkTsvKeuangan);
             const teksData = await response.text();
             
-            const baris = teksData.split("\n").map(b => b.trim()).filter(b => b !== "");
+            // Pecah berdasarkan baris
+            const baris = teksData.split("\n").map(b => b.trim());
             dataKeuanganGlobal = [];
             let daftarTahun = new Set();
             let daftarBulan = new Set();
 
-            // LOOP MEMBACA FORMAT BARU SESUAI FOTO SPREADSHEET
+            // Loop dimulai dari indeks 1 (melewati baris judul/header)
             for(let i = 1; i < baris.length; i++) {
+                if (baris[i] === "") continue; // Lewati jika ada baris kosong
+                
                 const kolom = baris[i].split("\t").map(k => k.trim());
                 
-                // Memastikan data minimal terisi sampai kolom Jumlah (Indeks 4)
-                if(kolom.length >= 5) {
+                // Validasi: Pastikan minimal kolom tanggal, keterangan, dan jumlah ada isi dasarnya
+                if(kolom.length >= 5 && kolom[2] !== "") {
                     let tipeTransaksi = kolom[1] ? kolom[1].toLowerCase() : ""; 
-                    let statusTipe = "keluar"; // Default pengaman
+                    let statusTipe = "keluar"; // Default jika tidak terdeteksi
 
-                    // Deteksi Jenis Transaksi dari Kolom B (Pilih Salah Satu)
-                    if (tipeTransaksi === "pemasukkan" || tipeTransaksi.includes("masuk")) {
+                    // Deteksi Jenis Transaksi dari Kolom B
+                    if (tipeTransaksi.includes("masuk") || tipeTransaksi === "pemasukkan") {
                         statusTipe = "masuk";
-                    } else if (tipeTransaksi === "pengeluaran" || tipeTransaksi.includes("keluar")) {
+                    } else if (tipeTransaksi.includes("keluar") || tipeTransaksi === "pengeluaran") {
                         statusTipe = "keluar";
                     }
 
@@ -189,8 +192,8 @@
                     if (teksTanggal.includes("/")) {
                         const partTanggal = teksTanggal.split("/");
                         if (partTanggal.length >= 3) {
-                            let indeksBulan = parseInt(partTanggal[1], 10) - 1; // Ubah "05" -> 4
-                            let tahunExtracted = partTanggal[2].trim();
+                            let indeksBulan = parseInt(partTanggal[1], 10) - 1; 
+                            let tahunExtracted = partTanggal[2].trim().split(" ")[0]; // Mengantisipasi jika ada format jam bawaan google form
 
                             if (indeksBulan >= 0 && indeksBulan <= 11) {
                                 teksBulan = namaBulanIndo[indeksBulan];
@@ -204,13 +207,12 @@
                     }
 
                     dataKeuanganGlobal.push({
-                        tanggal: teksTanggal,            // Kolom C (Tanggal)
-                        bulan: teksBulan,                // Hasil Ekstraksi Nama Bulan
-                        tahun: teksTahun,                // Hasil Ekstraksi Tahun
-                        keterangan: kolom[3] || "",       // Kolom D (Keterangan Transaksi)
-                        kategori: kolom[3] || "",         // Karena tidak ada kolom kategori, kita tampilkan keterangan sebagai nama kategori visual
+                        tanggal: teksTanggal,
+                        bulan: teksBulan,
+                        tahun: teksTahun,
+                        keterangan: kolom[3] || "-",
                         tipe: statusTipe, 
-                        jumlah: kolom[4] || "0"          // Kolom E (Jumlah)
+                        jumlah: kolom[4] || "0"
                     });
                 }
             }
@@ -220,19 +222,19 @@
             const bulanTersedia = Array.from(daftarBulan).sort((a, b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b));
             isiDropdownFilter('filter-bulan', bulanTersedia);
 
-            // Jalankan filter perdana
+            // Tampilkan ke tabel
             terapkanFilter();
 
         } catch (error) {
-            console.error(error);
+            console.error("Detail Error:", error);
             document.getElementById('data-tabel-keuangan').innerHTML = 
-                "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive atau data kosong.</td></tr>";
+                "<tr><td colspan='4' style='text-align: center; color: #E53935;'>Gagal terhubung ke Google Drive. Pastikan spreadsheet sudah di-Publish as TSV.</td></tr>";
         }
     }
 
     function isiDropdownFilter(idElemen, dataArray) {
         const elemen = document.getElementById(idElemen);
-        while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown lama
+        while (elemen.options.length > 1) { elemen.remove(1); } // Reset dropdown
         
         dataArray.forEach(item => {
             if(item) {
@@ -275,7 +277,7 @@
     function renderTabelKeuangan(data) {
         const tbody = document.getElementById('data-tabel-keuangan');
         if(data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Data tidak ditemukan atau tidak cocok dengan filter.</td></tr>";
             return;
         }
 
@@ -305,7 +307,7 @@
         return 'Rp ' + angka.toLocaleString('id-ID'); 
     }
 
-    // Eksekusi load data saat halaman dibuka
+    // Jalankan sistem
     loadKeuanganDariDrive();
 </script>
 </body>
