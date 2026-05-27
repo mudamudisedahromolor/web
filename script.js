@@ -95,19 +95,55 @@ function hitungTotalKeseluruhan() {
     document.getElementById('total-keluar').innerText = formatRupiah(k);
 }
 
-// 1. FUNGSI TOTAL FIX (TIDAK BERUBAH)
-function hitungTotalKeseluruhan() {
+// ... (Bagian atas file tetap sama) ...
+
+// Fungsi untuk menghitung angka berdasarkan filter tahun
+function updateKartuAngka(dataFilter) {
     let m = 0, k = 0;
-    dataKeuanganGlobal.forEach(i => {
+    dataFilter.forEach(i => {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
-    // Mengupdate card atas dengan TOTAL KESELURUHAN (Fix)
+
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-keluar').innerText = formatRupiah(k);
-    
-    // Angka ini sekarang jadi SALDO TOTAL KESELURUHAN (Fix)
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
+}
+
+window.terapkanFilter = function() {
+    const thn = document.getElementById('filter-tahun').value;
+    const bln = document.getElementById('filter-bulan').value;
+    const kat = document.getElementById('filter-kategori').value;
+    const cari = document.getElementById('input-cari').value.toLowerCase();
+
+    // Filter untuk isi tabel
+    dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
+        return (thn === "Semua" || item.tahun === thn) && 
+               (bln === "Semua" || item.bulan === bln) && 
+               (kat === "Semua" || item.tipe === kat) && 
+               (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
+    });
+
+    // --- LOGIKA BARU: Update Kartu Atas ---
+    // Jika filter tahun = "Semua", gunakan seluruh data. Jika tidak, filter berdasarkan tahun.
+    let dataUntukKartu = (thn === "Semua") 
+                         ? dataKeuanganGlobal 
+                         : dataKeuanganGlobal.filter(item => item.tahun === thn);
+    
+    updateKartuAngka(dataUntukKartu);
+    // -------------------------------------
+
+    halamanSaatIni = 1;
+    renderTabel();
+}
+
+// Saat pertama kali load, jalankan perhitungan total keseluruhan
+async function loadKeuanganDariDrive() {
+    // ... (kode loading Anda sebelumnya sampai isiDropdown) ...
+
+    // Hitung total awal saat load pertama
+    updateKartuAngka(dataKeuanganGlobal); 
+    renderTabel();
 }
 
 // 2. FUNGSI FILTER (TIDAK MENGUBAH TOTAL DI ATAS)
