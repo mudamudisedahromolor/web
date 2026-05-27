@@ -209,14 +209,15 @@ body { background-color: #f4f4f4; }
 /* Kartu Profil */
 .team-card {
     background: #fff; padding: 20px; border-radius: 15px;
+    border: 3px solid #FFD700; width: 120px; height: 120px;
     text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     
 }
 .team-card img {
     width: 100px; height: 100px; border-radius: 50%;
     object-fit: cover; margin-bottom: 10px; border: 2px solid #eee;
-    border: 3px solid #FFD700; width: 120px; height: 120px;
+    
 }
 .ketua-card img { border: 3px solid #FFD700; width: 120px; height: 120px; }
-.team-card {border: 3px solid #FFD700; width: 120px; height: 120px;}
+
 .team-card img { border: 3px solid #FFD700; width: 120px; height: 120px; }
