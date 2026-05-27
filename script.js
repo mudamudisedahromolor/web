@@ -16,31 +16,34 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // LOGIKA PERBAIKAN: Klik urut bertahap dari Layer 2 ke Layer 3 (Kompatibel 100% untuk semua HP)
+    // LOGIKA ANTI-GAGAL: Klik urut bertahap dari Layer 2 ke Layer 3 khusus layar sentuh HP fisik
     document.querySelectorAll('.trigger-layer2').forEach(tombol => {
-        tombol.addEventListener('click', function(efek) {
-            // Mencegah halaman melompat ke atas atau me-refresh halaman saat diklik
-            efek.preventDefault(); 
-            
-            // Cari elemen pembungkus li terdekat (.submenu-item)
-            const indukLi = this.closest('.submenu-item');
-            // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
-            const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
-            
-            if (layer3) {
-                // Cek status apakah menu yang diklik ini sebenarnya sudah terbuka atau belum
-                const apakahSudahBuka = layer3.classList.contains('buka');
-
-                // 1. Tutup SEMUA sub-menu layer 3 yang lain agar tidak saling tabrakan/menumpuk
-                document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
-                    menuLain.classList.remove('buka');
-                });
+        // Memasang event 'click' dan 'touchstart' sekaligus agar kompatibel dengan semua OS Mobile
+        ['click', 'touchstart'].forEach(namaEvent => {
+            tombol.addEventListener(namaEvent, function(efek) {
+                // Mengunci browser HP agar tidak melompat ke atas halaman atau membatalkan aksi script
+                efek.preventDefault(); 
+                efek.stopPropagation(); 
                 
-                // 2. Jika menu yang diklik tadinya tertutup, sekarang kita buka kondisinya
-                if (!apakahSudahBuka) {
-                    layer3.classList.add('buka');
+                // Cari elemen pembungkus li terdekat (.submenu-item)
+                const indukLi = this.closest('.submenu-item');
+                // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
+                const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
+                
+                if (layer3) {
+                    const apakahSudahBuka = layer3.classList.contains('buka');
+    
+                    // 1. Tutup SEMUA sub-menu layer 3 yang lain agar tidak saling tumpang tindih
+                    document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
+                        menuLain.classList.remove('buka');
+                    });
+                    
+                    // 2. Jika menu yang diketuk tadinya tertutup, sekarang kita buka total ke bawah
+                    if (!apakahSudahBuka) {
+                        layer3.classList.add('buka');
+                    }
                 }
-            }
+            }, { passive: false }); // Memaksa browser HP menuruti perintah preventDefault() secara penuh
         });
     });
 });
@@ -82,7 +85,7 @@ let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 10;
-const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "December"];
 
 async function loadKeuanganDariDrive() {
     try {
