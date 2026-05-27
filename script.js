@@ -1,4 +1,23 @@
 /* ==========================================================================
+   1. FUNGSI NAVBAR / MENU MOBILE (Ditaruh Paling Atas Agar Selalu Jalan)
+   ========================================================================== */
+document.addEventListener("DOMContentLoaded", function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navBar = document.querySelector('.main-navbar');
+    
+    if (menuBtn && navBar) {
+        // Trik reset tombol agar selalu responsif
+        const newMenuBtn = menuBtn.cloneNode(true);
+        menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+        
+        newMenuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            navBar.classList.toggle('aktif');
+        });
+    }
+});
+
+/* ==========================================================================
    SISTEM KEUANGAN FINAL - TOTAL FIX (ID HTML: total-keluar)
    ========================================================================== */
 
