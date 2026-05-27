@@ -171,7 +171,7 @@ body {
     font-weight: normal; 
 }
 
-/* Hover teks di Layer 2 saja */
+/* Hover teks di Layer 2 */
 .submenu-item > a:hover { 
     color: yellow !important; 
     background-color: #C62828; 
@@ -184,11 +184,11 @@ body {
 
 /* Layer 3: Sub-menu Bagian Dalam (Rapat Bulanan & 17-an) */
 .sub-submenu-dalam {
-    display: none; /* Sembunyikan dulu secara default */
+    display: none; /* Sembunyikan secara default, diatur oleh CSS PC atau JS HP */
     list-style: none; 
     padding: 0;
     margin: 0;
-    background-color: #bd2724; 
+    background-color: #bd2724; /* Merah agak gelap sebagai penanda anak menu */
 }
 
 /* --- TAMPILAN PC / LAPTOP (Minimal Lebar Layar 769px) --- */
@@ -205,6 +205,10 @@ body {
     .submenu-item:hover > .sub-submenu-dalam {
         display: block;
     }
+
+    .sub-submenu-dalam li a {
+        padding-left: 20px !important;
+    }
 }
 
 .sub-submenu-dalam li {
@@ -217,21 +221,10 @@ body {
     font-weight: normal;
 }
 
+/* Hover teks khusus di Layer 3 */
 .sub-submenu-dalam li a:hover {
     color: yellow !important;
     background-color: #a11f1d !important;
-}
-
-/* --- TAMPILAN HP (Maksimal Lebar Layar 768px) --- */
-@media screen and (max-width: 768px) {
-    /* Class bantuan yang akan dipicu oleh JavaScript saat diklik di HP */
-    .sub-submenu-dalam.buka {
-        display: block !important;
-    }
-    
-    .sub-submenu-dalam li a {
-        padding-left: 35px !important; /* Efek menjorok ke dalam di layar HP */
-    }
 }
 
 /* ==========================================================================
@@ -407,8 +400,28 @@ body {
     .nav-list { flex-direction: column; }
     .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.1); }
     
-    /* Menggabungkan reset layout dropdown 3 layer di HP */
-    .submenu, .sub-submenu-dalam { position: static; box-shadow: none; padding-left: 15px; }
+    /* Reset tata letak menu di HP agar memanjang ke bawah standar */
+    .submenu { 
+        position: static; 
+        box-shadow: none; 
+        padding-left: 15px; 
+    }
+
+    /* PERBAIKAN TOTAL LAYER 3 DI HP: Tumbuh penuh ke bawah tanpa menjorok kanan */
+    .sub-submenu-dalam {
+        position: static;
+        box-shadow: none;
+    }
+
+    .sub-submenu-dalam.buka {
+        display: block !important;
+    }
+    
+    .sub-submenu-dalam li a {
+        padding-left: 20px !important; /* Rata kiri se-lebar layar dengan menu utama */
+        background-color: #a11f1d !important; /* Blok warna merah gelap penuh */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Batas tipis antar menu */
+    }
 
     /* Hero Section HP */
     .hero-title-box { flex-direction: column; gap: 5px; }
@@ -579,15 +592,3 @@ body {
 .team-socials { display: flex; justify-content: center; gap: 15px; margin-top: auto; }
 .team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
 .team-socials a:hover { color: #E53935; transform: scale(1.2); }
-
-/* Sembunyikan Layer 3 secara default di tampilan HP */
-@media screen and (max-width: 768px) {
-    .sub-submenu-dalam {
-        display: none; 
-    }
-    
-    /* Class bantuan dari JavaScript untuk membuka Layer 3 */
-    .sub-submenu-dalam.buka {
-        display: block !important;
-    }
-}
