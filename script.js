@@ -16,28 +16,29 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // LOGIKA BARU: Klik urut bertahap dari Layer 2 (Bulanan/Tahunan) ke Layer 3 di layar HP
+    // LOGIKA PERBAIKAN: Klik urut bertahap dari Layer 2 ke Layer 3 (Kompatibel 100% untuk semua HP)
     document.querySelectorAll('.trigger-layer2').forEach(tombol => {
         tombol.addEventListener('click', function(efek) {
-            // Hanya jalankan fungsi klik bertingkat ini jika di layar HP (lebar layar <= 768px)
-            if (window.innerWidth <= 768) {
-                efek.preventDefault(); // Mencegah halaman melompat atau refresh
+            // Mencegah halaman melompat ke atas atau me-refresh halaman saat diklik
+            efek.preventDefault(); 
+            
+            // Cari elemen pembungkus li terdekat (.submenu-item)
+            const indukLi = this.closest('.submenu-item');
+            // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
+            const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
+            
+            if (layer3) {
+                // Cek status apakah menu yang diklik ini sebenarnya sudah terbuka atau belum
+                const apakahSudahBuka = layer3.classList.contains('buka');
+
+                // 1. Tutup SEMUA sub-menu layer 3 yang lain agar tidak saling tabrakan/menumpuk
+                document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
+                    menuLain.classList.remove('buka');
+                });
                 
-                // Cari elemen pembungkus li terdekat (.submenu-item)
-                const indukLi = this.closest('.submenu-item');
-                // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
-                const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
-                
-                if (layer3) {
-                    // Tutup dulu sub-menu layer 3 lainnya yang sedang terbuka agar rapi bergantian
-                    document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
-                        if (menuLain !== layer3) {
-                            menuLain.classList.remove('buka');
-                        }
-                    });
-                    
-                    // Buka atau tutup sub-menu layer 3 yang sedang Anda ketuk
-                    layer3.classList.toggle('buka');
+                // 2. Jika menu yang diklik tadinya tertutup, sekarang kita buka kondisinya
+                if (!apakahSudahBuka) {
+                    layer3.classList.add('buka');
                 }
             }
         });
