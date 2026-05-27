@@ -171,23 +171,40 @@ body {
     font-weight: normal; 
 }
 
-/* Hover teks di Layer 2 */
+/* Hover teks di Layer 2 saja */
 .submenu-item > a:hover { 
     color: yellow !important; 
     background-color: #C62828; 
 }
 
 /* Memunculkan Layer 2 saat Kegiatan di-hover */
-.nav-item:hover .submenu { 
+.nav-item:hover > .submenu { 
     display: block; 
 }
 
 /* Layer 3: Sub-menu Bagian Dalam (Rapat Bulanan & 17-an) */
 .sub-submenu-dalam {
+    display: none; /* Sembunyikan dulu secara default */
     list-style: none; 
     padding: 0;
     margin: 0;
-    background-color: #bd2724; /* Merah agak gelap sebagai penanda anak menu */
+    background-color: #bd2724; 
+}
+
+/* --- TAMPILAN PC / LAPTOP (Minimal Lebar Layar 769px) --- */
+@media screen and (min-width: 769px) {
+    .sub-submenu-dalam {
+        position: absolute;
+        top: 0;
+        left: 100%; /* Membuka sub-menu tingkat 3 ke arah KANAN di PC */
+        min-width: 200px;
+        box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
+    }
+    
+    /* Hanya munculkan Layer 3 dari menu yang sedang di-hover saja */
+    .submenu-item:hover > .sub-submenu-dalam {
+        display: block;
+    }
 }
 
 .sub-submenu-dalam li {
@@ -195,16 +212,26 @@ body {
 }
 
 .sub-submenu-dalam li a {
-    padding-left: 35px !important; /* Efek menjorok masuk ke kanan */
     font-size: 12px;
     color: #fff;
     font-weight: normal;
 }
 
-/* Hover teks khusus di Layer 3 */
 .sub-submenu-dalam li a:hover {
     color: yellow !important;
     background-color: #a11f1d !important;
+}
+
+/* --- TAMPILAN HP (Maksimal Lebar Layar 768px) --- */
+@media screen and (max-width: 768px) {
+    /* Class bantuan yang akan dipicu oleh JavaScript saat diklik di HP */
+    .sub-submenu-dalam.buka {
+        display: block !important;
+    }
+    
+    .sub-submenu-dalam li a {
+        padding-left: 35px !important; /* Efek menjorok ke dalam di layar HP */
+    }
 }
 
 /* ==========================================================================

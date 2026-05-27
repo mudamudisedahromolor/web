@@ -15,20 +15,32 @@ document.addEventListener("DOMContentLoaded", function() {
             navBar.classList.toggle('aktif');
         });
     }
-});
 
-document.querySelectorAll('.trigger-layer2').forEach(tombol => {
-    tombol.addEventListener('click', (efek) => {
-        // Mencegah link me-refresh halaman saat diklik
-        efek.preventDefault(); 
-        
-        // Mencari kotak sub-submenu-dalam yang berada tepat di bawah tulisan yang diklik
-        const layer3 = tombol.nextElementSibling;
-        
-        if (layer3) {
-            // Togle class 'buka' (kalau diklik muncul, diklik lagi sembunyi)
-            layer3.classList.toggle('buka');
-        }
+    // LOGIKA BARU: Klik urut bertahap dari Layer 2 (Bulanan/Tahunan) ke Layer 3 di layar HP
+    document.querySelectorAll('.trigger-layer2').forEach(tombol => {
+        tombol.addEventListener('click', function(efek) {
+            // Hanya jalankan fungsi klik bertingkat ini jika di layar HP (lebar layar <= 768px)
+            if (window.innerWidth <= 768) {
+                efek.preventDefault(); // Mencegah halaman melompat atau refresh
+                
+                // Cari elemen pembungkus li terdekat (.submenu-item)
+                const indukLi = this.closest('.submenu-item');
+                // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
+                const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
+                
+                if (layer3) {
+                    // Tutup dulu sub-menu layer 3 lainnya yang sedang terbuka agar rapi bergantian
+                    document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
+                        if (menuLain !== layer3) {
+                            menuLain.classList.remove('buka');
+                        }
+                    });
+                    
+                    // Buka atau tutup sub-menu layer 3 yang sedang Anda ketuk
+                    layer3.classList.toggle('buka');
+                }
+            }
+        });
     });
 });
 
@@ -138,7 +150,6 @@ window.terapkanFilter = function() {
     });
 
     // 2. Hitung Angka Kartu Atas (HANYA BERDASARKAN FILTER TAHUN)
-    // Jika tidak ada tahun dipilih ("Semua"), maka hitung total keseluruhan seperti di foto.
     let m = 0, k = 0;
     
     let dataUntukKartu = dataKeuanganGlobal; 
@@ -159,53 +170,3 @@ window.terapkanFilter = function() {
     const saldoCardTitle = document.querySelector('.card-box.saldo h4');
     if (saldoCardTitle) {
         saldoCardTitle.innerHTML = `<i class="fa-solid fa-wallet"></i> Saldo Kas ${thn === "Semua" ? "Keseluruhan" : "(" + thn + ")"}`;
-    }
-    document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
-
-    // 3. Render Tabel (Update UI)
-    halamanSaatIni = 1;
-    renderTabel();
-}
-
-function renderTabel() {
-    const tbody = document.getElementById('data-tabel-keuangan');
-    if (!tbody) return;
-
-    if (dataTersaringGlobal.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#666;">Data transaksi tidak ditemukan.</td></tr>`;
-        return;
-    }
-
-    const start = (halamanSaatIni - 1) * barisPerHalaman;
-    const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
-    
-    let html = pageData.map(i => `
-        <tr>
-            <td>${i.tanggal}</td>
-            <td>${i.keterangan}</td>
-            <td style="font-weight:bold;">
-                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' 
-                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
-            </td>
-            <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
-        </tr>
-    `).join('');
-
-    const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
-    if (totalHal > 1) {
-        let tombolNav = "";
-        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
-        if (halamanSaatIni === 1) {
-            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
-        } else if (halamanSaatIni === totalHal) {
-            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
-        } else {
-            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
-        }
-        html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
-    }
-    tbody.innerHTML = html;
-}
-
-window.nav = (dir) => { halamanSaatIni += dir; renderTabel(); };
-function formatRupiah(a) { return 'Rp ' + Math.abs(a).toLocaleString('id-ID'); }
