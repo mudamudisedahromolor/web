@@ -160,3 +160,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// ==========================================================================
+// SCRIPT KHUSUS CAROUSEL STRUKTUR (SWIPER)
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", function() {
+    // Pastikan swiper hanya dijalankan jika ada elemen .mySwiper di halaman tersebut
+    if (document.querySelector('.mySwiper')) {
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1, 
+            spaceBetween: 15,
+            centeredSlides: true, 
+            loop: true,
+            
+            // Fokus ke elemen dengan Index 2 (Ketua)
+            initialSlide: 2, 
+            
+            // Tambahan konfigurasi agar perhitungan tengahnya lebih stabil
+            observer: true,
+            observeParents: true,
+            
+            breakpoints: {
+                768: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                }
+            }
+        });
+    }
+
+    // Script Menu Mobile
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            document.querySelector('.main-navbar').classList.toggle('aktif');
+        });
+    }
+});
