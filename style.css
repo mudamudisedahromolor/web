@@ -41,6 +41,16 @@ body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; }
 .nav-item:hover .submenu { display: block; }
 
 /* ==========================================================================
+   PERBAIKAN HYPERLINK LOGO
+   ========================================================================== */
+.logo-wrapper {
+    text-decoration: none; /* Menghilangkan garis bawah hyperlink */
+    color: inherit; /* Mencegah font berubah jadi warna biru bawaan link */
+    display: flex; /* Mengembalikan posisi gambar dan teks agar berdampingan */
+    align-items: center; /* Memastikan posisi vertikalnya sejajar di tengah */
+    gap: 12px; /* Memberikan jarak antara logo dan teks */
+}
+/* ==========================================================================
    2. HERO SECTION (Foto Full Screen)
    ========================================================================== */
 .hero-container {
