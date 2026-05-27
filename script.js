@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const navBar = document.querySelector('.main-navbar');
     
     if (menuBtn && navBar) {
-        // Trik reset tombol agar responsif di HP (khususnya iPhone)
         const newMenuBtn = menuBtn.cloneNode(true);
         menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
         
@@ -16,36 +15,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // LOGIKA ANTI-GAGAL: Klik urut bertahap dari Layer 2 ke Layer 3 khusus layar sentuh HP fisik
-    document.querySelectorAll('.trigger-layer2').forEach(tombol => {
-        // Memasang event 'click' dan 'touchstart' sekaligus agar kompatibel dengan semua OS Mobile
-        ['click', 'touchstart'].forEach(namaEvent => {
-            tombol.addEventListener(namaEvent, function(efek) {
-                // Mengunci browser HP agar tidak melompat ke atas halaman atau membatalkan aksi script
-                efek.preventDefault(); 
-                efek.stopPropagation(); 
-                
-                // Cari elemen pembungkus li terdekat (.submenu-item)
-                const indukLi = this.closest('.submenu-item');
-                // Temukan kotak sub-menu layer 3 khusus yang ada di dalam li tersebut
-                const layer3 = indukLi ? indukLi.querySelector('.sub-submenu-dalam') : null;
-                
-                if (layer3) {
-                    const apakahSudahBuka = layer3.classList.contains('buka');
-    
-                    // 1. Tutup SEMUA sub-menu layer 3 yang lain agar tidak saling tumpang tindih
-                    document.querySelectorAll('.sub-submenu-dalam').forEach(menuLain => {
-                        menuLain.classList.remove('buka');
-                    });
-                    
-                    // 2. Jika menu yang diketuk tadinya tertutup, sekarang kita buka total ke bawah
-                    if (!apakahSudahBuka) {
-                        layer3.classList.add('buka');
-                    }
-                }
-            }, { passive: false }); // Memaksa browser HP menuruti perintah preventDefault() secara penuh
+    // SYSTEM DROPDOWN HP DIRECT TARGET (ANTI-GAGAL)
+    const btnBulanan = document.getElementById('btn-bulanan');
+    const btnTahunan = document.getElementById('btn-tahunan');
+    const menuRapat = document.getElementById('menu-rapat');
+    const menu17an = document.getElementById('menu-17an');
+
+    if (btnBulanan && menuRapat) {
+        btnBulanan.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Tutup menu tahunan terlebih dahulu
+            if (menu17an) menu17an.classList.remove('buka');
+            
+            // Buka atau tutup menu rapat bulanan
+            menuRapat.classList.toggle('buka');
         });
-    });
+    }
+
+    if (btnTahunan && menu17an) {
+        btnTahunan.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Tutup menu bulanan terlebih dahulu
+            if (menuRapat) menuRapat.classList.remove('buka');
+            
+            // Buka atau tutup menu 17-an
+            menu17an.classList.toggle('buka');
+        });
+    }
 });
 
 /* ==========================================================================
