@@ -226,3 +226,31 @@ body { background-color: #f4f4f4; }
     gap: 15px;
     margin-top: 20px;
 }
+
+/* Styling NIM */
+.nim-text { font-size: 11px; color: #888; margin: 5px 0; }
+
+/* Styling Sosmed */
+.team-socials { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+.team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
+.team-socials a:hover { color: #E53935; transform: scale(1.2); }
+
+/* Grid Layout */
+.hierarki-row { display: flex; justify-content: center; margin-bottom: 20px; }
+.hierarki-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Kartu Profil */
+.team-card {
+    background: #fff; padding: 20px; border-radius: 15px;
+    text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.team-card img {
+    width: 100px; height: 100px; border-radius: 50%;
+    object-fit: cover; margin-bottom: 10px; border: 2px solid #eee;
+}
+.ketua-card img { border: 3px solid #FFD700; width: 120px; height: 120px; }
