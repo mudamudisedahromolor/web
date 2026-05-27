@@ -8,9 +8,34 @@
     <link rel="icon" href="images/mms.png" type="image/png">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="style.css?v=101">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* Gaya khusus untuk slider agar rapi di dalam kotak putih */
+        body { background-color: #f4f4f4; } /* Warna dasar abu-abu terang seperti halaman laporan */
+        
+        .swiper { width: 100%; padding: 20px 0 50px 0; }
+        .swiper-slide { transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0.5; transform: scale(0.85); }
+        .swiper-slide-active { opacity: 1; transform: scale(1.05); z-index: 10; }
+
+        .team-card {
+            background: #fff; padding: 30px 20px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            border: 1px solid #eee; min-height: 280px;
+        }
+        .team-card img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #ddd; }
+        .ketua-card img { border-color: #E53935; width: 130px; height: 130px; } /* Border merah untuk ketua */
+        
+        .team-card h4 { color: #333; font-size: 16px; margin-bottom: 5px; font-weight: bold; }
+        .team-card p { color: #E53935; font-weight: 600; font-size: 13px; text-transform: uppercase; margin-bottom: 5px; }
+        .nim-text { font-size: 11px !important; color: #888 !important; text-transform: none !important; font-weight: normal !important; margin-bottom: 15px !important; }
+        
+        .team-socials { display: flex; justify-content: center; gap: 15px; margin-top: auto; }
+        .team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
+        .team-socials a:hover { color: #E53935; transform: scale(1.2); }
+    </style>
 </head>
 <body> 
     
@@ -66,14 +91,16 @@
         </nav>
     </header>
 
-    <div class="hero-container" style="align-items: flex-start; padding-top: 160px; padding-bottom: 50px;">
-        <div class="hero-overlay"></div>
+    <div style="padding-top: 150px; padding-bottom: 60px; display: flex; justify-content: center;">
         
-        <div class="content-box struktur-box">
-            <h2 class="box-title">STRUKTUR PENGURUS INTI</h2>
-            <hr class="box-divider">
-            <p class="petunjuk-geser"><i class="fa-solid fa-left-right"></i> Geser untuk melihat pengurus</p>
-
+        <div class="content-box" style="width: 95%; max-width: 1000px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 40px; border-radius: 12px;">
+            <h2 class="box-title" style="color: #E53935; text-align: center; font-size: 28px; margin-bottom: 15px;">STRUKTUR PENGURUS INTI</h2>
+            <hr class="box-divider" style="border: 0; height: 3px; background-color: #E53935; width: 60px; margin: 0 auto 30px auto;">
+            
+            <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 14px;">
+                <i class="fa-solid fa-left-right"></i> Geser untuk melihat detail pengurus
+            </p>
+            
             <div class="swiper mySwiper">
                 <div class="swiper-wrapper">
                     
@@ -84,8 +111,8 @@
                             <p>Sekretaris II</p>
                             <p class="nim-text">NIM: 2026004</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
@@ -97,8 +124,8 @@
                             <p>Sekretaris I</p>
                             <p class="nim-text">NIM: 2026003</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
@@ -110,8 +137,8 @@
                             <p>Ketua</p>
                             <p class="nim-text">NIM: 2026001</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
@@ -123,8 +150,8 @@
                             <p>Wakil Ketua</p>
                             <p class="nim-text">NIM: 2026002</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
@@ -136,8 +163,8 @@
                             <p>Bendahara I</p>
                             <p class="nim-text">NIM: 2026005</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
@@ -149,20 +176,52 @@
                             <p>Bendahara II</p>
                             <p class="nim-text">NIM: 2026006</p>
                             <div class="team-socials">
-                                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
                             </div>
                         </div>
                     </div>
 
                 </div>
             </div>
-            
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="script.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // 1. Inisialisasi Slider (Berjalan setelah HTML dimuat penuh)
+            const swiper = new Swiper(".mySwiper", {
+                slidesPerView: 1,       
+                spaceBetween: 20,
+                centeredSlides: true,   
+                loop: true,
+                initialSlide: 2,        // Fokus ke Ketua (Slide ke-3)
+                breakpoints: {
+                    768: {
+                        slidesPerView: 3, 
+                        spaceBetween: 30
+                    }
+                }
+            });
+
+            // 2. Perbaikan Tombol Navbar Mobile (Dijamin Berfungsi)
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const navBar = document.querySelector('.main-navbar');
+            
+            if (menuBtn && navBar) {
+                // Menghapus event listener lama jika ada, lalu memasang yang baru
+                const newMenuBtn = menuBtn.cloneNode(true);
+                menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+                
+                newMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Mencegah reload halaman
+                    navBar.classList.toggle('aktif');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
-
