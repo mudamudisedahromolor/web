@@ -552,3 +552,15 @@ body {
 .team-socials { display: flex; justify-content: center; gap: 15px; margin-top: auto; }
 .team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
 .team-socials a:hover { color: #E53935; transform: scale(1.2); }
+
+/* Sembunyikan Layer 3 secara default di tampilan HP */
+@media screen and (max-width: 768px) {
+    .sub-submenu-dalam {
+        display: none; 
+    }
+    
+    /* Class bantuan dari JavaScript untuk membuka Layer 3 */
+    .sub-submenu-dalam.buka {
+        display: block !important;
+    }
+}

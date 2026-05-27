@@ -17,6 +17,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+document.querySelectorAll('.trigger-layer2').forEach(tombol => {
+    tombol.addEventListener('click', (efek) => {
+        // Mencegah link me-refresh halaman saat diklik
+        efek.preventDefault(); 
+        
+        // Mencari kotak sub-submenu-dalam yang berada tepat di bawah tulisan yang diklik
+        const layer3 = tombol.nextElementSibling;
+        
+        if (layer3) {
+            // Togle class 'buka' (kalau diklik muncul, diklik lagi sembunyi)
+            layer3.classList.toggle('buka');
+        }
+    });
+});
+
 /* ==========================================================================
    2. SCRIPT KHUSUS CAROUSEL STRUKTUR (SWIPER)
    ========================================================================== */
