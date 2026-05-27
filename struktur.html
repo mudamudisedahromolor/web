@@ -166,15 +166,28 @@
                 <i class="fa-solid fa-left-right"></i> Geser ke kanan atau kiri untuk melihat detail pengurus
             </p>
             
-            <div class="swiper mySwiper">
+                        <div class="swiper mySwiper">
                 <div class="swiper-wrapper">
                     
                     <div class="swiper-slide">
                         <div class="team-card">
-                            <img src="images/ben1.jpg" alt="Bendahara I">
-                            <h4>Kadarini Setyowati</h4>
-                            <p>Bendahara I</p>
-                            <p class="nim-text">NIM: 2026005</p>
+                            <img src="images/sek2.jpg" alt="Sekretaris II">
+                            <h4>[Nama Sek II]</h4>
+                            <p>Sekretaris II</p>
+                            <p class="nim-text">NIM: 2026004</p>
+                            <div class="team-socials">
+                                <a href="https://instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="https://wa.me/628" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/sek1.jpg" alt="Sekretaris I">
+                            <h4>Febiola Giska Putri</h4>
+                            <p>Sekretaris I</p>
+                            <p class="nim-text">NIM: 2026003</p>
                             <div class="team-socials">
                                 <a href="https://instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                                 <a href="https://wa.me/628" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
@@ -210,10 +223,23 @@
 
                     <div class="swiper-slide">
                         <div class="team-card">
-                            <img src="images/sek1.jpg" alt="Sekretaris I">
-                            <h4>Febiola Giska Putri</h4>
-                            <p>Sekretaris I</p>
-                            <p class="nim-text">NIM: 2026003</p>
+                            <img src="images/ben1.jpg" alt="Bendahara I">
+                            <h4>Kadarini Setyowati</h4>
+                            <p>Bendahara I</p>
+                            <p class="nim-text">NIM: 2026005</p>
+                            <div class="team-socials">
+                                <a href="https://instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="https://wa.me/628" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/ben2.jpg" alt="Bendahara II">
+                            <h4>[Nama Ben II]</h4>
+                            <p>Bendahara II</p>
+                            <p class="nim-text">NIM: 2026006</p>
                             <div class="team-socials">
                                 <a href="https://instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                                 <a href="https://wa.me/628" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
@@ -223,6 +249,33 @@
 
                 </div>
             </div>
+            ```
+
+### 2. Update JavaScript (Paling Bawah)
+Pastikan Anda mengubah angka `initialSlide` dari `1` menjadi `2` pada bagian script terbawah, karena sekarang urutan kartu Ketua ada di urutan ketiga (dalam sistem array kodingan, hitungannya adalah 0, 1, 2).
+
+```html
+    <script>
+        // 1. Konfigurasi Sistem Jalannya Carousel (Swiper)
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1,       
+            spaceBetween: 15,
+            centeredSlides: true,   
+            loop: true,             
+            initialSlide: 2,        /* <--- Ubah angka ini jadi 2 agar fokus ke Ketua */
+            breakpoints: {
+                768: {
+                    slidesPerView: 3,  
+                    spaceBetween: 30
+                }
+            }
+        });
+
+        // 2. Sistem Kontrol Navigasi Navbar HP
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.querySelector('.main-navbar').classList.toggle('aktif');
+        });
+    </script>
             </div>
     </div>
 
