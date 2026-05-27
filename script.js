@@ -170,3 +170,53 @@ window.terapkanFilter = function() {
     const saldoCardTitle = document.querySelector('.card-box.saldo h4');
     if (saldoCardTitle) {
         saldoCardTitle.innerHTML = `<i class="fa-solid fa-wallet"></i> Saldo Kas ${thn === "Semua" ? "Keseluruhan" : "(" + thn + ")"}`;
+    }
+    document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
+
+    // 3. Render Tabel (Update UI)
+    halamanSaatIni = 1;
+    renderTabel();
+}
+
+function renderTabel() {
+    const tbody = document.getElementById('data-tabel-keuangan');
+    if (!tbody) return;
+
+    if (dataTersaringGlobal.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#666;">Data transaksi tidak ditemukan.</td></tr>`;
+        return;
+    }
+
+    const start = (halamanSaatIni - 1) * barisPerHalaman;
+    const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
+    
+    let html = pageData.map(i => `
+        <tr>
+            <td>${i.tanggal}</td>
+            <td>${i.keterangan}</td>
+            <td style="font-weight:bold;">
+                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' 
+                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
+            </td>
+            <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
+        </tr>
+    `).join('');
+
+    const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
+    if (totalHal > 1) {
+        let tombolNav = "";
+        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
+        if (halamanSaatIni === 1) {
+            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        } else if (halamanSaatIni === totalHal) {
+            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
+        } else {
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        }
+        html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
+    }
+    tbody.innerHTML = html;
+}
+
+window.nav = (dir) => { halamanSaatIni += dir; renderTabel(); };
+function formatRupiah(a) { return 'Rp ' + Math.abs(a).toLocaleString('id-ID'); }
