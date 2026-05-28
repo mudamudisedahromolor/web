@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Rapat Bulanan - Muda Mudi Sedahromo Lor</title>
+    
+    <link rel="icon" href="images/mms.png" type="image/png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body> 
+    
+    <header class="site-header">
+        <div class="top-header">
+            <div class="header-logo-area">
+                <a href="index.html" class="logo-wrapper">
+                    <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
+                    <div class="header-text">
+                        <span class="brand-title">MUDA MUDI</span>
+                        <span class="brand-subtitle">Sedahromo Lor 05</span>
+                    </div>
+                </a>
+            </div>
+            <div class="header-right-stuff">
+                <form class="search-box" action="#" method="GET">
+                    <input type="text" placeholder="Cari informasi..." name="search">
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+                <div class="header-socials">
+                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+                <button class="menu-toggle" id="mobile-menu-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div> 
+        </div> 
+        <nav class="main-navbar">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html">BERANDA</a></li>
+                <li class="nav-item">
+                    <a href="#">PROFIL</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="struktur.html">STRUKTUR KEANGGOTAAN</a></li>
+                        <li class="submenu-item"><a href="visi-misi.html">VISI & MISI</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">KEGIATAN</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="rapat-hasilrapat.html">RAPAT BULANAN</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">LAPORAN</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="laporan-keuangan.html">KEUANGAN</a></li>
+                        <li class="submenu-item"><a href="#">PERTANGGUNG JAWABAN</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="finance-page-wrapper">
+        <div class="content-box" style="max-width: 1100px; width: 95%;">
+            <h2 class="box-title">NOTULEN RAPAT BULANAN</h2>
+            <hr class="box-divider">
+            <p style="text-align: center; margin-bottom: 30px;">
+                Transparansi hasil musyawarah, pembahasan program kerja, dan keputusan bersama Muda Mudi Sedahromo Lor 05.
+            </p>
+
+            <div class="filter-container" style="justify-content: space-between; align-items: center;">
+                <div style="font-size: 14px; color: #555; font-weight: bold;">
+                    <i class="fa-solid fa-folder-open"></i> Arsip Keputusan
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filter-rapat-tahun" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Tahun</option>
+                    </select>
+                    
+                    <select id="filter-rapat-bulan" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Bulan</option>
+                    </select>
+                    
+                    <input type="text" id="input-cari-rapat" class="filter-box" style="width: 220px;" placeholder="Cari topik atau pembahasan..." onkeyup="terapkanFilterRapat()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="finance-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Tanggal Rapat</th>
+                            <th style="width: 25%;">Agenda / Topik Pembahasan</th>
+                            <th style="width: 45%;">Hasil Musyawarah / Keputusan</th>
+                            <th style="width: 15%;">Lokasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-tabel-rapat">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Arsip Google Sheets...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
