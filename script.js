@@ -112,7 +112,6 @@ let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 10;
 
-// --- MEMBACA LIVE DATA SPREADSHEET KEUANGAN ---
 async function loadKeuanganDariDrive() {
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
@@ -144,7 +143,6 @@ async function loadKeuanganDariDrive() {
             });
         }
 
-        // Isi data saringan dropdown filter secara dinamis sesuai isi kas nyata
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
         isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
         
@@ -158,7 +156,6 @@ async function loadKeuanganDariDrive() {
     }
 }
 
-// --- PEMPROSESAN ARSIP FILTER & AKUMULASI NOMINAL KARTU ---
 window.terapkanFilter = function() {
     const thnInput = document.getElementById('filter-tahun');
     const blnInput = document.getElementById('filter-bulan');
@@ -200,7 +197,6 @@ window.terapkanFilter = function() {
     renderTabel();
 }
 
-// --- MOUNTING ELEMEN DATA KE TABEL KEUANGAN ---
 function renderTabel() {
     const tbody = document.getElementById('data-tabel-keuangan');
     if (!tbody) return;
@@ -256,7 +252,6 @@ let dataRapatTersaring = [];
 let halRapatSaatIni = 1;
 const barisRapatPerHal = 5; 
 
-// --- MEMBACA LIVE DATA BERITA ACARA RAPAT ---
 async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
@@ -304,7 +299,6 @@ async function loadRapatDariDrive() {
     }
 }
 
-// --- EKSEKUSI FILTER PENCARIAN NOTULEN ---
 window.terapkanFilterRapat = function() {
     const thn = document.getElementById('filter-rapat-tahun').value;
     const bln = document.getElementById('filter-rapat-bulan').value;
@@ -320,7 +314,6 @@ window.terapkanFilterRapat = function() {
     renderTabelRapat();
 }
 
-// --- MOUNTING DATA NOTULEN KE TABEL RAPAT ---
 function renderTabelRapat() {
     const tbody = document.getElementById('data-tabel-rapat');
     if (!tbody) return;
@@ -364,17 +357,11 @@ window.navRapat = (dir) => { halRapatSaatIni += dir; renderTabelRapat(); };
 
 /* ==========================================================================
    6. FUNGSI UTILITAS & PEMBANTU (HELPERS)
-   --------------------------------------------------------------------------
-   Instruksi: Fungsi pendukung mekanis untuk menyisipkan data teks ke elemen 
-   opsi select option (dropdown) serta mengubah angka nominal biasa menjadi 
-   format mata uang Rupiah Indonesia (Rp 000.000).
    ========================================================================== */
 function isiDropdown(id, dataArray) {
     const el = document.getElementById(id);
     if (!el) return;
-    
-    el.innerHTML = el.options[0].outerHTML; // Amankan baris pertama select bawaan ("Semua")
-    
+    el.innerHTML = el.options[0].outerHTML; 
     dataArray.forEach(item => {
         let opt = document.createElement("option");
         opt.value = item; 
@@ -389,16 +376,13 @@ function formatRupiah(angka) {
 
 
 /* ==========================================================================
-   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & SORT LIVE)
-   --------------------------------------------------------------------------
-   Instruksi: Mendukung deteksi upload banyak file sekaligus di form, memotong 
-   link berdasarkan koma, lalu menyusunnya berjejer ke bawah secara otomatis.
+   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & AUTO SORT FIX)
    ========================================================================== */
-const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=605024526&single=true&output=tsv";
+// PASTIKAN LINK INI ADALAH LINK TSV HASIL PUBLISH SHEET DOKUMENTASIMU
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=246001796&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
 
-// --- MEMBACA LIVE DATA SPREADSHEET GALERI DOKUMENTASI ---
 async function loadDokumentasiDariDrive() {
     try {
         const response = await fetch(`${linkTsvDokumentasi}&cache=${new Date().getTime()}`);
@@ -416,18 +400,19 @@ async function loadDokumentasiDariDrive() {
             const kolom = barisBersih.split("\t");
             if (kolom.length < 5) continue; 
 
-            // MAP URUTAN SELEKTOR KOLOM SINKRON:
-            // kolom[1] = Agenda | kolom[2] = Subjek | kolom[3] = Tanggal Kegiatan Asli | kolom[4] = Kegiatan | kolom[5] = Link Foto (Bisa Banyak Link)
-            let agendaRaw = kolom[1] ? kolom[1].trim() : "-";
-            let subjekRaw = kolom[2] ? kolom[2].trim() : "-";
-            let tglRaw = kolom[3] ? kolom[3].trim() : ""; 
-            let kegiatanRaw = kolom[4] ? kolom[4].trim() : "-";
+            // URUTAN SELEKTOR MAP SESUAI SCREENSHOT SHEET:
+            // kolom[1] = Tanggal Kegiatan | kolom[2] = Agenda | kolom[3] = Kegiatan | kolom[4] = Subject | kolom[5] = Upload File
+            let tglRaw = kolom[1] ? kolom[1].trim() : ""; 
+            let agendaRaw = kolom[2] ? kolom[2].trim() : "-";
+            let kegiatanRaw = kolom[3] ? kolom[3].trim() : "-";
+            let subjekRaw = kolom[4] ? kolom[4].trim() : "-";
             let linkFotoAsli = kolom[5] ? kolom[5].trim() : ""; 
             
             if (!tglRaw) continue;
 
+            // Memotong tanggal bertipe DD/MM/YYYY secara bersih
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
-            let thn = tglSplit[2] || tglSplit[0] || "2026";
+            let thn = tglSplit[2] ? tglSplit[2].trim() : "2026";
             if(thn.length > 4) thn = thn.substring(0,4);
             
             let indexBulan = parseInt(tglSplit[1], 10) - 1;
@@ -447,7 +432,7 @@ async function loadDokumentasiDariDrive() {
             });
         }
 
-        // Urutkan data berdasarkan Tanggal Kegiatan Nyata paling baru di atas
+        // Urutkan data berdasarkan Tanggal Kegiatan Nyata terupdate otomatis di atas
         dataDokumentasiGlobal.sort((itemA, itemB) => {
             let splitA = itemA.tanggal.includes("/") ? itemA.tanggal.split("/") : itemA.tanggal.split("-");
             let splitB = itemB.tanggal.includes("/") ? itemB.tanggal.split("/") : itemB.tanggal.split("-");
@@ -466,7 +451,6 @@ async function loadDokumentasiDariDrive() {
     }
 }
 
-// --- EKSEKUSI FILTER TOPIK GALERI DOKUMENTASI ---
 window.terapkanFilterDokumentasi = function() {
     const thn = document.getElementById('filter-dok-tahun').value;
     const bln = document.getElementById('filter-dok-bulan').value;
@@ -481,7 +465,6 @@ window.terapkanFilterDokumentasi = function() {
     renderTabelDokumentasi();
 }
 
-// --- MOUNTING DATA BERKAS & GAMBAR KE TABEL GALERI DOKUMENTASI (MULTI IMAGE HANDLER) ---
 function renderTabelDokumentasi() {
     const tbody = document.getElementById('data-tabel-dokumentasi');
     if (!tbody) return;
@@ -495,10 +478,7 @@ function renderTabelDokumentasi() {
         let kolomMedia = "";
         
         if (i.linkAsli) {
-            // Memecah teks link gabungan dari Google Sheets berdasarkan tanda koma (jika upload > 1 gambar)
             let daftarLink = i.linkAsli.split(",").map(link => link.trim());
-            
-            // Flexbox vertikal agar baris gambar tersusun rapi ke bawah (seperti di-enter)
             kolomMedia = `<div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">`;
             
             daftarLink.forEach((linkSingle, index) => {
@@ -527,7 +507,7 @@ function renderTabelDokumentasi() {
                                 <img src="${renderUrl}" alt="${i.agenda}" style="max-width:260px; max-height:200px; object-fit:contain; background-color:#fafafa; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
                             </a>
                             <br>
-                            <a href="${linkSingle}" target="_blank" style="font-size:10px; color:#E53935; text-decoration:none; display:inline-block; margin-top:4px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Foto ${index + 1} (Penuh)</a>
+                            <a href="${linkSingle}" target="_blank" style="font-size:11px; color:#E53935; text-decoration:none; display:inline-block; margin-top:4px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Foto ${index + 1} (Penuh)</a>
                         </div>`;
                 } else {
                     kolomMedia += `
