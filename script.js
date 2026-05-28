@@ -171,7 +171,7 @@ const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a
 let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
-const barisPerHalaman = 10;
+const barisPerHalaman = 7;
 
 // Mengambil Data dari Live Google Spreadsheet
 async function loadKeuanganDariDrive() {
