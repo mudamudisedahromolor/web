@@ -33,7 +33,7 @@
                     <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
                 <div class="header-socials">
-                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="Instagram"><i class="fa-solid fa-camera"></i></a>
                     <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
                     <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
                     <a href="https://www.tiktok.com/@mudamudisedahromolor05?is_from_webapp=1&sender_device=pc" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
@@ -80,42 +80,21 @@
             </p>
 
             <div class="filter-container" style="justify-content: space-between; align-items: center; margin-bottom: 25px;">
-    <div style="font-size: 14px; color: #555; font-weight: bold;">
-        <i class="fa-solid fa-images" style="color: #E53935;"></i> Galeri & Berkas Acara
-    </div>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <select id="filter-dok-tahun" class="filter-box" onchange="terapkanFilterDokumentasi()">
-            <option value="Semua">Semua Tahun</option>
-        </select>
-        
-        <select id="filter-dok-bulan" class="filter-box" onchange="terapkanFilterDokumentasi()">
-            <option value="Semua">Semua Bulan</option>
-        </select>
-        
-        <input type="text" id="input-cari-dok" class="filter-box" style="width: 230px;" placeholder="Cari agenda atau kegiatan..." onkeyup="terapkanFilterDokumentasi()">
-    </div>
-</div>
-
-<div class="table-responsive">
-    <table class="finance-table">
-        <thead>
-            <tr>
-                <th style="width: 15%;">Tanggal</th>
-                <th style="width: 20%;">Agenda</th>
-                <th style="width: 35%;">Kegiatan</th>
-                <th style="width: 30%; text-align: center;">Foto / File</th>
-            </tr>
-        </thead>
-        <tbody id="data-tabel-dokumentasi">
-            <tr>
-                <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
-                    <i class="fa-solid fa-spinner fa-spin fa-xl" style="color: #E53935; margin-bottom: 10px;"></i>
-                    <br>Sinkronisasi berkas gambar dari Google Drive...
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                <div style="font-size: 14px; color: #555; font-weight: bold;">
+                    <i class="fa-solid fa-images" style="color: #E53935;"></i> Galeri & Berkas Acara
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filter-dok-tahun" class="filter-box" onchange="terapkanFilterDokumentasi()">
+                        <option value="Semua">Semua Tahun</option>
+                    </select>
+                    
+                    <select id="filter-dok-bulan" class="filter-box" onchange="terapkanFilterDokumentasi()">
+                        <option value="Semua">Semua Bulan</option>
+                    </select>
+                    
+                    <input type="text" id="input-cari-dok" class="filter-box" style="width: 230px;" placeholder="Cari agenda atau kegiatan..." onkeyup="terapkanFilterDokumentasi()">
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table class="finance-table">
@@ -127,7 +106,7 @@
                             <th style="width: 30%; text-align: center;">Foto / File</th>
                         </tr>
                     </thead>
-                    <tbody id="data-tabel-keuangan">
+                    <tbody id="data-tabel-dokumentasi">
                         <tr>
                             <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
                                 <i class="fa-solid fa-spinner fa-spin fa-xl" style="color: #E53935; margin-bottom: 10px;"></i>
@@ -140,7 +119,7 @@
 
             <div class="gallery-footer">
                 <a href="https://drive.google.com/drive/folders/1ZL1loVYgZPfvnuOxMz6vIHCzw9aHwanW?hl=id" target="_blank" class="btn-open-drive">
-                    <i class="fa-sxolid fa-arrow-up-right-from-square"></i> Lihat Folder Sumber di Google Drive
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Folder Sumber di Google Drive
                 </a>
             </div>
         </div>
