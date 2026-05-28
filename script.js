@@ -201,7 +201,7 @@ async function loadKeuanganDariDrive() {
             daftarBulan.add(bln);
 
             dataKeuanganGlobal.push({ 
-                tanggal: tglRaw, bulan: bln, tahun: thn, keterangan: kolom[3], tipe: statusTipe, jumlah: kolom[4] || "0" 
+                tanggal: tglRaw, bulan: bln, tahun: thn, keterangan: kolom[3], tipe: statusTipe, jumlah: kolom[4] || "0", linkNota: kolom[5] || ""
             });
         }
 
@@ -275,16 +275,19 @@ function renderTabel() {
     const start = (halamanSaatIni - 1) * barisPerHalaman;
     const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
     
-    let html = pageData.map(i => `
-        <tr>
-            <td>${i.tanggal}</td>
-            <td>${i.keterangan}</td>
-            <td style="font-weight:bold;">
-                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
-            </td>
-            <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
-        </tr>
-    `).join('');
+let html = pageData.map(i => `
+    <tr>
+        <td>${i.tanggal}</td>
+        <td>
+            ${i.keterangan}
+            ${i.linkNota ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
+        </td>
+        <td style="font-weight:bold;">
+            ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
+        </td>
+        <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
+    </tr>
+`).join('');
 
     // Tambah Tombol Navigasi Halaman jika data melebihi limit
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
