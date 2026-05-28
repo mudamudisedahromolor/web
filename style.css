@@ -383,27 +383,129 @@ body {
 .finance-table tr:hover { background-color: #f1f1f1; }
 
 /* ==========================================================================
-   5. HALAMAN STRUKTUR ORGANISASI (SWIPER INTERAKTIF)
+   5. HALAMAN STRUKTUR ORGANISASI & SWIPER CAROUSEL (DIPERBARUI)
    ========================================================================== */
-.hierarki-row { display: flex; justify-content: center; margin-bottom: 20px; }
-.ketua-card { transform: scale(1.1); border: 2px solid #FFD700; } 
-.hierarki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 20px; }
-.nim-text { font-size: 11px !important; color: #888 !important; text-transform: none !important; margin-bottom: 12px; }
-.struktur-box { max-width: 1000px !important; background: transparent !important; box-shadow: none !important; }
-.petunjuk-geser { text-align: center; color: #ddd; margin-bottom: 20px; font-size: 13px; }
+.structure-page-wrapper { 
+    padding-top: 150px; 
+    padding-bottom: 60px; 
+    display: flex; 
+    justify-content: center; 
+}
 
-.swiper { width: 100%; padding: 20px 0 50px 0; }
-.swiper-slide { transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0.5; transform: scale(0.85); }
-.swiper-slide-active { opacity: 1; transform: scale(1.05); z-index: 10; }
+.content-box-structure {
+    position: relative; 
+    z-index: 2; 
+    background-color: #ffffff;
+    width: 95%; 
+    max-width: 1000px; 
+    padding: 40px; 
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin: 0 auto;
+}
 
-.team-card { background: #fff; padding: 30px 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 280px; }
-.team-card img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #ddd; }
-.ketua-card img { border-color: #FFD700; width: 125px; height: 125px; }
-.team-card h4 { color: #333; font-size: 16px; margin-bottom: 6px; font-weight: bold; }
-.team-card p { color: #E53935; font-weight: 600; font-size: 13px; text-transform: uppercase; margin-bottom: 2px; }
-.team-socials { display: flex; justify-content: center; gap: 15px; margin-top: auto; }
-.team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
-.team-socials a:hover { color: #E53935; transform: scale(1.2); }
+.swipe-instruction {
+    text-align: center; 
+    color: #666; 
+    margin-bottom: 20px; 
+    font-size: 14px;
+}
+
+.swiper { 
+    width: 100%; 
+    padding: 20px 0 50px 0; 
+}
+
+.swiper-slide { 
+    transition: transform 0.3s ease, opacity 0.3s ease; 
+    opacity: 0.5; 
+    transform: scale(0.85); 
+}
+
+.swiper-slide-active { 
+    opacity: 1; 
+    transform: scale(1.05); 
+    z-index: 10; 
+}
+
+/* Desain Kartu Tim */
+.team-card {
+    background: #fff; 
+    padding: 30px 20px; 
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    text-align: center;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    border: 1px solid #eee; 
+    min-height: 280px;
+}
+
+.team-card img { 
+    width: 110px; 
+    height: 110px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    margin-bottom: 15px; 
+    border: 3px solid #ddd; 
+}
+
+/* Penanda khusus kartu Ketua */
+.team-card.ketua-card img { 
+    border-color: #E53935; 
+    width: 130px; 
+    height: 130px; 
+}
+
+.team-card h4 { 
+    color: #333; 
+    font-size: 16px; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+}
+
+.team-card p { 
+    color: #E53935; 
+    font-weight: 600; 
+    font-size: 13px; 
+    text-transform: uppercase; 
+    margin-bottom: 5px; 
+}
+
+.nim-text { 
+    font-size: 11px !important; 
+    color: #888 !important; 
+    text-transform: none !important; 
+    font-weight: normal !important; 
+    margin-bottom: 15px !important; 
+}
+
+.team-socials { 
+    display: flex; 
+    justify-content: center; 
+    gap: 15px; 
+    margin-top: auto; 
+}
+
+.team-socials a { 
+    color: #555; 
+    font-size: 18px; 
+    transition: 0.3s; 
+}
+
+.team-socials a:hover { 
+    color: #E53935; 
+    transform: scale(1.2); 
+}
+
+/* Responsivitas Layar HP Kecil */
+@media screen and (max-width: 768px) {
+    .content-box-structure { 
+        padding: 25px; 
+        width: 95%; 
+    }
+}
 
 /* ==========================================================================
    6. MEDIA QUERIES KHUSUS DESKTOP / LAPTOP (PC)
@@ -463,3 +565,4 @@ body {
     .slide-content { width: 100%; padding: 25px; }
     .slide-content h3 { font-size: 20px; }
 }
+
