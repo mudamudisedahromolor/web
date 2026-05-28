@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Rapat Bulanan - Muda Mudi Sedahromo Lor</title>
+    <title>Muda Mudi Sedahromo Lor 05</title>
     
     <link rel="icon" href="images/mms.png" type="image/png">
     <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
@@ -96,75 +96,7 @@
         <div class="slider-dots" id="dots-container"></div>
     </div>
 
-
-    <script>
-        // --- A. DATA KEGIATAN (EDIT DI SINI TIAP MINGGU) ---
-        const kegiatanData = [
-            {
-                gambar: "images/foto-tirakatan.jpg", 
-                judul: "Malam Tirakatan 17 Agustus 2025",
-                deskripsi: "Kegiatan rutin tahunan untuk memperingati Hari Kemerdekaan Indonesia. Warga berkumpul di madrasah dinniyah untuk doa bersama, refleksi perjuangan para pahlawan bangsa."
-            },
-            {
-                gambar: "images/foto-lomba.jpg",
-                judul: "Lomba Agustusan Tahun 2025",
-                deskripsi: "Salah satu lomba anak yaitu pindah air dengan sendok untuk memperingati hari ulang tahun kemerdekaan Indonesia.yang ke-80 Tahun"
-            },
-            {
-                gambar: "images/momen-kebersamaan.jpg",
-                judul: "Momen Kebersamaan di Evaluasi Kegiatan",
-                deskripsi: "Momen indah di mana seluruh anggota organisasi berkumpul untuk mengevaluasi kegiatan dalam memperingati HUT-RI yang ke 80 tahun dari persiapan, eksekusi acara, serta harapan kedepannya"
-            }
-        ];
-
-        // --- B. MESIN SLIDER OTOMATIS ---
-        const sliderContainer = document.getElementById('slider-container');
-        const dotsContainer = document.getElementById('dots-container');
-        let slideIndex = 1, slideTimer;
-
-        // Mencetak HTML Slider dari Data
-        function renderSlider() {
-            let slidesHTML = "", dotsHTML = "";
-            kegiatanData.forEach((item, index) => {
-                slidesHTML += `
-                    <div class="slide ${index === 0 ? 'aktif' : ''}">
-                        <img src="${item.gambar}" alt="${item.judul}" class="slide-img">
-                        <div class="slide-content">
-                            <h3>${item.judul}</h3><p>${item.deskripsi}</p>
-                        </div>
-                    </div>`;
-                dotsHTML += `<span class="dot ${index === 0 ? 'aktif' : ''}" onclick="currentSlide(${index + 1})"></span>`;
-            });
-            sliderContainer.innerHTML = slidesHTML;
-            dotsContainer.innerHTML = dotsHTML;
-        }
-
-        // Logika Pergeseran Slide
-        function showSlides(n) {
-            let slides = document.getElementsByClassName("slide");
-            let dots = document.getElementsByClassName("dot");
-            if (n > slides.length) slideIndex = 1;    
-            if (n < 1) slideIndex = slides.length;
-            Array.from(slides).forEach(s => s.classList.remove("aktif"));
-            Array.from(dots).forEach(d => d.classList.remove("aktif"));
-            if (slides.length > 0) {
-                slides[slideIndex-1].classList.add("aktif");  
-                dots[slideIndex-1].classList.add("aktif");
-            }
-        }
-
-        function autoSlide() {
-            slideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, 5000);
-        }
-        function currentSlide(n) { showSlides(slideIndex = n); clearInterval(slideTimer); autoSlide(); }
-
-        // --- C. MESIN MENU HAMBURGER HP ---
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.querySelector('.main-navbar').classList.toggle('aktif');
-        });
-
-        // Jalankan semua fungsi saat web dibuka
-        renderSlider(); showSlides(slideIndex); autoSlide();
-    </script>
+<script src="script.js?v=1"></script>
+ 
 </body>
 </html>

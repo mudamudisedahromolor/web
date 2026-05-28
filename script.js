@@ -3,108 +3,169 @@
    BERKAS UTAMA    : SCRIPT.JS (LOGIKA INTERAKTIF & DATABASE REAL-TIME)
    ========================================================================== */
 
-// Konstanta Global yang dipakai bersama oleh seluruh modul halaman (Keuangan, Rapat, Dokumentasi)
+// Konstanta Global yang dipakai bersama oleh seluruh modul halaman
 const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "December"];
 
-
 /* ==========================================================================
-   1. SISTEM NAVIGASI & MENU DROPDOWN MOBILE (HP)
+   1. SISTEM INISIALISASI UTAMA
    --------------------------------------------------------------------------
-   Instruksi: Mengatur fungsi buka-tutup menu utama (gorden) serta sub-menu 
-   tingkat 2 (Bulanan & Tahunan) agar berjalan responsif di layar handphone.
+   Instruksi: Menjalankan berbagai fungsi ketika halaman web selesai dimuat.
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", function() {
+    initNavigasiMobile();
+    initCarouselOrganisasi();
+    initHeroSlider(); // Inisialisasi slider untuk halaman beranda (index.html)
     
-    // --- A. TOMBOL HAMBURGER (STRIP 3) ---
+    // Memuat database eksternal berdasarkan halaman yang sedang dibuka
+    if (document.getElementById('data-tabel-keuangan')) loadKeuanganDariDrive();
+    if (document.getElementById('data-tabel-rapat')) loadRapatDariDrive();
+    if (document.getElementById('data-tabel-dokumentasi')) loadDokumentasiDariDrive();
+});
+
+/* ==========================================================================
+   2. SISTEM NAVIGASI & MENU DROPDOWN MOBILE (HP)
+   --------------------------------------------------------------------------
+   Instruksi: Mengatur fungsi buka-tutup menu utama dan sub-menu untuk HP.
+   ========================================================================== */
+function initNavigasiMobile() {
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navBar = document.querySelector('.main-navbar');
     
+    // A. Tombol Hamburger (Buka/Tutup Navigasi Utama)
     if (menuBtn && navBar) {
         menuBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            navBar.classList.toggle('aktif'); // Memicu class gorden muncul di CSS
+            navBar.classList.toggle('aktif'); 
         });
     }
 
-    // --- B. TRIGGER DROPDOWN KEGIATAN (BULANAN) ---
+    // B. Trigger Dropdown Kegiatan (Bulanan & Tahunan)
     const btnBulanan = document.getElementById('btn-bulanan');
     const menuRapat = document.getElementById('menu-rapat');
+    const btnTahunan = document.getElementById('btn-tahunan');
     const menu17an = document.getElementById('menu-17an');
 
     if (btnBulanan && menuRapat) {
         btnBulanan.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Tutup menu tahunan terlebih dahulu agar tidak bertumpuk di HP
-            if (menu17an) menu17an.classList.remove('buka');
+            e.preventDefault(); e.stopPropagation();
+            if (menu17an) menu17an.classList.remove('buka'); // Tutup menu lain agar tidak bertumpuk
             menuRapat.classList.toggle('buka');
         });
     }
 
-    // --- C. TRIGGER DROPDOWN KEGIATAN (TAHUNAN) ---
-    const btnTahunan = document.getElementById('btn-tahunan');
-
     if (btnTahunan && menu17an) {
         btnTahunan.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Tutup menu bulanan terlebih dahulu agar tidak bertumpuk di HP
-            if (menuRapat) menuRapat.classList.remove('buka');
+            e.preventDefault(); e.stopPropagation();
+            if (menuRapat) menuRapat.classList.remove('buka'); // Tutup menu lain agar tidak bertumpuk
             menu17an.classList.toggle('buka');
         });
     }
+}
 
-    /* ==========================================================================
-       2. CAROUSEL STRUKTUR ORGANISASI (SWIPER)
-       --------------------------------------------------------------------------
-       Instruksi: Mengaktifkan mode geser (swipe) interaktif kartu pengurus inti.
-       Sistem hanya akan berjalan jika elemen '.mySwiper' terdeteksi di halaman.
-       ========================================================================== */
+/* ==========================================================================
+   3. SISTEM CAROUSEL & SLIDER GAMBAR
+   ========================================================================== */
+
+// --- A. Carousel Struktur Organisasi (Swiper.js) ---
+function initCarouselOrganisasi() {
     if (document.querySelector('.mySwiper') && typeof Swiper !== 'undefined') {
         new Swiper(".mySwiper", {
             slidesPerView: 1, 
             spaceBetween: 15,
             centeredSlides: true, 
             loop: true,
-            initialSlide: 2, // Fokus awal card di browser langsung ke indeks 2 (Ketua)
+            initialSlide: 2, // Fokus awal ke Ketua
             observer: true,
             observeParents: true,
             breakpoints: {
-                768: { slidesPerView: 3, spaceBetween: 30 } // Tampilan otomatis melebar jadi 3 kolom di PC
+                768: { slidesPerView: 3, spaceBetween: 30 } // Tampilan 3 kolom di Desktop
             }
         });
     }
+}
 
-    /* ==========================================================================
-       3. INISIALISASI PEMUATAN DATABASE OTOMATIS
-       --------------------------------------------------------------------------
-       Instruksi: Memicu fungsi fetch data database eksternal sesaat setelah 
-       struktur halaman selesai dimuat sempurna oleh browser.
-       ========================================================================== */
-    // Jalankan mesin Kas Keuangan jika elemen tabel keuangan terdeteksi
-    if (document.getElementById('data-tabel-keuangan')) {
-        loadKeuanganDariDrive();
+// --- B. Slider Otomatis Halaman Beranda (index.html) ---
+// Data untuk slider halaman utama (edit isi di sini tiap minggu/kegiatan baru)
+const kegiatanData = [
+    {
+        gambar: "images/foto-tirakatan.jpg", 
+        judul: "Malam Tirakatan 17 Agustus 2025",
+        deskripsi: "Kegiatan rutin tahunan untuk memperingati Hari Kemerdekaan Indonesia. Warga berkumpul di madrasah dinniyah untuk doa bersama, refleksi perjuangan para pahlawan bangsa."
+    },
+    {
+        gambar: "images/foto-lomba.jpg",
+        judul: "Lomba Agustusan Tahun 2025",
+        deskripsi: "Salah satu lomba anak yaitu pindah air dengan sendok untuk memperingati hari ulang tahun kemerdekaan Indonesia.yang ke-80 Tahun"
+    },
+    {
+        gambar: "images/momen-kebersamaan.jpg",
+        judul: "Momen Kebersamaan di Evaluasi Kegiatan",
+        deskripsi: "Momen indah di mana seluruh anggota organisasi berkumpul untuk mengevaluasi kegiatan dalam memperingati HUT-RI yang ke 80 tahun dari persiapan, eksekusi acara, serta harapan kedepannya"
     }
+];
 
-    // Jalankan mesin Notulen Rapat jika elemen tabel rapat terdeteksi
-    if (document.getElementById('data-tabel-rapat')) {
-        loadRapatDariDrive();
-    }
+let slideIndex = 1, slideTimer;
 
-    // Jalankan mesin Galeri Dokumentasi jika elemen tabel dokumentasi terdeteksi
-    if (document.getElementById('data-tabel-dokumentasi')) {
-        loadDokumentasiDariDrive();
-    }
-});
+function initHeroSlider() {
+    const sliderContainer = document.getElementById('slider-container');
+    const dotsContainer = document.getElementById('dots-container');
+    
+    // Jika elemen slider tidak ditemukan (bukan di halaman index), batalkan fungsi ini
+    if (!sliderContainer || !dotsContainer) return;
+
+    // 1. Merakit HTML untuk gambar slide dan titik navigasi (dots)
+    let slidesHTML = "", dotsHTML = "";
+    kegiatanData.forEach((item, index) => {
+        slidesHTML += `
+            <div class="slide ${index === 0 ? 'aktif' : ''}">
+                <img src="${item.gambar}" alt="${item.judul}" class="slide-img">
+                <div class="slide-content">
+                    <h3>${item.judul}</h3><p>${item.deskripsi}</p>
+                </div>
+            </div>`;
+        dotsHTML += `<span class="dot ${index === 0 ? 'aktif' : ''}" onclick="currentSlide(${index + 1})"></span>`;
+    });
+    
+    sliderContainer.innerHTML = slidesHTML;
+    dotsContainer.innerHTML = dotsHTML;
+
+    // Jalankan animasi slide otomatis
+    showSlides(slideIndex);
+    autoSlide();
+}
+
+function showSlides(n) {
+    let slides = document.getElementsByClassName("slide");
+    let dots = document.getElementsByClassName("dot");
+    
+    if (slides.length === 0) return; // Pengaman jika tidak ada slide
+
+    if (n > slides.length) slideIndex = 1;    
+    if (n < 1) slideIndex = slides.length;
+    
+    // Reset semua kelas 'aktif'
+    Array.from(slides).forEach(s => s.classList.remove("aktif"));
+    Array.from(dots).forEach(d => d.classList.remove("aktif"));
+    
+    // Tampilkan slide yang sedang aktif
+    slides[slideIndex-1].classList.add("aktif");  
+    dots[slideIndex-1].classList.add("aktif");
+}
+
+function autoSlide() {
+    slideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, 5000); // Ganti gambar tiap 5 detik
+}
+
+// Terpicu ketika user mengeklik titik navigasi manual
+window.currentSlide = function(n) { 
+    showSlides(slideIndex = n); 
+    clearInterval(slideTimer); // Hentikan timer otomatis sementara
+    autoSlide(); // Mulai ulang timer otomatis
+}
 
 
 /* ==========================================================================
    4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV)
-   --------------------------------------------------------------------------
-   Instruksi: Menarik data kas, menghitung otomatis total kalkulasi nominal pada
-   kartu ringkasan (Pemasukan, Pengeluaran, Saldo), serta melakukan pemfilteran.
    ========================================================================== */
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=988078683&single=true&output=tsv";
 let dataKeuanganGlobal = [];
@@ -112,6 +173,7 @@ let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 10;
 
+// Mengambil Data dari Live Google Spreadsheet
 async function loadKeuanganDariDrive() {
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
@@ -143,6 +205,7 @@ async function loadKeuanganDariDrive() {
             });
         }
 
+        // Auto-fill dropdown filter
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
         isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
         
@@ -150,12 +213,11 @@ async function loadKeuanganDariDrive() {
     } catch (e) {
         console.error("Gagal memuat data keuangan", e);
         const tBody = document.getElementById('data-tabel-keuangan');
-        if (tBody) {
-            tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan koneksi internet stabil.</td></tr>`;
-        }
+        if (tBody) tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan koneksi internet stabil.</td></tr>`;
     }
 }
 
+// Proses Filter & Penjumlahan Kartu Saldo
 window.terapkanFilter = function() {
     const thnInput = document.getElementById('filter-tahun');
     const blnInput = document.getElementById('filter-bulan');
@@ -169,6 +231,7 @@ window.terapkanFilter = function() {
     const kat = katInput.value;
     const cari = cariInput.value.toLowerCase();
 
+    // Saring data berdasarkan input user
     dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
         return (thn === "Semua" || item.tahun === thn) && 
                (bln === "Semua" || item.bulan === bln) && 
@@ -176,6 +239,7 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
+    // Hitung nominal Pemasukan, Pengeluaran, Saldo
     let m = 0, k = 0;
     let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
@@ -184,19 +248,20 @@ window.terapkanFilter = function() {
         i.tipe === 'masuk' ? m += n : k += n;
     });
 
+    // Render hasil kalkulasi ke HTML
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-keluar').innerText = formatRupiah(k);
     
     const saldoCardTitle = document.querySelector('.card-box.saldo h4');
-    if (saldoCardTitle) {
-        saldoCardTitle.innerHTML = `<i class="fa-solid fa-wallet"></i> Saldo Kas ${thn === "Semua" ? "Keseluruhan" : "(" + thn + ")"}`;
-    }
+    if (saldoCardTitle) saldoCardTitle.innerHTML = `<i class="fa-solid fa-wallet"></i> Saldo Kas ${thn === "Semua" ? "Keseluruhan" : "(" + thn + ")"}`;
+    
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
 
-    halamanSaatIni = 1;
+    halamanSaatIni = 1; // Reset halaman saat filter diubah
     renderTabel();
 }
 
+// Rendering Baris Tabel Keuangan
 function renderTabel() {
     const tbody = document.getElementById('data-tabel-keuangan');
     if (!tbody) return;
@@ -206,6 +271,7 @@ function renderTabel() {
         return;
     }
 
+    // Pagination Limit
     const start = (halamanSaatIni - 1) * barisPerHalaman;
     const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
     
@@ -214,17 +280,18 @@ function renderTabel() {
             <td>${i.tanggal}</td>
             <td>${i.keterangan}</td>
             <td style="font-weight:bold;">
-                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' 
-                                  : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
+                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
             </td>
             <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
         </tr>
     `).join('');
 
+    // Tambah Tombol Navigasi Halaman jika data melebihi limit
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
         let tombolNav = "";
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
+        
         if (halamanSaatIni === 1) {
             tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
@@ -237,22 +304,16 @@ function renderTabel() {
     tbody.innerHTML = html;
 }
 
+// Aksi Tombol Navigasi Keuangan
 window.nav = (dir) => { 
     halamanSaatIni += dir; 
     renderTabel(); 
-    
-    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
 
 
 /* ==========================================================================
    5. SISTEM NOTULEN & HASIL MUSYAWARAH RAPAT BULANAN
-   --------------------------------------------------------------------------
-   Instruksi: Sinkronisasi lembar berita acara rapat bulanan yang diinput oleh 
-   sekretaris via Google Form dan merendernya rapi ke dalam urutan baris tabel.
    ========================================================================== */
 const linkTsvRapat = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRq9to0l-2kWwtGcTvwY70z_Ga8NAVmI-C_k4LYoDgTxGhqPY954gdkuRGmqRYe3wP-zSd6M9cUz-qC/pub?gid=1613608992&single=true&output=tsv";
 let dataRapatGlobal = [];
@@ -260,6 +321,7 @@ let dataRapatTersaring = [];
 let halRapatSaatIni = 1;
 const barisRapatPerHal = 5; 
 
+// Mengambil Arsip Berita Acara dari Drive
 async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
@@ -279,7 +341,6 @@ async function loadRapatDariDrive() {
 
             let tglRaw = kolom[1]; 
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
-            
             let thn = tglSplit[2] || tglSplit[0] || "2026";
             if(thn.length > 4) thn = thn.substring(0,4); 
             
@@ -301,12 +362,11 @@ async function loadRapatDariDrive() {
     } catch (e) {
         console.error("Gagal memuat arsip rapat", e);
         const tBodyRapat = document.getElementById('data-tabel-rapat');
-        if (tBodyRapat) {
-            tBodyRapat.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat database rapat. Pastikan spreadsheet telah dipublikasikan ke web.</td></tr>`;
-        }
+        if (tBodyRapat) tBodyRapat.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat database rapat. Pastikan spreadsheet telah dipublikasikan ke web.</td></tr>`;
     }
 }
 
+// Fungsi Filter Notulen Rapat
 window.terapkanFilterRapat = function() {
     const thn = document.getElementById('filter-rapat-tahun').value;
     const bln = document.getElementById('filter-rapat-bulan').value;
@@ -318,10 +378,11 @@ window.terapkanFilterRapat = function() {
                (item.agenda.toLowerCase().includes(cari) || item.hasil.toLowerCase().includes(cari) || item.lokasi.toLowerCase().includes(cari));
     });
 
-    halRapatSaatIni = 1;
+    halRapatSaatIni = 1; // Reset halaman
     renderTabelRapat();
 }
 
+// Rendering Tabel Notulen Rapat
 function renderTabelRapat() {
     const tbody = document.getElementById('data-tabel-rapat');
     if (!tbody) return;
@@ -360,47 +421,27 @@ function renderTabelRapat() {
     tbody.innerHTML = html;
 }
 
+// Aksi Tombol Navigasi Rapat
 window.navRapat = (dir) => { 
     halRapatSaatIni += dir; 
     renderTabelRapat(); 
-    
-    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
 
 
 /* ==========================================================================
-   6. FUNGSI UTILITAS & PEMBANTU (HELPERS)
-   ========================================================================== */
-function isiDropdown(id, dataArray) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = el.options[0].outerHTML; 
-    dataArray.forEach(item => {
-        let opt = document.createElement("option");
-        opt.value = item; 
-        opt.text = item;
-        el.appendChild(opt);
-    });
-}
-
-function formatRupiah(angka) { 
-    return 'Rp ' + Math.abs(angka).toLocaleString('id-ID'); 
-}
-
-
-/* ==========================================================================
-   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD, SORT, & PAGINATION)
+   6. SISTEM DOKUMENTASI & GALERI KEGIATAN
+   --------------------------------------------------------------------------
+   Instruksi: Sistem cerdas yang mengurutkan data dokumentasi otomatis
+   berdasarkan Tanggal Nyata Kegiatan, menangani upload lebih dari 1 file 
+   sekaligus, dan memecah tautan Google Drive agar rapi berjajar vertikal.
    ========================================================================== */
 const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
 
-// PENGATURAN HALAMAN (PAGINATION) DOKUMENTASI
 let halDokSaatIni = 1;
-const barisDokPerHal = 5; // Batas kegiatan per halaman, ubah angka 5 jika ingin lebih banyak/sedikit
+const barisDokPerHal = 5; // Batas galeri per halaman
 
 async function loadDokumentasiDariDrive() {
     try {
@@ -419,8 +460,7 @@ async function loadDokumentasiDariDrive() {
             const kolom = barisBersih.split("\t");
             if (kolom.length < 5) continue; 
 
-            // URUTAN SELEKTOR MAP SESUAI SCREENSHOT SHEET:
-            // kolom[1] = Tanggal Kegiatan | kolom[2] = Agenda | kolom[3] = Kegiatan | kolom[4] = Subject | kolom[5] = Upload File
+            // Penataan Indeks Kolom Tabel Dokumentasi
             let tglRaw = kolom[1] ? kolom[1].trim() : ""; 
             let agendaRaw = kolom[2] ? kolom[2].trim() : "-";
             let kegiatanRaw = kolom[3] ? kolom[3].trim() : "-";
@@ -429,7 +469,6 @@ async function loadDokumentasiDariDrive() {
             
             if (!tglRaw) continue;
 
-            // Memotong tanggal bertipe DD/MM/YYYY secara bersih
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
             let thn = tglSplit[2] ? tglSplit[2].trim() : "2026";
             if(thn.length > 4) thn = thn.substring(0,4);
@@ -451,7 +490,7 @@ async function loadDokumentasiDariDrive() {
             });
         }
 
-        // Urutkan data berdasarkan Tanggal Kegiatan Nyata terupdate otomatis di atas
+        // Pengurutan Otomatis (Dari Terbaru ke Terlama)
         dataDokumentasiGlobal.sort((itemA, itemB) => {
             let splitA = itemA.tanggal.includes("/") ? itemA.tanggal.split("/") : itemA.tanggal.split("-");
             let splitB = itemB.tanggal.includes("/") ? itemB.tanggal.split("/") : itemB.tanggal.split("-");
@@ -481,8 +520,7 @@ window.terapkanFilterDokumentasi = function() {
                (item.agenda.toLowerCase().includes(cari) || item.kegiatan.toLowerCase().includes(cari) || item.subjek.toLowerCase().includes(cari));
     });
 
-    // Reset ke halaman 1 setiap kali filter digunakan
-    halDokSaatIni = 1;
+    halDokSaatIni = 1; // Reset halaman
     renderTabelDokumentasi();
 }
 
@@ -495,13 +533,13 @@ function renderTabelDokumentasi() {
         return;
     }
 
-    // PEMOTONGAN DATA UNTUK SISTEM HALAMAN (PAGINATION)
     const start = (halDokSaatIni - 1) * barisDokPerHal;
     const pageData = dataDokumentasiTersaring.slice(start, start + barisDokPerHal);
 
     let html = pageData.map(i => {
         let kolomMedia = "";
         
+        // Logika Multi-Gambar (Memotong string tautan ganda)
         if (i.linkAsli) {
             let daftarLink = i.linkAsli.split(",").map(link => link.trim());
             kolomMedia = `<div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">`;
@@ -512,6 +550,7 @@ function renderTabelDokumentasi() {
                 let renderUrl = linkSingle;
                 let isImg = false;
                 
+                // Konversi URL Drive
                 if (linkSingle.includes("id=")) {
                     let idFile = linkSingle.split("id=")[1].split("&")[0];
                     renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
@@ -540,7 +579,6 @@ function renderTabelDokumentasi() {
                         </a>`;
                 }
             });
-            
             kolomMedia += `</div>`;
         } else {
             kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
@@ -557,7 +595,7 @@ function renderTabelDokumentasi() {
         `;
     }).join('');
 
-    // PEMBUATAN TOMBOL NAVIGASI HALAMAN (NEXT / PREV)
+    // Navigasi Pagination Dokumentasi
     const totalHal = Math.ceil(dataDokumentasiTersaring.length / barisDokPerHal);
     if (totalHal > 1) {
         let tombolNav = "";
@@ -570,20 +608,34 @@ function renderTabelDokumentasi() {
         } else {
             tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navDok(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="navDok(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
-        // Ditambahkan pada colspan="5" untuk menutupi border bawah
         html += `<tr><td colspan="5" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
 
     tbody.innerHTML = html;
 }
 
-// FUNGSI AKSI SAAT TOMBOL NEXT / PREV DIKLIK
+// Aksi Tombol Navigasi Dokumentasi
 window.navDok = (dir) => { 
     halDokSaatIni += dir; 
     renderTabelDokumentasi(); 
-    
-    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
+
+/* ==========================================================================
+   7. FUNGSI UTILITAS & PEMBANTU UMUM
+   ========================================================================== */
+function isiDropdown(id, dataArray) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = el.options[0].outerHTML; // Simpan opsi default "Semua"
+    dataArray.forEach(item => {
+        let opt = document.createElement("option");
+        opt.value = item; 
+        opt.text = item;
+        el.appendChild(opt);
+    });
+}
+
+function formatRupiah(angka) { 
+    return 'Rp ' + Math.abs(angka).toLocaleString('id-ID'); 
+}
