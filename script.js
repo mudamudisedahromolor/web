@@ -378,7 +378,6 @@ function formatRupiah(angka) {
 /* ==========================================================================
    7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & AUTO SORT FIX)
    ========================================================================== */
-// MENGGUNAKAN GID TERBARU DARI SHEET DATA_FINAL (600804245)
 const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
@@ -522,13 +521,14 @@ function renderTabelDokumentasi() {
             kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
         }
 
+        // URUTAN INJEKSI DATA BARU (Tanggal -> Foto -> Agenda -> Subjek -> Kegiatan)
         return `
             <tr>
                 <td style="font-weight:500; color:#444; vertical-align:top;"><i class="fa-regular fa-calendar" style="color:#E53935; margin-right:4px;"></i> ${i.tanggal}</td>
+                <td style="vertical-align:top; padding-top:15px;">${kolomMedia}</td>
                 <td style="font-weight:bold; color:#E53935; vertical-align:top; line-height:1.4;">${i.agenda}</td>
                 <td style="font-weight:600; color:#555; vertical-align:top;">${i.subjek}</td>
                 <td style="line-height:1.6; text-align:justify; white-space:pre-line; vertical-align:top; padding-right:10px;">${i.kegiatan}</td>
-                <td style="vertical-align:middle;">${kolomMedia}</td>
             </tr>
         `;
     }).join('');
