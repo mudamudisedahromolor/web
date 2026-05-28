@@ -389,10 +389,10 @@ function formatRupiah(angka) {
 
 
 /* ==========================================================================
-   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (DENGAN KOLOM SUBJEK BARU)
+   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (SORTING TANGGAL KEGIATAN NYATA)
    --------------------------------------------------------------------------
-   Instruksi: Menarik data dokumentasi dari form, membaca kolom Subjek (Kolom E)
-   dan menggeser pembacaan Link Foto ke urutan indeks Kolom F secara aman.
+   Instruksi: Menarik data, menyelaraskan pembacaan map kolom, lalu mengurutkan
+   data berdasarkan tanggal dilaksanakannya kegiatan, BUKAN waktu isi form.
    ========================================================================== */
 const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=246001796&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
@@ -414,10 +414,16 @@ async function loadDokumentasiDariDrive() {
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            // Mengamankan pembacaan data minimal 5 indeks array kolom karena adanya data Subjek Baru
             if (kolom.length < 5) continue; 
 
-            let tglRaw = kolom[1] ? kolom[1].trim() : "";
+            // MAP URUTAN KOLOM SINKRON:
+            // kolom[1] = Agenda | kolom[2] = Subjek | kolom[3] = Tanggal Kegiatan Nyata | kolom[4] = Kegiatan | kolom[5] = Link Foto
+            let agendaRaw = kolom[1] ? kolom[1].trim() : "-";
+            let subjekRaw = kolom[2] ? kolom[2].trim() : "-";
+            let tglRaw = kolom[3] ? kolom[3].trim() : ""; // Ini Tanggal Kegiatan Nyata pilihan pengurus
+            let kegiatanRaw = kolom[4] ? kolom[4].trim() : "-";
+            let linkFotoAsli = kolom[5] ? kolom[5].trim() : ""; 
+            
             if (!tglRaw) continue;
 
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
@@ -430,14 +436,9 @@ async function loadDokumentasiDariDrive() {
             if(thn && thn.trim() !== "") daftarTahunDok.add(thn);
             if(bln && bln !== "Semua") daftarBulanDok.add(bln);
 
-            // PENATAAN MAP INDEKS BARU:
-            // kolom[2] = Agenda | kolom[3] = Kegiatan | kolom[4] = Subjek Baru | kolom[5] = Link Drive Foto
-            let subjekRaw = kolom[4] ? kolom[4].trim() : "-";
-            let linkFotoAsli = kolom[5] ? kolom[5].trim() : ""; 
             let linkGambarRender = "";
             let isImage = false;
 
-            // Memilah token ID file Drive agar lolos dari blokir sistem keamanan web browser
             if (linkFotoAsli) {
                 if (linkFotoAsli.includes("id=")) {
                     let idFile = linkFotoAsli.split("id=")[1].split("&")[0];
@@ -456,14 +457,26 @@ async function loadDokumentasiDariDrive() {
                 tanggal: tglRaw, 
                 bulan: bln, 
                 tahun: thn, 
-                agenda: kolom[2], 
-                kegiatan: kolom[3], 
-                subjek: subjekRaw, // Menitipkan variabel subjek baru
+                agenda: agendaRaw, 
+                kegiatan: kegiatanRaw, 
+                subjek: subjekRaw, 
                 fotoUrl: linkGambarRender, 
                 linkAsli: linkFotoAsli, 
                 isImage: isImage
             });
         }
+
+        // --- SISTEM SORTING: MEMAKSA STRIP/SLASH TANGGAL KEGIATAN DIURUTKAN DARI YANG TERBARU ---
+        dataDokumentasiGlobal.sort((itemA, itemB) => {
+            let splitA = itemA.tanggal.includes("/") ? itemA.tanggal.split("/") : itemA.tanggal.split("-");
+            let splitB = itemB.tanggal.includes("/") ? itemB.tanggal.split("/") : itemB.tanggal.split("-");
+            
+            // Konversi teks DD/MM/YYYY menjadi objek tanggal Date(YYYY, MM-1, DD) agar akurat dihitung browser
+            let dateA = new Date(splitA[2], splitA[1] - 1, splitA[0]);
+            let dateB = new Date(splitB[2], splitB[1] - 1, splitB[0]);
+            
+            return dateB - dateA; // Hasil: Tanggal kegiatan paling baru berada di atas tabel
+        });
 
         isiDropdown('filter-dok-tahun', Array.from(daftarTahunDok).sort().reverse());
         isiDropdown('filter-dok-bulan', Array.from(daftarBulanDok).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
@@ -471,7 +484,6 @@ async function loadDokumentasiDariDrive() {
         terapkanFilterDokumentasi();
     } catch (e) {
         console.error("Gagal memuat data dokumentasi", e);
-        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         document.getElementById('data-tabel-dokumentasi').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke database dokumentasi.</td></tr>`;
     }
 }
@@ -497,7 +509,6 @@ function renderTabelDokumentasi() {
     if (!tbody) return;
 
     if (dataDokumentasiTersaring.length === 0) {
-        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">Tidak ditemukan rekaman kegiatan yang cocok.</td></tr>`;
         return;
     }
@@ -524,7 +535,6 @@ function renderTabelDokumentasi() {
             kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
         }
 
-        // Menyisipkan kolom baru ${i.subjek} tepat di urutan kolom ke-3 (tengah) tabel
         return `
             <tr>
                 <td style="font-weight:500; color:#444; vertical-align:top;"><i class="fa-regular fa-calendar" style="color:#E53935; margin-right:4px;"></i> ${i.tanggal}</td>
