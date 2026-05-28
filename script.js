@@ -241,9 +241,10 @@ window.nav = (dir) => {
     halamanSaatIni += dir; 
     renderTabel(); 
     
-    // Scroll otomatis tabel keuangan
-    const areaKeuangan = document.querySelector('.finance-page-wrapper');
-    if (areaKeuangan) areaKeuangan.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
 };
 
 
@@ -363,9 +364,10 @@ window.navRapat = (dir) => {
     halRapatSaatIni += dir; 
     renderTabelRapat(); 
     
-    // Scroll otomatis tabel rapat
-    const areaRapat = document.querySelector('.finance-page-wrapper');
-    if (areaRapat) areaRapat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
 };
 
 
@@ -580,9 +582,8 @@ window.navDok = (dir) => {
     halDokSaatIni += dir; 
     renderTabelDokumentasi(); 
     
-    // Perintah untuk menggulir layar otomatis ke atas area tabel dengan efek halus
-    const areaGaleri = document.querySelector('.content-box-gallery');
-    if (areaGaleri) {
-        areaGaleri.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Memberi jeda sepersekian detik agar tabel selesai dirakit, lalu scroll ke paling atas
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
 };
