@@ -264,7 +264,7 @@ body {
     text-shadow: 1px 1px 3px rgba(0,0,0,0.8); 
 }
 
-/* Kotak Halaman Putih */
+/* Kotak Halaman Putih Standard */
 .content-box {
     position: relative; 
     z-index: 2; 
@@ -360,7 +360,7 @@ body {
 .dot.aktif, .dot:hover { background-color: #E53935; }
 
 /* ==========================================================================
-   4. HALAMAN TRANSPARANSI KAS KEUANGAN
+   4. HALAMAN TRANSPARANSI KAS KEUANGAN & TRANSAKSI
    ========================================================================== */
 .finance-page-wrapper { padding-top: 180px; padding-bottom: 60px; display: flex; justify-content: center; }
 .summary-cards { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
@@ -383,7 +383,7 @@ body {
 .finance-table tr:hover { background-color: #f1f1f1; }
 
 /* ==========================================================================
-   5. HALAMAN STRUKTUR ORGANISASI & SWIPER CAROUSEL (DIPERBARUI)
+   5. HALAMAN STRUKTUR PENGURUS INTI & SWIPER CAROUSEL
    ========================================================================== */
 .structure-page-wrapper { 
     padding-top: 150px; 
@@ -428,7 +428,7 @@ body {
     z-index: 10; 
 }
 
-/* Desain Kartu Tim */
+/* Desain Kartu Kepengurusan */
 .team-card {
     background: #fff; 
     padding: 30px 20px; 
@@ -451,7 +451,7 @@ body {
     border: 3px solid #ddd; 
 }
 
-/* Penanda khusus kartu Ketua */
+/* Modifikasi Khusus Kartu Ketua */
 .team-card.ketua-card img { 
     border-color: #E53935; 
     width: 130px; 
@@ -499,75 +499,8 @@ body {
     transform: scale(1.2); 
 }
 
-/* Responsivitas Layar HP Kecil */
-@media screen and (max-width: 768px) {
-    .content-box-structure { 
-        padding: 25px; 
-        width: 95%; 
-    }
-}
-
 /* ==========================================================================
-   6. MEDIA QUERIES KHUSUS DESKTOP / LAPTOP (PC)
-   ========================================================================== */
-@media screen and (min-width: 769px) {
-    .submenu-item:hover > .sub-submenu-dalam {
-        display: block;
-    }
-    .sub-submenu-dalam {
-        position: absolute;
-        top: 0;
-        left: 100%; 
-        min-width: 200px;
-        box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
-    }
-    .sub-submenu-dalam li a {
-        padding-left: 20px !important;
-    }
-}
-
-/* ==========================================================================
-   7. MEDIA QUERIES SATU PINTU KHUSUS MOBILE (HP)
-   ========================================================================== */
-@media screen and (max-width: 768px) {
-    /* Header HP */
-    .top-header { flex-direction: column; padding: 15px 20px; position: relative; }
-    .header-logo-area { margin-bottom: 15px; }
-    .header-right-stuff { flex-direction: column; gap: 15px; width: 100%; }
-    .search-box { width: 100%; max-width: 100%; }
-    .menu-toggle { display: block; position: absolute; top: 15px; right: 20px; }
-  
-    /* Aturan Buka Tutup Menu Samping/Gorden di HP */
-    .main-navbar { display: none; padding: 0; width: 100%; }
-    .main-navbar.aktif { display: block; }
-    .nav-list { flex-direction: column; }
-    .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.1); }
-    
-    .submenu { position: static; box-shadow: none; padding-left: 15px; }
-
-    /* Penyelarasan Dropdown Kegiatan Lapisan ke-3 di HP */
-    .sub-submenu-dalam { position: static !important; box-shadow: none !important; left: auto !important; top: auto !important; width: 100% !important; }
-    .sub-submenu-dalam.buka { display: block !important; }
-    .sub-submenu-dalam li a { padding-left: 25px !important; background-color: #a11f1d !important; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: block !important; width: 100% !important; }
-
-    /* Konten Layout Utama HP */
-    .hero-title-box { flex-direction: column; gap: 5px; }
-    .hero-title-box h1 { font-size: 28px; text-align: center; }
-    .hero-content h2 { font-size: 18px; }
-    .hero-description { font-size: 14px; }
-    .content-box { padding: 25px; width: 95%; }
-    .box-title { font-size: 24px !important; }
-
-    /* Slider Berita HP */
-    .slider-wrapper { margin: -40px 20px 40px; }
-    .slide.aktif { flex-direction: column; } 
-    .slide-img { width: 100%; height: 200px; min-height: auto; }
-    .slide-content { width: 100%; padding: 25px; }
-    .slide-content h3 { font-size: 20px; }
-}
-
-/* ==========================================================================
-   8. HALAMAN DOKUMENTASI (GOOGLE DRIVE EMBED GALERI)
+   6. HALAMAN DOKUMENTASI (GOOGLE DRIVE EMBED & AUTOMATED TABLE)
    ========================================================================== */
 .gallery-page-wrapper {
     padding-top: 150px;
@@ -595,11 +528,11 @@ body {
     font-size: 14px;
 }
 
-/* Kotak Responsif untuk Google Drive Iframe */
+/* Kotak Frame Drive Lama */
 .drive-embed-container {
     position: relative;
     width: 100%;
-    height: 600px; /* Tinggi galeri foto */
+    height: 600px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -612,36 +545,83 @@ body {
     border: none;
 }
 
-/* Tombol aksi di bawah galeri */
-.gallery-footer {
-    margin-top: 25px;
-    text-align: center;
+/* Penyelarasan Render Gambar dari Form Ke Dalam Tabel */
+#data-tabel-dokumentasi img {
+    max-width: 180px;
+    max-height: 120px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease-in-out;
 }
 
-.btn-open-drive {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #E53935;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 25px;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 10px rgba(229, 57, 53, 0.2);
+#data-tabel-dokumentasi img:hover {
+    transform: scale(1.04);
 }
 
-.btn-open-drive:hover {
-    background-color: #C62828;
-    transform: translateY(-2px);
+/* ==========================================================================
+   7. MEDIA QUERIES KHUSUS DESKTOP / LAPTOP (PC)
+   ========================================================================== */
+@media screen and (min-width: 769px) {
+    .submenu-item:hover > .sub-submenu-dalam {
+        display: block;
+    }
+    .sub-submenu-dalam {
+        position: absolute;
+        top: 0;
+        left: 100%; 
+        min-width: 200px;
+        box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
+    }
+    .sub-submenu-dalam li a {
+        padding-left: 20px !important;
+    }
+    .menu-toggle {
+        display: none;
+    }
 }
 
-/* Responsivitas Layar HP */
+/* ==========================================================================
+   8. MEDIA QUERIES SATU PINTU KHUSUS MOBILE (HP)
+   ========================================================================== */
 @media screen and (max-width: 768px) {
-    .content-box-gallery {
-        padding: 25px;
-    }
-    .drive-embed-container {
-        height: 450px; /* Sedikit lebih pendek di layar HP agar pas */
-    }
+    /* Header HP */
+    .top-header { flex-direction: column; padding: 15px 20px; position: relative; }
+    .header-logo-area { margin-bottom: 15px; }
+    .header-right-stuff { flex-direction: column; gap: 15px; width: 100%; }
+    .search-box { width: 100%; max-width: 100%; }
+    .menu-toggle { display: block; position: absolute; top: 15px; right: 20px; }
+  
+    /* Aturan Buka Tutup Menu Samping/Gorden di HP */
+    .main-navbar { display: none; padding: 0; width: 100%; }
+    .main-navbar.aktif { display: block; }
+    .nav-list { flex-direction: column; }
+    .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.1); }
+    
+    .submenu { position: static; box-shadow: none; padding-left: 15px; }
+
+    /* Penyelarasan Dropdown Kegiatan Lapisan ke-3 di HP */
+    .sub-submenu-dalam { position: static !important; box-shadow: none !important; left: auto !important; top: auto !important; width: 100% !important; }
+    .sub-submenu-dalam.buka { display: block !important; }
+    .sub-submenu-dalam li a { padding-left: 25px !important; background-color: #a11f1d !important; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: block !important; width: 100% !important; }
+
+    /* Konten Layout Utama HP */
+    .hero-title-box { flex-direction: column; gap: 5px; }
+    .hero-title-box h1 { font-size: 28px; text-align: center; }
+    .hero-content h2 { font-size: 18px; }
+    .hero-description { font-size: 14px; }
+    
+    /* Box Isi Konten di HP */
+    .content-box, .content-box-structure, .content-box-gallery { padding: 25px; width: 95%; }
+    .box-title { font-size: 24px !important; }
+
+    /* Slider Berita HP */
+    .slider-wrapper { margin: -40px 20px 40px; }
+    .slide.aktif { flex-direction: column; } 
+    .slide-img { width: 100%; height: 200px; min-height: auto; }
+    .slide-content { width: 100%; padding: 25px; }
+    .slide-content h3 { font-size: 20px; }
+
+    /* Embed Frame Drive HP */
+    .drive-embed-container { height: 450px; }
 }
