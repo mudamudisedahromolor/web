@@ -6,98 +6,93 @@
     <title>Laporan Keuangan - Muda Mudi Sedahromo Lor</title>
     
     <link rel="icon" href="images/mms.png" type="image/png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
-<link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
-
-<link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
 </head>
 
 <body> 
 
-             <header class="site-header">
-               <div class="top-header">
-                 <div class="header-logo-area">
-                    <a href="index.html" class="logo-wrapper">
+    <header class="site-header">
+        <div class="top-header">
+            <div class="header-logo-area">
+                <a href="index.html" class="logo-wrapper">
                     <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
-
                     <div class="header-text">
                         <span class="brand-title">MUDA MUDI</span>
                         <span class="brand-subtitle">Sedahromo Lor 05</span>
                     </div>
-                    </a>
-                 </div>
+                </a>
+            </div>
 
-                <div class="header-right-stuff">
-                <form class="search-box" action="#" method="GET">
-                    <input type="text" placeholder="Cari informasi..." name="search">
-                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-                </form>
-                <div class="header-socials">
-                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                </div>
-                <button class="menu-toggle" id="mobile-menu-btn">
+            <div class="header-right-stuff">
+                <button class="menu-toggle" id="mobile-menu-btn" aria-label="Toggle Menu">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                 </div> 
-                </div> 
-
-
-
-             <nav class="main-navbar">
-                <ul class="nav-list">
-                        <li class="nav-item"><a href="index.html">BERANDA</a></li>
-                       
-                        <li class="nav-item">
-                            <a href="#">PROFIL</a>
-                              <ul class="submenu">
-                                <li class="submenu-item"><a href="struktur.html">STRUKTUR KEANGGOTAAN</a></li>
-                                <li class="submenu-item"><a href="visi-misi.html">VISI & MISI</a></li>
-                             </ul>
-                        </li>
-                        
-<li class="nav-item">
-    <a href="#">KEGIATAN</a>
-    
-    <ul class="submenu">
-        <li class="submenu-item">
-            <a href="#" id="btn-bulanan" class="trigger-layer2">BULANAN ▼</a>
-            
-            <ul id="menu-rapat" class="sub-submenu-dalam">
-                <li><a href="#">RAPAT BULANAN</a></li>
-            </ul>
-        </li> 
-
-        <li class="submenu-item">
-            <a href="#" id="btn-tahunan" class="trigger-layer2">TAHUNAN ▼</a>
-            
-            <ul id="menu-17an" class="sub-submenu-dalam">
-                <li><a href="#">17-an</a></li>
-            </ul>
-        </li> 
-    </ul>
-</li>
-                        
-                         
-                <li class="nav-item">
-                    <a href="#">LAPORAN</a>
-                    <ul class="submenu">
-                        <li class="submenu-item"><a href="laporan-keuangan.html">KEUANGAN</a></li>
-                        <li class="submenu-item"><a href="#">PERTANGGUNG JAWABAN</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-
+            </div> 
+        </div> 
     </header>
 
+    <nav class="main-navbar" id="side-navbar">
+        
+        <div class="nav-search-social-area">
+            <form class="search-box" action="#" method="GET">
+                <input type="text" placeholder="Cari informasi..." name="search">
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+            <div class="header-socials">
+                <a href="#" title="Website"><i class="fa-solid fa-globe"></i></a>
+                <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+        </div>
 
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="index.html"><span class="menu-bullet"></span>BERANDA</a>
+            </li>
+           
+            <li class="nav-item has-submenu">
+                <a href="#" class="trigger-submenu"><span class="menu-bullet"></span>PROFIL <i class="fa-solid fa-chevron-down arrow-icon"></i></a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="struktur.html">STRUKTUR KEANGGOTAAN</a></li>
+                    <li class="submenu-item"><a href="visi-misi.html">VISI & MISI</a></li>
+                </ul>
+            </li>
+            
+            <li class="nav-item has-submenu">
+                <a href="#" class="trigger-submenu"><span class="menu-bullet"></span>KEGIATAN <i class="fa-solid fa-chevron-down arrow-icon"></i></a>
+                <ul class="submenu">
+                    <li class="submenu-item has-sub-submenu">
+                        <a href="#" id="btn-bulanan" class="trigger-layer2">BULANAN <i class="fa-solid fa-chevron-down arrow-icon"></i></a>
+                        <ul id="menu-rapat" class="sub-submenu-dalam">
+                            <li><a href="#">RAPAT BULANAN</a></li>
+                        </ul>
+                    </li> 
 
+                    <li class="submenu-item has-sub-submenu">
+                        <a href="#" id="btn-tahunan" class="trigger-layer2">TAHUNAN <i class="fa-solid fa-chevron-down arrow-icon"></i></a>
+                        <ul id="menu-17an" class="sub-submenu-dalam">
+                            <li><a href="#">17-an</a></li>
+                        </ul>
+                    </li> 
+                </ul>
+            </li>
+                            
+            <li class="nav-item has-submenu">
+                <a href="#" class="trigger-submenu"><span class="menu-bullet"></span>LAPORAN <i class="fa-solid fa-chevron-down arrow-icon"></i></a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="laporan-keuangan.html">KEUANGAN</a></li>
+                    <li class="submenu-item"><a href="#">PERTANGGUNG JAWABAN</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
     <div class="hero-container" style="align-items: flex-start; padding-top: 160px; padding-bottom: 50px;">
         <div class="hero-overlay"></div>
@@ -120,11 +115,49 @@
     </div>
 
     <script>
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.querySelector('.main-navbar').classList.toggle('aktif');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sideNavbar = document.getElementById('side-navbar');
+
+        // 1. Klik tombol strip 3 -> Buka / Tutup Navigasi Utama
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Mencegah event bubbling
+            sideNavbar.classList.toggle('aktif');
+        });
+
+        // 2. Klik di luar area navbar ketika aktif -> Otomatis menutup navbar
+        document.addEventListener('click', (e) => {
+            if (sideNavbar.classList.contains('aktif') && !sideNavbar.contains(e.target) && e.target !== mobileMenuBtn) {
+                sideNavbar.classList.remove('aktif');
+            }
+        });
+
+        // 3. Dropdown untuk Menu Utama yang punya Submenu (Profil, Kegiatan, Laporan)
+        const mainSubmenuTriggers = document.querySelectorAll('.trigger-submenu');
+        mainSubmenuTriggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                const submenu = trigger.nextElementSibling;
+                if (submenu) {
+                    submenu.classList.toggle('aktif');
+                    trigger.querySelector('.arrow-icon').classList.toggle('rotated');
+                }
+            });
+        });
+
+        // 4. Dropdown untuk Lapisan ke-2 di dalam Kegiatan (Bulanan / Tahunan)
+        const layer2Triggers = document.querySelectorAll('.trigger-layer2');
+        layer2Triggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Biar tidak mengganggu menu di atasnya
+                const targetSubmenu = trigger.nextElementSibling;
+                if(targetSubmenu) {
+                    targetSubmenu.classList.toggle('aktif');
+                    trigger.querySelector('.arrow-icon').classList.toggle('rotated');
+                }
+            });
         });
     </script>
-
 
 </body>
 </html>
