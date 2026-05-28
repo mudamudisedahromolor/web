@@ -308,7 +308,6 @@ function renderTabel() {
 window.nav = (dir) => { 
     halamanSaatIni += dir; 
     renderTabel(); 
-    setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
 
 
