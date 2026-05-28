@@ -80,21 +80,42 @@
             </p>
 
             <div class="filter-container" style="justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div style="font-size: 14px; color: #555; font-weight: bold;">
-                    <i class="fa-solid fa-images" style="color: #E53935;"></i> Galeri & Berkas Acara
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
-                        <option value="Semua">Semua Tahun</option>
-                    </select>
-                    
-                    <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
-                        <option value="Semua">Semua Bulan</option>
-                    </select>
-                    
-                    <input type="text" id="input-cari" class="filter-box" style="width: 230px;" placeholder="Cari agenda atau kegiatan..." onkeyup="terapkanFilter()">
-                </div>
-            </div>
+    <div style="font-size: 14px; color: #555; font-weight: bold;">
+        <i class="fa-solid fa-images" style="color: #E53935;"></i> Galeri & Berkas Acara
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <select id="filter-dok-tahun" class="filter-box" onchange="terapkanFilterDokumentasi()">
+            <option value="Semua">Semua Tahun</option>
+        </select>
+        
+        <select id="filter-dok-bulan" class="filter-box" onchange="terapkanFilterDokumentasi()">
+            <option value="Semua">Semua Bulan</option>
+        </select>
+        
+        <input type="text" id="input-cari-dok" class="filter-box" style="width: 230px;" placeholder="Cari agenda atau kegiatan..." onkeyup="terapkanFilterDokumentasi()">
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="finance-table">
+        <thead>
+            <tr>
+                <th style="width: 15%;">Tanggal</th>
+                <th style="width: 20%;">Agenda</th>
+                <th style="width: 35%;">Kegiatan</th>
+                <th style="width: 30%; text-align: center;">Foto / File</th>
+            </tr>
+        </thead>
+        <tbody id="data-tabel-dokumentasi">
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fa-solid fa-spinner fa-spin fa-xl" style="color: #E53935; margin-bottom: 10px;"></i>
+                    <br>Sinkronisasi berkas gambar dari Google Drive...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
             <div class="table-responsive">
                 <table class="finance-table">

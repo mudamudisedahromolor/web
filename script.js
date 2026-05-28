@@ -392,3 +392,137 @@ function formatRupiah(angka) {
 }
 
 
+/* ==========================================================================
+   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (GOOGLE SHEETS TSV)
+   --------------------------------------------------------------------------
+   Instruksi: Menarik data arsip dokumentasi acara, memproses link unggahan 
+   Google Drive agar bisa dirender menjadi gambar HTML secara otomatis.
+   ========================================================================== */
+// JANGAN LUPA GANTI LINK DI BAWAH INI dengan link publikasi TSV Spreadsheet Form Dokumentasimu!
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/KODE_SPREADSHEET_TANGGAPAN_FORM_KAMU/pub?gid=NOMOR_GID_HALAMAN&single=true&output=tsv";
+
+let dataDokumentasiGlobal = [];
+let dataDokumentasiTersaring = [];
+
+// Pemicu otomatis saat halaman dokumentasi dibuka
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById('data-tabel-dokumentasi')) {
+        loadDokumentasiDariDrive();
+    }
+});
+
+async function loadDokumentasiDariDrive() {
+    try {
+        const response = await fetch(`${linkTsvDokumentasi}&cache=${new Date().getTime()}`);
+        const teksData = await response.text();
+        const baris = teksData.split("\n");
+        
+        dataDokumentasiGlobal = [];
+        let daftarTahunDok = new Set();
+        let daftarBulanDok = new Set();
+
+        for (let i = 1; i < baris.length; i++) {
+            const barisBersih = baris[i].trim();
+            if (!barisBersih) continue;
+            
+            const kolom = barisBersih.split("\t");
+            if (kolom.length < 5) continue; 
+
+            let tglRaw = kolom[1]; 
+            let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
+            
+            let thn = tglSplit[2] || tglSplit[0] || "2026";
+            if(thn.length > 4) thn = thn.substring(0,4);
+            
+            let indexBulan = parseInt(tglSplit[1], 10) - 1;
+            let bln = namaBulanIndo[indexBulan] || "Semua";
+
+            if(thn && thn.trim() !== "") daftarTahunDok.add(thn);
+            if(bln && bln !== "Semua") daftarBulanDok.add(bln);
+
+            let linkFotoAsli = kolom[4] ? kolom[4].trim() : "";
+            let linkGambarRender = "";
+            let isImage = false;
+
+            if (linkFotoAsli.includes("id=")) {
+                let idFile = linkFotoAsli.split("id=")[1].split("&")[0];
+                linkGambarRender = `https://lh3.googleusercontent.com/d/${idFile}`;
+                isImage = true;
+            } else if (linkFotoAsli.includes("/d/")) {
+                let idFile = linkFotoAsli.split("/d/")[1].split("/")[0];
+                linkGambarRender = `https://lh3.googleusercontent.com/d/${idFile}`;
+                isImage = true;
+            } else {
+                linkGambarRender = linkFotoAsli;
+            }
+
+            dataDokumentasiGlobal.push({ 
+                tanggal: tglRaw, bulan: bln, tahun: thn, agenda: kolom[2], kegiatan: kolom[3], fotoUrl: linkGambarRender, linkAsli: linkFotoAsli, isImage: isImage
+            });
+        }
+
+        isiDropdown('filter-dok-tahun', Array.from(daftarTahunDok).sort().reverse());
+        isiDropdown('filter-dok-bulan', Array.from(daftarBulanDok).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
+
+        terapkanFilterDokumentasi();
+    } catch (e) {
+        console.error("Gagal memuat data dokumentasi", e);
+        document.getElementById('data-tabel-dokumentasi').innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke database dokumentasi.</td></tr>`;
+    }
+}
+
+window.terapkanFilterDokumentasi = function() {
+    const thn = document.getElementById('filter-dok-tahun').value;
+    const bln = document.getElementById('filter-dok-bulan').value;
+    const cari = document.getElementById('input-cari-dok').value.toLowerCase();
+
+    dataDokumentasiTersaring = dataDokumentasiGlobal.filter(item => {
+        return (thn === "Semua" || item.tahun === thn) && 
+               (bln === "Semua" || item.bulan === bln) && 
+               (item.agenda.toLowerCase().includes(cari) || item.kegiatan.toLowerCase().includes(cari));
+    });
+
+    renderTabelDokumentasi();
+}
+
+function renderTabelDokumentasi() {
+    const tbody = document.getElementById('data-tabel-dokumentasi');
+    if (!tbody) return;
+
+    if (dataDokumentasiTersaring.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">Tidak ditemukan rekaman kegiatan yang cocok.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = dataDokumentasiTersaring.map(i => {
+        let kolomMedia = "";
+        if (i.fotoUrl && i.isImage) {
+            kolomMedia = `
+                <div style="text-align:center;">
+                    <a href="${i.linkAsli}" target="_blank">
+                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:180px; max-height:120px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
+                    </a>
+                    <br>
+                    <a href="${i.linkAsli}" target="_blank" style="font-size:11px; color:#E53935; text-decoration:none; display:inline-block; margin-top:5px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Lihat Ukuran Penuh</a>
+                </div>`;
+        } else if (i.linkAsli) {
+            kolomMedia = `
+                <div style="text-align:center;">
+                    <a href="${i.linkAsli}" target="_blank" style="padding:6px 12px; background:#f5f5f5; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#333; font-size:12px; display:inline-block; font-weight:bold;">
+                        <i class="fa-solid fa-paperclip" style="color:#E53935;"></i> Buka Berkas
+                    </a>
+                </div>`;
+        } else {
+            kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
+        }
+
+        return `
+            <tr>
+                <td style="font-weight:500; color:#444; vertical-align:top;"><i class="fa-regular fa-calendar" style="color:#E53935; margin-right:4px;"></i> ${i.tanggal}</td>
+                <td style="font-weight:bold; color:#E53935; vertical-align:top; line-height:1.4;">${i.agenda}</td>
+                <td style="line-height:1.6; text-align:justify; white-space:pre-line; vertical-align:top; padding-right:10px;">${i.kegiatan}</td>
+                <td style="vertical-align:middle;">${kolomMedia}</td>
+            </tr>
+        `;
+    }).join('');
+}
