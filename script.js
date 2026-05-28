@@ -394,7 +394,7 @@ function formatRupiah(angka) {
    Instruksi: Menarik data dokumentasi dari form, membaca kolom Subjek (Kolom E)
    dan menggeser pembacaan Link Foto ke urutan indeks Kolom F secara aman.
    ========================================================================== */
-const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=175100676&single=true&output=tsv";
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=246001796&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
 
