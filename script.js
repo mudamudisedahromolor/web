@@ -226,11 +226,11 @@ function renderTabel() {
         let tombolNav = "";
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
         if (halamanSaatIni === 1) {
-            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halamanSaatIni === totalHal) {
-            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
+            tombolNav = `<div style="text-align:left;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
         } else {
-            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button><button onclick="nav(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="nav(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
         html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
@@ -341,11 +341,11 @@ function renderTabelRapat() {
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;";
         
         if (halRapatSaatIni === 1) {
-            tombolNav = `<div style="text-align:right;"><button onclick="navRapat(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="text-align:right;"><button onclick="navRapat(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halRapatSaatIni === totalHal) {
-            tombolNav = `<div style="text-align:left;"><button onclick="navRapat(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button></div>`;
+            tombolNav = `<div style="text-align:left;"><button onclick="navRapat(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
         } else {
-            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navRapat(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Selanjutnya</button><button onclick="navRapat(1)" style="${styleBtn}">Sebelumnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navRapat(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="navRapat(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
         html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
@@ -376,11 +376,15 @@ function formatRupiah(angka) {
 
 
 /* ==========================================================================
-   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & AUTO SORT FIX)
+   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD, SORT, & PAGINATION)
    ========================================================================== */
 const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
+
+// PENGATURAN HALAMAN (PAGINATION) DOKUMENTASI
+let halDokSaatIni = 1;
+const barisDokPerHal = 5; // Batas kegiatan per halaman, ubah angka 5 jika ingin lebih banyak/sedikit
 
 async function loadDokumentasiDariDrive() {
     try {
@@ -461,6 +465,8 @@ window.terapkanFilterDokumentasi = function() {
                (item.agenda.toLowerCase().includes(cari) || item.kegiatan.toLowerCase().includes(cari) || item.subjek.toLowerCase().includes(cari));
     });
 
+    // Reset ke halaman 1 setiap kali filter digunakan
+    halDokSaatIni = 1;
     renderTabelDokumentasi();
 }
 
@@ -473,7 +479,11 @@ function renderTabelDokumentasi() {
         return;
     }
 
-    tbody.innerHTML = dataDokumentasiTersaring.map(i => {
+    // PEMOTONGAN DATA UNTUK SISTEM HALAMAN (PAGINATION)
+    const start = (halDokSaatIni - 1) * barisDokPerHal;
+    const pageData = dataDokumentasiTersaring.slice(start, start + barisDokPerHal);
+
+    let html = pageData.map(i => {
         let kolomMedia = "";
         
         if (i.linkAsli) {
@@ -486,7 +496,6 @@ function renderTabelDokumentasi() {
                 let renderUrl = linkSingle;
                 let isImg = false;
                 
-                // Konversi token ID Google Drive ke bypass direct image link
                 if (linkSingle.includes("id=")) {
                     let idFile = linkSingle.split("id=")[1].split("&")[0];
                     renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
@@ -521,7 +530,6 @@ function renderTabelDokumentasi() {
             kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
         }
 
-        // URUTAN INJEKSI DATA BARU (Tanggal -> Foto -> Agenda -> Subjek -> Kegiatan)
         return `
             <tr>
                 <td style="font-weight:500; color:#444; vertical-align:top;"><i class="fa-regular fa-calendar" style="color:#E53935; margin-right:4px;"></i> ${i.tanggal}</td>
@@ -532,4 +540,29 @@ function renderTabelDokumentasi() {
             </tr>
         `;
     }).join('');
+
+    // PEMBUATAN TOMBOL NAVIGASI HALAMAN (NEXT / PREV)
+    const totalHal = Math.ceil(dataDokumentasiTersaring.length / barisDokPerHal);
+    if (totalHal > 1) {
+        let tombolNav = "";
+        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;";
+        
+        if (halDokSaatIni === 1) {
+            tombolNav = `<div style="text-align:right;"><button onclick="navDok(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        } else if (halDokSaatIni === totalHal) {
+            tombolNav = `<div style="text-align:left;"><button onclick="navDok(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
+        } else {
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navDok(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="navDok(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        }
+        // Ditambahkan pada colspan="5" untuk menutupi border bawah
+        html += `<tr><td colspan="5" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
+    }
+
+    tbody.innerHTML = html;
 }
+
+// FUNGSI AKSI SAAT TOMBOL NEXT / PREV DIKLIK
+window.navDok = (dir) => { 
+    halDokSaatIni += dir; 
+    renderTabelDokumentasi(); 
+};
