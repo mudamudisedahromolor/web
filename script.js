@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
    Instruksi: Menarik data kas, menghitung otomatis total kalkulasi nominal pada
    kartu ringkasan (Pemasukan, Pengeluaran, Saldo), serta melakukan pemfilteran.
    ========================================================================== */
-const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
+const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=988078683&single=true&output=tsv";
 let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
@@ -378,8 +378,8 @@ function formatRupiah(angka) {
 /* ==========================================================================
    7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & AUTO SORT FIX)
    ========================================================================== */
-// PASTIKAN LINK INI ADALAH LINK TSV HASIL PUBLISH SHEET DOKUMENTASIMU
-const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=246001796&single=true&output=tsv";
+// MENGGUNAKAN GID TERBARU DARI SHEET DATA_FINAL (600804245)
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
 
