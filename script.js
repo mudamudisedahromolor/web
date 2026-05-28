@@ -1,21 +1,19 @@
 /* ==========================================================================
-   1. FUNGSI NAVBAR / MENU MOBILE (Ditaruh Paling Atas Agar Selalu Jalan)
+   SISTEM NAVIGASI UTAMA & DROPDOWN (INDEX & HALAMAN DALAM)
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", function() {
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navBar = document.querySelector('.main-navbar');
     
+    // Toggle membuka navbar utama di HP
     if (menuBtn && navBar) {
-        const newMenuBtn = menuBtn.cloneNode(true);
-        menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
-        
-        newMenuBtn.addEventListener('click', function(e) {
+        menuBtn.addEventListener('click', function(e) {
             e.preventDefault();
             navBar.classList.toggle('aktif');
         });
     }
 
-    // SYSTEM DROPDOWN HP DIRECT TARGET (ANTI-GAGAL)
+    // Navigasi Sub-menu Kegiatan (Bulanan / Tahunan) di HP
     const btnBulanan = document.getElementById('btn-bulanan');
     const btnTahunan = document.getElementById('btn-tahunan');
     const menuRapat = document.getElementById('menu-rapat');
@@ -25,11 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btnBulanan.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Tutup menu tahunan terlebih dahulu
             if (menu17an) menu17an.classList.remove('buka');
-            
-            // Buka atau tutup menu rapat bulanan
             menuRapat.classList.toggle('buka');
         });
     }
@@ -38,28 +32,21 @@ document.addEventListener("DOMContentLoaded", function() {
         btnTahunan.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Tutup menu bulanan terlebih dahulu
             if (menuRapat) menuRapat.classList.remove('buka');
-            
-            // Buka atau tutup menu 17-an
             menu17an.classList.toggle('buka');
         });
     }
-});
 
-/* ==========================================================================
-   2. SCRIPT KHUSUS CAROUSEL STRUKTUR (SWIPER)
-   ========================================================================== */
-document.addEventListener("DOMContentLoaded", function() {
-    // Pastikan swiper hanya dijalankan jika ada elemen .mySwiper (Halaman Struktur)
-    if (document.querySelector('.mySwiper')) {
-        const swiper = new Swiper(".mySwiper", {
+    /* ==========================================================================
+       SCRIPT CAROUSEL STRUKTUR (SWIPER) - Hanya Jalan Jika Elemennya Ada
+       ========================================================================== */
+    if (document.querySelector('.mySwiper') && typeof Swiper !== 'undefined') {
+        new Swiper(".mySwiper", {
             slidesPerView: 1, 
             spaceBetween: 15,
             centeredSlides: true, 
             loop: true,
-            initialSlide: 2, // Fokus ke elemen dengan Index 2 (Ketua)
+            initialSlide: 2, 
             observer: true,
             observeParents: true,
             breakpoints: {
@@ -67,20 +54,17 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-});
 
-/* ==========================================================================
-   3. SISTEM KEUANGAN (GOOGLE SHEETS)
-   ========================================================================== */
-// Hanya panggil fungsi Google Drive jika ada tabel keuangan di halaman tersebut
-document.addEventListener("DOMContentLoaded", () => {
+    /* ==========================================================================
+       SISTEM KEUANGAN (GOOGLE SHEETS) - Hanya Jalan di Halaman Keuangan
+       ========================================================================== */
     if (document.getElementById('data-tabel-keuangan')) {
         loadKeuanganDariDrive();
     }
 });
 
+// Pemuatan data database keuangan
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=988078683&single=true&output=tsv";
-
 let dataKeuanganGlobal = [];
 let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
@@ -119,12 +103,14 @@ async function loadKeuanganDariDrive() {
         }
 
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
-        isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b)=>namaBulanIndo.indexOf(a)-namaBulanIndo.indexOf(b)));
-
-        terapkanFilter(); // Memanggil filter pertama kali
+        isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
+        terapkanFilter();
     } catch (e) {
         console.error("Gagal memuat data", e);
-        document.getElementById('data-tabel-keuangan').innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan koneksi internet stabil.</td></tr>`;
+        const tBody = document.getElementById('data-tabel-keuangan');
+        if (tBody) {
+            tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan koneksi internet stabil.</td></tr>`;
+        }
     }
 }
 
@@ -138,14 +124,19 @@ function isiDropdown(id, dataArray) {
     });
 }
 
-// FUNGSI FILTER UTAMA & PERUBAHAN ANGKA KARTU
 window.terapkanFilter = function() {
-    const thn = document.getElementById('filter-tahun').value;
-    const bln = document.getElementById('filter-bulan').value;
-    const kat = document.getElementById('filter-kategori').value;
-    const cari = document.getElementById('input-cari').value.toLowerCase();
+    const thnInput = document.getElementById('filter-tahun');
+    const blnInput = document.getElementById('filter-bulan');
+    const katInput = document.getElementById('filter-kategori');
+    const cariInput = document.getElementById('input-cari');
 
-    // 1. Filter Data untuk Tabel (Berdasarkan SEMUA jenis filter)
+    if(!thnInput || !blnInput || !katInput || !cariInput) return;
+
+    const thn = thnInput.value;
+    const bln = blnInput.value;
+    const kat = katInput.value;
+    const cari = cariInput.value.toLowerCase();
+
     dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
         return (thn === "Semua" || item.tahun === thn) && 
                (bln === "Semua" || item.bulan === bln) && 
@@ -153,31 +144,23 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
-    // 2. Hitung Angka Kartu Atas (HANYA BERDASARKAN FILTER TAHUN)
     let m = 0, k = 0;
-    
-    let dataUntukKartu = dataKeuanganGlobal; 
-    if (thn !== "Semua") {
-        dataUntukKartu = dataKeuanganGlobal.filter(item => item.tahun === thn);
-    }
+    let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
     dataUntukKartu.forEach(i => {
         let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
         i.tipe === 'masuk' ? m += n : k += n;
     });
 
-    // Update tampilan kartu
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-keluar').innerText = formatRupiah(k);
     
-    // Khusus Saldo Kas (Filter), mari kita update text judulnya agar relevan
     const saldoCardTitle = document.querySelector('.card-box.saldo h4');
     if (saldoCardTitle) {
         saldoCardTitle.innerHTML = `<i class="fa-solid fa-wallet"></i> Saldo Kas ${thn === "Semua" ? "Keseluruhan" : "(" + thn + ")"}`;
     }
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
 
-    // 3. Render Tabel (Update UI)
     halamanSaatIni = 1;
     renderTabel();
 }
