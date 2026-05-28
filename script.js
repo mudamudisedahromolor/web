@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // GANTI LINK DI BAWAH INI dengan link publikasi TSV Google Sheets milik Google Form Rapatmu!
-const linkTsvRapat = "https://docs.google.com/spreadsheets/d/e/KODE_SPREADSHEET_RAPAT_KAMU/pub?gid=NOMOR_GID_KAMU&single=true&output=tsv";
+const linkTsvRapat = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRq9to0l-2kWwtGcTvwY70z_Ga8NAVmI-C_k4LYoDgTxGhqPY954gdkuRGmqRYe3wP-zSd6M9cUz-qC/pub?gid=1613608992&single=true&output=tsv";
 
 let dataRapatGlobal = [];
 let dataRapatTersaring = [];
