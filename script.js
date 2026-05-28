@@ -414,7 +414,7 @@ async function loadDokumentasiDariDrive() {
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            // Diubah menjadi minimal 5 kolom karena ada tambahan data kolom Subjek Baru
+            // Mengamankan pembacaan data minimal 5 indeks array kolom karena adanya data Subjek Baru
             if (kolom.length < 5) continue; 
 
             let tglRaw = kolom[1] ? kolom[1].trim() : "";
@@ -471,6 +471,7 @@ async function loadDokumentasiDariDrive() {
         terapkanFilterDokumentasi();
     } catch (e) {
         console.error("Gagal memuat data dokumentasi", e);
+        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         document.getElementById('data-tabel-dokumentasi').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke database dokumentasi.</td></tr>`;
     }
 }
@@ -496,6 +497,7 @@ function renderTabelDokumentasi() {
     if (!tbody) return;
 
     if (dataDokumentasiTersaring.length === 0) {
+        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">Tidak ditemukan rekaman kegiatan yang cocok.</td></tr>`;
         return;
     }
@@ -506,7 +508,7 @@ function renderTabelDokumentasi() {
             kolomMedia = `
                 <div style="text-align:center;">
                     <a href="${i.linkAsli}" target="_blank">
-                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:180px; max-height:120px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
+                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:260px; max-height:200px; object-fit:contain; background-color:#fafafa; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
                     </a>
                     <br>
                     <a href="${i.linkAsli}" target="_blank" style="font-size:11px; color:#E53935; text-decoration:none; display:inline-block; margin-top:5px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Lihat Ukuran Penuh</a>
