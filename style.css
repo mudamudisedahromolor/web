@@ -386,7 +386,7 @@ body {
    5. HALAMAN STRUKTUR PENGURUS INTI & SWIPER CAROUSEL
    ========================================================================== */
 .structure-page-wrapper { 
-    padding-top: 150px; 
+    padding-top: 170px; 
     padding-bottom: 60px; 
     display: flex; 
     justify-content: center; 
@@ -503,7 +503,7 @@ body {
    6. HALAMAN DOKUMENTASI (GOOGLE DRIVE EMBED & AUTOMATED TABLE)
    ========================================================================== */
 .gallery-page-wrapper {
-    padding-top: 150px;
+    padding-top: 170px;
     padding-bottom: 60px;
     display: flex;
     justify-content: center;
