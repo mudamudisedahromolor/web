@@ -389,12 +389,12 @@ function formatRupiah(angka) {
 
 
 /* ==========================================================================
-   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (DENGAN KOLOM SUBJEK BARU)
+   7. SISTEM DOKUMENTASI & GALERI KEGIATAN (MULTI-UPLOAD & SORT LIVE)
    --------------------------------------------------------------------------
-   Instruksi: Menarik data dokumentasi dari form, membaca kolom Subjek (Kolom E)
-   dan menggeser pembacaan Link Foto ke urutan indeks Kolom F secara aman.
+   Instruksi: Mendukung deteksi upload banyak file sekaligus di form, memotong 
+   link berdasarkan koma, lalu menyusunnya berjejer ke bawah secara otomatis.
    ========================================================================== */
-const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=605024526&single=true&output=tsv";
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=246001796&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
 
@@ -414,10 +414,16 @@ async function loadDokumentasiDariDrive() {
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            // Mengamankan pembacaan data minimal 5 indeks array kolom karena adanya data Subjek Baru
             if (kolom.length < 5) continue; 
 
-            let tglRaw = kolom[1] ? kolom[1].trim() : "";
+            // MAP URUTAN SELEKTOR KOLOM SINKRON:
+            // kolom[1] = Agenda | kolom[2] = Subjek | kolom[3] = Tanggal Kegiatan Asli | kolom[4] = Kegiatan | kolom[5] = Link Foto (Bisa Banyak Link)
+            let agendaRaw = kolom[1] ? kolom[1].trim() : "-";
+            let subjekRaw = kolom[2] ? kolom[2].trim() : "-";
+            let tglRaw = kolom[3] ? kolom[3].trim() : ""; 
+            let kegiatanRaw = kolom[4] ? kolom[4].trim() : "-";
+            let linkFotoAsli = kolom[5] ? kolom[5].trim() : ""; 
+            
             if (!tglRaw) continue;
 
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
@@ -430,40 +436,25 @@ async function loadDokumentasiDariDrive() {
             if(thn && thn.trim() !== "") daftarTahunDok.add(thn);
             if(bln && bln !== "Semua") daftarBulanDok.add(bln);
 
-            // PENATAAN MAP INDEKS BARU:
-            // kolom[2] = Agenda | kolom[3] = Kegiatan | kolom[4] = Subjek Baru | kolom[5] = Link Drive Foto
-            let subjekRaw = kolom[4] ? kolom[4].trim() : "-";
-            let linkFotoAsli = kolom[5] ? kolom[5].trim() : ""; 
-            let linkGambarRender = "";
-            let isImage = false;
-
-            // Memilah token ID file Drive agar lolos dari blokir sistem keamanan web browser
-            if (linkFotoAsli) {
-                if (linkFotoAsli.includes("id=")) {
-                    let idFile = linkFotoAsli.split("id=")[1].split("&")[0];
-                    linkGambarRender = `https://lh3.googleusercontent.com/d/${idFile}`;
-                    isImage = true;
-                } else if (linkFotoAsli.includes("/d/")) {
-                    let idFile = linkFotoAsli.split("/d/")[1].split("/")[0];
-                    linkGambarRender = `https://lh3.googleusercontent.com/d/${idFile}`;
-                    isImage = true;
-                } else {
-                    linkGambarRender = linkFotoAsli;
-                }
-            }
-
             dataDokumentasiGlobal.push({ 
                 tanggal: tglRaw, 
                 bulan: bln, 
                 tahun: thn, 
-                agenda: kolom[2], 
-                kegiatan: kolom[3], 
-                subjek: subjekRaw, // Menitipkan variabel subjek baru
-                fotoUrl: linkGambarRender, 
-                linkAsli: linkFotoAsli, 
-                isImage: isImage
+                agenda: agendaRaw, 
+                kegiatan: kegiatanRaw, 
+                subjek: subjekRaw, 
+                linkAsli: linkFotoAsli 
             });
         }
+
+        // Urutkan data berdasarkan Tanggal Kegiatan Nyata paling baru di atas
+        dataDokumentasiGlobal.sort((itemA, itemB) => {
+            let splitA = itemA.tanggal.includes("/") ? itemA.tanggal.split("/") : itemA.tanggal.split("-");
+            let splitB = itemB.tanggal.includes("/") ? itemB.tanggal.split("/") : itemB.tanggal.split("-");
+            let dateA = new Date(splitA[2], splitA[1] - 1, splitA[0]);
+            let dateB = new Date(splitB[2], splitB[1] - 1, splitB[0]);
+            return dateB - dateA;
+        });
 
         isiDropdown('filter-dok-tahun', Array.from(daftarTahunDok).sort().reverse());
         isiDropdown('filter-dok-bulan', Array.from(daftarBulanDok).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
@@ -471,7 +462,6 @@ async function loadDokumentasiDariDrive() {
         terapkanFilterDokumentasi();
     } catch (e) {
         console.error("Gagal memuat data dokumentasi", e);
-        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         document.getElementById('data-tabel-dokumentasi').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke database dokumentasi.</td></tr>`;
     }
 }
@@ -491,40 +481,67 @@ window.terapkanFilterDokumentasi = function() {
     renderTabelDokumentasi();
 }
 
-// --- MOUNTING DATA BERKAS & GAMBAR KE TABEL GALERI DOKUMENTASI ---
+// --- MOUNTING DATA BERKAS & GAMBAR KE TABEL GALERI DOKUMENTASI (MULTI IMAGE HANDLER) ---
 function renderTabelDokumentasi() {
     const tbody = document.getElementById('data-tabel-dokumentasi');
     if (!tbody) return;
 
     if (dataDokumentasiTersaring.length === 0) {
-        // CRITICAL: Diubah menjadi colspan="5" agar sinkron menutup batas tepi horizontal kanan tabel
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;">Tidak ditemukan rekaman kegiatan yang cocok.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = dataDokumentasiTersaring.map(i => {
         let kolomMedia = "";
-        if (i.fotoUrl && i.isImage) {
-            kolomMedia = `
-                <div style="text-align:center;">
-                    <a href="${i.linkAsli}" target="_blank">
-                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:260px; max-height:200px; object-fit:contain; background-color:#fafafa; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
-                    </a>
-                    <br>
-                    <a href="${i.linkAsli}" target="_blank" style="font-size:11px; color:#E53935; text-decoration:none; display:inline-block; margin-top:5px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Lihat Ukuran Penuh</a>
-                </div>`;
-        } else if (i.linkAsli) {
-            kolomMedia = `
-                <div style="text-align:center;">
-                    <a href="${i.linkAsli}" target="_blank" style="padding:6px 12px; background:#f5f5f5; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#333; font-size:12px; display:inline-block; font-weight:bold;">
-                        <i class="fa-solid fa-paperclip" style="color:#E53935;"></i> Buka Berkas
-                    </a>
-                </div>`;
+        
+        if (i.linkAsli) {
+            // Memecah teks link gabungan dari Google Sheets berdasarkan tanda koma (jika upload > 1 gambar)
+            let daftarLink = i.linkAsli.split(",").map(link => link.trim());
+            
+            // Flexbox vertikal agar baris gambar tersusun rapi ke bawah (seperti di-enter)
+            kolomMedia = `<div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">`;
+            
+            daftarLink.forEach((linkSingle, index) => {
+                if (!linkSingle) return;
+                
+                let renderUrl = linkSingle;
+                let isImg = false;
+                
+                // Konversi token ID Google Drive ke bypass direct image link
+                if (linkSingle.includes("id=")) {
+                    let idFile = linkSingle.split("id=")[1].split("&")[0];
+                    renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
+                    isImg = true;
+                } else if (linkSingle.includes("/d/")) {
+                    let idFile = linkSingle.split("/d/")[1].split("/")[0];
+                    renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
+                    isImg = true;
+                } else if (linkSingle.match(/\.(jpeg|jpg|gif|png)$/) != null) {
+                    isImg = true;
+                }
+
+                if (isImg) {
+                    kolomMedia += `
+                        <div style="text-align:center; margin-bottom: 5px;">
+                            <a href="${linkSingle}" target="_blank">
+                                <img src="${renderUrl}" alt="${i.agenda}" style="max-width:260px; max-height:200px; object-fit:contain; background-color:#fafafa; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
+                            </a>
+                            <br>
+                            <a href="${linkSingle}" target="_blank" style="font-size:10px; color:#E53935; text-decoration:none; display:inline-block; margin-top:4px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Foto ${index + 1} (Penuh)</a>
+                        </div>`;
+                } else {
+                    kolomMedia += `
+                        <a href="${linkSingle}" target="_blank" style="padding:6px 12px; background:#f5f5f5; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#333; font-size:11px; display:inline-block; font-weight:bold;">
+                            <i class="fa-solid fa-paperclip" style="color:#E53935;"></i> Buka Berkas ${index + 1}
+                        </a>`;
+                }
+            });
+            
+            kolomMedia += `</div>`;
         } else {
             kolomMedia = `<div style="text-align:center; color:#999; font-style:italic; font-size:12px;">Tidak ada file</div>`;
         }
 
-        // Menyisipkan kolom baru ${i.subjek} tepat di urutan kolom ke-3 (tengah) tabel
         return `
             <tr>
                 <td style="font-weight:500; color:#444; vertical-align:top;"><i class="fa-regular fa-calendar" style="color:#E53935; margin-right:4px;"></i> ${i.tanggal}</td>
