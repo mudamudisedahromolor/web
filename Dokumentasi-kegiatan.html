@@ -3,34 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan - Muda Mudi Sedahromo Lor</title>
+    <title>Dokumentasi Kegiatan - Muda Mudi Sedahromo Lor</title>
     
     <link rel="icon" href="images/mms.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
+    
+    <link rel="stylesheet" href="style.css?v=102">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
-<link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
-
-<link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
 </head>
-
 <body> 
-
-             <header class="site-header">
-               <div class="top-header">
-                 <div class="header-logo-area">
-                    <a href="index.html" class="logo-wrapper">
+    
+    <header class="site-header">
+        <div class="top-header">
+            <div class="header-logo-area">
+                <a href="index.html" class="logo-wrapper">
                     <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
-
                     <div class="header-text">
                         <span class="brand-title">MUDA MUDI</span>
                         <span class="brand-subtitle">Sedahromo Lor 05</span>
                     </div>
-                    </a>
-                 </div>
-
-                <div class="header-right-stuff">
+                </a>
+            </div>
+            <div class="header-right-stuff">
                 <form class="search-box" action="#" method="GET">
                     <input type="text" placeholder="Cari informasi..." name="search">
                     <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
@@ -44,10 +41,8 @@
                 <button class="menu-toggle" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                 </div> 
-                </div> 
-
-
+            </div> 
+        </div> 
         <nav class="main-navbar">
             <ul class="nav-list">
                 <li class="nav-item"><a href="index.html">BERANDA</a></li>
@@ -61,7 +56,8 @@
                 <li class="nav-item">
                     <a href="#">KEGIATAN</a>
                     <ul class="submenu">
-                        <li class="submenu-item"><a href="#">RAPAT BULANAN</a></li>
+                        <li class="submenu-item"><a href="rapat-hasilrapat.html">RAPAT BULANAN</a></li>
+                        <li class="submenu-item"><a href="kegiatan-dokumentasi.html">DOKUMENTASI</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -75,33 +71,29 @@
         </nav>
     </header>
 
-
-    <div class="hero-container" style="align-items: flex-start; padding-top: 160px; padding-bottom: 50px;">
-        <div class="hero-overlay"></div>
-        
-        <div class="content-box">
-            <h2 class="box-title">Visi & Misi</h2>
+    <div class="gallery-page-wrapper">
+        <div class="content-box-gallery">
+            <h2 class="box-title">DOKUMENTASI KEGIATAN</h2>
             <hr class="box-divider">
-            
-            <h3>Visi</h3>
-            <p>Mewujudkan generasi muda Sedahromo Lor yang bertaqwa, kompak, kreatif, mandiri, serta aktif dan peduli dalam memajukan lingkungan serta masyarakat desa.</p>
+            <p class="gallery-desc">
+                Arsip foto dan kilas balik seluruh kegiatan serta program kerja yang diselenggarakan oleh Muda Mudi Sedahromo Lor 05.
+            </p>
 
-            <h3>Misi</h3>
-            <ul>
-                <li>Mempererat tali silaturahmi dan rasa kekeluargaan antar pemuda melalui kegiatan rutin yang positif.</li>
-                <li>Menyelenggarakan program kerja bakti sosial dan lingkungan secara berkala di wilayah Sedahromo Lor.</li>
-                <li>Menjadi wadah aspirasi, kreasi, dan pengembangan bakat bagi seluruh anggota organisasi.</li>
-                <li>Mendukung penuh program kerja pemerintah desa demi mewujudkan kemajuan desa yang harmonis.</li>
-            </ul>
+            <div class="drive-embed-container">
+                <iframe src="https://drive.google.com/embeddedfolderview?id=1ZL1loVYgZPfvnuOxMz6vIHCzw9aHwanW1ZL1loVYgZPfvnuOxMz6vIHCzw9aHwanW#grid" 
+                        class="drive-iframe" 
+                        allow="autoplay">
+                </iframe>
+            </div>
+            
+            <div class="gallery-footer">
+                <a href="https://drive.google.com/drive/folders/1ZL1loVYgZPfvnuOxMz6vIHCzw9aHwanW" target="_blank" class="btn-open-drive">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Langsung di Google Drive
+                </a>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.querySelector('.main-navbar').classList.toggle('aktif');
-        });
-    </script>
-
-
+    <script src="script.js"></script>
 </body>
 </html>

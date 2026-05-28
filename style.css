@@ -566,3 +566,82 @@ body {
     .slide-content h3 { font-size: 20px; }
 }
 
+/* ==========================================================================
+   8. HALAMAN DOKUMENTASI (GOOGLE DRIVE EMBED GALERI)
+   ========================================================================== */
+.gallery-page-wrapper {
+    padding-top: 150px;
+    padding-bottom: 60px;
+    display: flex;
+    justify-content: center;
+}
+
+.content-box-gallery {
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    width: 95%;
+    max-width: 1100px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin: 0 auto;
+}
+
+.gallery-desc {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* Kotak Responsif untuk Google Drive Iframe */
+.drive-embed-container {
+    position: relative;
+    width: 100%;
+    height: 600px; /* Tinggi galeri foto */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.drive-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Tombol aksi di bawah galeri */
+.gallery-footer {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.btn-open-drive {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #E53935;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 25px;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(229, 57, 53, 0.2);
+}
+
+.btn-open-drive:hover {
+    background-color: #C62828;
+    transform: translateY(-2px);
+}
+
+/* Responsivitas Layar HP */
+@media screen and (max-width: 768px) {
+    .content-box-gallery {
+        padding: 25px;
+    }
+    .drive-embed-container {
+        height: 450px; /* Sedikit lebih pendek di layar HP agar pas */
+    }
+}
