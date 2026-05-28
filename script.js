@@ -399,7 +399,7 @@ function formatRupiah(angka) {
    Google Drive agar bisa dirender menjadi gambar HTML secara otomatis.
    ========================================================================== */
 // JANGAN LUPA GANTI LINK DI BAWAH INI dengan link publikasi TSV Spreadsheet Form Dokumentasimu!
-const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/KODE_SPREADSHEET_TANGGAPAN_FORM_KAMU/pub?gid=NOMOR_GID_HALAMAN&single=true&output=tsv";
+const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=175100676&single=true&output=tsv";
 
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
