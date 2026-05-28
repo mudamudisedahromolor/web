@@ -458,7 +458,7 @@ async function loadDokumentasiDariDrive() {
                 tahun: thn, 
                 agenda: kolom[2], 
                 kegiatan: kolom[3], 
-                subjek: subjekRaw, // Menyisipkan variabel subjek baru
+                subjek: subjekRaw, // Menitipkan variabel subjek baru
                 fotoUrl: linkGambarRender, 
                 linkAsli: linkFotoAsli, 
                 isImage: isImage
@@ -508,7 +508,7 @@ function renderTabelDokumentasi() {
             kolomMedia = `
                 <div style="text-align:center;">
                     <a href="${i.linkAsli}" target="_blank">
-                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:260px; max-height:160px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
+                        <img src="${i.fotoUrl}" alt="${i.agenda}" style="max-width:260px; max-height:200px; object-fit:contain; background-color:#fafafa; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); border:1px solid #ddd;">
                     </a>
                     <br>
                     <a href="${i.linkAsli}" target="_blank" style="font-size:11px; color:#E53935; text-decoration:none; display:inline-block; margin-top:5px; font-weight:600;"><i class="fa-solid fa-magnifying-glass-plus"></i> Lihat Ukuran Penuh</a>
