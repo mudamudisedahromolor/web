@@ -115,18 +115,21 @@ function renderTabelAnggota() {
     
     let html = dataPerHalaman.map(i => {
         // Tentukan Nama Generasi berdasarkan Tahun Lahir secara otomatis di latar belakang
-        let generasi = "-";
-        const thnLahir = parseInt(i.tahun, 10);
-        
-        if (!isNaN(thnLahir)) {
-            if (thnLahir >= 1981 && thnLahir <= 1996) {
-                generasi = '<span style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Millennial</span>';
-            } else if (thnLahir >= 1997 && thnLahir <= 2012) {
-                generasi = '<span style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Gen Z</span>';
-            } else if (thnLahir >= 2013) {
-                generasi = '<span style="background: #FF9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Gen Alpha</span>';
-            }
-        }
+let generasi = "-";
+const thnLahir = parseInt(i.tahun, 10);
+
+if (!isNaN(thnLahir)) {
+    if (thnLahir >= 1981 && thnLahir <= 1996) {
+        // Millennial pakai warna Biru Ocean
+        generasi = '<span style="background-color: #0277bd; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Millennial</span>';
+    } else if (thnLahir >= 1997 && thnLahir <= 2009) {
+        // Gen Z pakai warna Hijau Daun (Sesuai mayoritas muda-mudi)
+        generasi = '<span style="background-color: #2e7d32; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Z</span>';
+    } else if (thnLahir >= 2010 && thnLahir <= 2024) {
+        // Gen Alpha pakai warna Jingga/Orange Hangat
+        generasi = '<span style="background-color: #ef6c00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Alpha</span>';
+    }
+}
 
         // Urutan `<td>` disesuaikan dengan `<thead>` HTML yang baru
         return `
