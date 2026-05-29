@@ -82,19 +82,17 @@
                  Daftar Anggota Muda Mudi Sedahromo Lor 05
             </p>
 
-            <div class="filter-container" style="justify-content: space-between; align-items: center; display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                <div style="font-size: 14px; color: #555; font-weight: bold;">
-                    <i class="fa-solid fa-folder-open"></i> DATABASE ANGGOTA
-                </div>
-                      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select id="filter-anggota-tahun" class="filter-box" onchange="terapkanFilterAnggota()">
-                        <option value="Semua">Semua Tahun</option>
-                    </select>
-                    
-                    <input type="text" id="input-cari-anggota" class="filter-box" style="width: 240px;" placeholder="Cari nama atau nomor anggota..." onkeyup="terapkanFilterAnggota()">
+
+            
+            <div class="filter-container" style="justify-content: flex-end; align-items: center; display: flex; margin-bottom: 20px;">
+                <div style="width: 100%; max-width: 350px; position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                    <input type="text" id="input-cari-anggota" class="filter-box" style="width: 100%; padding-left: 40px; height: 45px; border-radius: 25px; border: 1px solid #ccc;" placeholder="Cari nama atau NIM anggota..." onkeyup="terapkanFilterAnggota()">
                 </div>
             </div>
 
+
+            
             <div class="table-responsive">
                 <table class="finance-table" style="text-align: center;">
                     <thead>
