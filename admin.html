@@ -23,7 +23,7 @@
                 <a href="index.html" class="logo-wrapper" target="_blank">
                     <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
                     <div class="header-text">
-                        <span class="brand-title">BPH MMS</span>
+                        <span class="brand-title">MUDA MUDI</span>
                         <span class="brand-subtitle">Sedahromo Lor 05</span>
                     </div>
                 </a>
@@ -67,30 +67,53 @@
             </ul>
         </nav>
     </header>
+   
 
-    <div class="hero-container">
-        <div class="hero-overlay"></div>
-        
-        <div class="hero-content">
-            <div class="hero-title-box">
-                <!--bila ingin menambahkan logo besar di tengah, uncomment bagian ini dan tambahkan gambar di folder yang sama dengan nama "logo-besar.png"> -->
-                <!-- <img src="logo-besar.png" alt="Logo Besar" class="hero-title-logo"> -->
-                <h1>MUDA MUDI</h1>
-            </div>
-            <h2>Sedahromo Lor RT.05, Kartasura</h2>
-            <p class="hero-description">
-                Website ini merupakan sumber informasi resmi mengenai kegiatan, profil, dan laporan keuangan organisasi Muda Mudi Sedahromo Lor. Kami berkomitmen untuk transparansi dan kemajuan bersama demi mewujudkan pemuda desa yang aktif, kreatif, dan mandiri.
+    <div class="finance-page-wrapper">
+        <div class="content-box" style="max-width: 1100px; width: 95%;">
+            <h2 class="box-title">DAFTAR ANGGOTA</h2>
+            <hr class="box-divider">
+            <p style="text-align: center; margin-bottom: 30px;">
+                 Daftar Anggota Muda Mudi Sedahromo Lor 05
             </p>
-        </div>
-    </div>
 
+                            <div class="filter-container" style="justify-content: space-between; align-items: center;">
+                <div style="font-size: 14px; color: #555; font-weight: bold;">
+                    <i class="fa-solid fa-folder-open"></i> DATABASE ANGGOTA
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filter-rapat-tahun" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Tahun</option>
+                    </select>
+                    
+                    <select id="filter-rapat-bulan" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Bulan</option>
+                    </select>
+                    
+                    <input type="text" id="input-cari-rapat" class="filter-box" style="width: 220px;" placeholder="Cari topik atau pembahasan..." onkeyup="terapkanFilterRapat()">
+                </div>
+            </div>
 
-    <div class="slider-wrapper">
-        <div id="slider-container"></div>
-        <div class="slider-dots" id="dots-container"></div>
-    </div>
+                        <div class="table-responsive">
+                <table class="finance-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">NIM</th>
+                            <th style="width: 25%;">NAMA</th>
+                            <th style="width: 45%;">TANGGAL LAHIR</th>
+                            <th style="width: 15%;">USIA</th>
+                        </tr>
+                         <tbody id="data-tabel-rapat">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Arsip Google Sheets...
+                            </td></tr>
+                    </tbody>
+                    </thead>
+                    </table>
+            
 
-<script src="script.js?v=2"></script>
+<script src="admin.js"></script>
  
 </body>
 </html>
