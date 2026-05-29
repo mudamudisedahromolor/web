@@ -4,7 +4,7 @@
    ========================================================================== */
 
 // PENTING: Ganti dengan link publish TSV dari spreadsheet Biodata Anda
-const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTn31ZnEFDoTQXbcyeXC3sPgMVurwUNcpiC7Oz3pz2gFEnlv1e0K9Q8SjY6PVL1tIsdTg_uc9z9Rk31/pub?gid=1024012993&single=true&output=tsv";
+const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
 
 let dataAnggotaGlobal = [];
 let dataAnggotaTersaring = [];
