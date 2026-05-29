@@ -142,14 +142,14 @@ function renderTabelAnggota() {
             generasi = '<span style="background-color: #F57C00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Alpha</span>';
         } else if (i.tahunLahirInt >= 2025) {
             generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
-        }
+        } 
 
-                    <td style="padding: 10px 0;">
-                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" 
-                         style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto; cursor: pointer;" 
-                         onerror="this.src='${linkDefaultAvatar}'"
-                         onclick="bukaFotoFull('${urlFotoFull}')">
-                </td>
+ <td style="padding: 10px 0;">
+    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" 
+         style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto; cursor: pointer;" 
+         onerror="this.src='${linkDefaultAvatar}'"
+         onclick="window.bukaFotoFull('${urlFotoTampil}')">
+            </td>
                 
                 <td><span class="badge-usia" style="font-size: 13px; font-weight: 600; padding: 4px 10px;">${i.usia}</span></td>
                 <td>${generasi}</td>
