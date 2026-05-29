@@ -82,44 +82,41 @@
                  Daftar Anggota Muda Mudi Sedahromo Lor 05
             </p>
 
-                            <div class="filter-container" style="justify-content: space-between; align-items: center;">
+            <div class="filter-container" style="justify-content: space-between; align-items: center; display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                 <div style="font-size: 14px; color: #555; font-weight: bold;">
                     <i class="fa-solid fa-folder-open"></i> DATABASE ANGGOTA
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select id="filter-rapat-tahun" class="filter-box" onchange="terapkanFilterRapat()">
+                    <select id="filter-anggota-tahun" class="filter-box" onchange="terapkanFilterAnggota()">
                         <option value="Semua">Semua Tahun</option>
                     </select>
                     
-                    <select id="filter-rapat-bulan" class="filter-box" onchange="terapkanFilterRapat()">
-                        <option value="Semua">Semua Bulan</option>
-                    </select>
-                    
-                    <input type="text" id="input-cari-rapat" class="filter-box" style="width: 220px;" placeholder="Cari topik atau pembahasan..." onkeyup="terapkanFilterRapat()">
+                    <input type="text" id="input-cari-anggota" class="filter-box" style="width: 240px;" placeholder="Cari nama atau nomor anggota..." onkeyup="terapkanFilterAnggota()">
                 </div>
             </div>
 
-                        <div class="table-responsive">
-                <table class="finance-table">
+            <div class="table-responsive">
+                <table class="finance-table" style="text-align: center;">
                     <thead>
                         <tr>
                             <th style="width: 15%;">NIM</th>
-                            <th style="width: 25%;">NAMA</th>
-                            <th style="width: 45%;">TANGGAL LAHIR</th>
+                            <th style="width: 35%; text-align: left; padding-left: 15px;">NAMA</th>
+                            <th style="width: 35%;">TANGGAL LAHIR</th>
                             <th style="width: 15%;">USIA</th>
                         </tr>
-                         <tbody id="data-tabel-rapat">
+                    </thead>
+                    <tbody id="data-tabel-anggota">
                         <tr>
                             <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Arsip Google Sheets...
-                            </td></tr>
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database Anggota...
+                            </td>
+                        </tr>
                     </tbody>
-                    </thead>
-                    </table>
+                </table>
+            </div>
+        </div>
+    </div>
             
-
-
- <script src="admin.js?v=1"></script> 
- 
+    <script src="admin.js?v=1"></script> 
 </body>
 </html>
