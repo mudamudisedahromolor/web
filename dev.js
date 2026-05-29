@@ -144,16 +144,11 @@ function renderTabelAnggota() {
             generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
         }
 
-        return `
-            <tr style="height: 90px; vertical-align: middle;"> 
-                <td style="font-size: 14px; font-weight: bold; color: #555;">${i.nim}</td>
-                
-                <td style="padding: 10px 0;">
-                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;" onerror="this.src='${linkDefaultAvatar}'">
-                </td>
-                
-                <td style="text-align: left; padding-left: 20px; font-size: 15px; font-weight: 600; color: #333;">
-                    <i class="fa-solid fa-user" style="color:#E53935; margin-right:8px; font-size: 13px;"></i> ${i.nama}
+                    <td style="padding: 10px 0;">
+                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" 
+                         style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto; cursor: pointer;" 
+                         onerror="this.src='${linkDefaultAvatar}'"
+                         onclick="bukaFotoFull('${urlFotoFull}')">
                 </td>
                 
                 <td><span class="badge-usia" style="font-size: 13px; font-weight: 600; padding: 4px 10px;">${i.usia}</span></td>
@@ -186,21 +181,49 @@ window.navAnggota = (arah) => {
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
 
+        // DEFAULT FOTO: Avatar Inisial Nama
+        let linkDefaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(i.nama)}&background=E53935&color=fff&size=150&bold=true`;
+        let urlFotoTampil = linkDefaultAvatar; 
+        let urlFotoFull = linkDefaultAvatar; // <-- Siapkan link foto HD
+        
+        // LOGIKA PENARIKAN FOTO ANTI-BLOKIR
+        if (i.foto && i.foto !== "" && i.foto !== "-") {
+            let idFile = "";
+            if (i.foto.includes("id=")) {
+                idFile = i.foto.split("id=")[1].split("&")[0];
+            } else if (i.foto.includes("/d/")) {
+                idFile = i.foto.split("/d/")[1].split("/")[0];
+            }
+            
+            if (idFile !== "") {
+                urlFotoTampil = `https://drive.google.com/thumbnail?id=${idFile}&sz=w400`;
+                urlFotoFull = `https://drive.google.com/thumbnail?id=${idFile}&sz=w1000`; // <-- Resolusi w1000 agar HD saat diklik
+            } else if (i.foto.startsWith("http")) {
+                urlFotoTampil = i.foto;
+                urlFotoFull = i.foto;
+            }
+        }
+
+        // Klasifikasi Generasi Sesuai Standard Internasional
+        let generasi = "-";
+        // ... (KODE GENERASI TETAP SAMA, BIARKAN SAJA) ...
+
+
 // =========================================================
-// MESIN POPUP FOTO (TIDAK PINDAH TAB)
+// FUNGSI KONTROL POPUP FOTO (LIGHTBOX)
 // =========================================================
-window.bukaFotoFull = function(urlGambar) {
+window.bukaFotoFull = function(url) {
     const modal = document.getElementById('modal-foto-full');
     const imgModal = document.getElementById('img-modal-tampil');
     if(modal && imgModal) {
-        imgModal.src = urlGambar; // Suntikkan gambar ke dalam kotak popup
-        modal.style.display = 'flex'; // Munculkan layar gelapnya
+        imgModal.src = url; // Masukkan foto kualitas tinggi
+        modal.style.display = 'flex'; // Tampilkan layar gelap
     }
 }
 
 window.tutupFoto = function() {
     const modal = document.getElementById('modal-foto-full');
     if(modal) {
-        modal.style.display = 'none'; // Sembunyikan kembali layar gelapnya
+        modal.style.display = 'none'; // Sembunyikan layar gelap
     }
 }
