@@ -101,22 +101,32 @@ function renderTabelAnggota() {
     const start = (halAnggotaSaatIni - 1) * barisAnggotaPerHal;
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
-    let html = dataPerHalaman.map(i => {
-        // DEFAULT FOTO: Avatar Inisial Nama Otomatis (Warna Merah MMS)
+  
+   
+   let html = dataPerHalaman.map(i => {
+        // DEFAULT FOTO: Avatar Inisial Nama
         let linkDefaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(i.nama)}&background=E53935&color=fff&size=150&bold=true`;
         let urlFotoTampil = linkDefaultAvatar; 
         
+        // LOGIKA PENARIKAN FOTO ANTI-BLOKIR GOOGLE DRIVE
         if (i.foto && i.foto !== "" && i.foto !== "-") {
+            let idFile = "";
             if (i.foto.includes("id=")) {
-                let idFile = i.foto.split("id=")[1].split("&")[0];
-                urlFotoTampil = `https://docs.google.com/uc?export=view&id=${idFile}`;
+                idFile = i.foto.split("id=")[1].split("&")[0];
             } else if (i.foto.includes("/d/")) {
-                let idFile = i.foto.split("/d/")[1].split("/")[0];
-                urlFotoTampil = `https://docs.google.com/uc?export=view&id=${idFile}`;
+                idFile = i.foto.split("/d/")[1].split("/")[0];
+            }
+            
+            if (idFile !== "") {
+                // Menggunakan server thumbnail resmi Google (Dijamin muncul dan load lebih cepat)
+                urlFotoTampil = `https://drive.google.com/thumbnail?id=${idFile}&sz=w400`;
             } else if (i.foto.startsWith("http")) {
                 urlFotoTampil = i.foto;
             }
         }
+
+
+      
 
         // Klasifikasi Generasi Sesuai Standard Internasional
         let generasi = "-";
