@@ -3,7 +3,6 @@
    BERKAS KHUSUS   : DEV.JS (DATABASE ANGGOTA & FOTO)
    ========================================================================== */
 
-// PENTING: Ganti dengan link publish TSV dari spreadsheet Biodata Anda
 const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
 
 let dataAnggotaGlobal = [];
@@ -23,70 +22,67 @@ async function loadAnggotaDariDrive() {
         const baris = teksData.split("\n");
         
         dataAnggotaGlobal = [];
-        let daftarTahunLahir = new Set();
 
+        // Mulai baca dari baris ke-2 (melewati header)
         for (let i = 1; i < baris.length; i++) {
             const barisBersih = baris[i].trim();
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
             
-            // HAPUS syarat batas kolom agar data warga yang isiannya kosong sebagian tetap masuk
-            // if (kolom.length < 10) continue; 
-
-            // INDEKS YANG BENAR BERDASARKAN SCREENSHOT SPREADSHEET ANDA:
-            let nim = kolom[4] ? kolom[4].trim() : "-";          // Kolom E (Tempat Lahir) jadi NIM
-            let nama = kolom[2] ? kolom[2].trim() : "-";         // Kolom C (Nama Lengkap)
-            let tglLahirRaw = kolom[5] ? kolom[5].trim() : "";   // Kolom F (Tanggal Lahir)
-            let linkFotoRaw = kolom[14] ? kolom[14].trim() : ""; // Kolom O (Upload Foto)
+            let nama = kolom[2] ? kolom[2].trim() : "-";         
+            let nim = kolom[4] ? kolom[4].trim() : "-";          
+            let tglLahirRaw = kolom[6] ? kolom[6].trim() : "";   
+            let usiaDariSheet = kolom[7] ? kolom[7].trim() : ""; // Backup dari kolom H
+            let linkFotoRaw = kolom[13] ? kolom[13].trim() : ""; 
             
-            if (!tglLahirRaw || tglLahirRaw === "-") continue;
+            let thn = 0;
+            let usiaTeks = "-";
 
-            let thn = "Semua";
-            let usia = "-";
-
-            let partTgl = tglLahirRaw.split(/[\s/]+/);
-            if (partTgl.length >= 3) {
-                thn = partTgl[2].trim();
-                if(thn.length === 2) thn = parseInt(thn, 10) < 30 ? "20" + thn : "19" + thn; 
-                
-                const tahunSekarang = new Date().getFullYear();
-                usia = tahunSekarang - parseInt(thn, 10) + " Tahun";
+            // 1. Ekstrak 4 Digit Tahun Langsung dari Teks Tanggal (Paling Aman)
+            let cariTahun = tglLahirRaw.match(/\b(19\d{2}|20\d{2})\b/);
+            
+            if (cariTahun) {
+                thn = parseInt(cariTahun[0], 10);
             }
 
-            dataAnggotaGlobal.push({ 
-                nim: nim, 
-                nama: nama, 
-                tanggalLahir: tglLahirRaw, 
-                tahun: thn, 
-                usia: usia,
-                foto: linkFotoRaw 
-            });
-            
-            if (thn && thn !== "Semua") daftarTahunLahir.add(thn);
+            // 2. Hitung Usia (Jika gagal ekstrak, pakai kolom Usia bawaan spreadsheet)
+            if (thn > 0) {
+                usiaTeks = (new Date().getFullYear() - thn) + " Tahun";
+            } else if (usiaDariSheet && !isNaN(parseInt(usiaDariSheet, 10))) {
+                usiaTeks = usiaDariSheet + " Tahun";
+                thn = new Date().getFullYear() - parseInt(usiaDariSheet, 10); // Hitung mundur tahunnya
+            }
+
+            // Hanya masukkan ke tabel jika ada informasi tahun/usianya
+            if (thn > 0) {
+                dataAnggotaGlobal.push({ 
+                    nim: nim, 
+                    nama: nama, 
+                    tahunLahirInt: thn, 
+                    usia: usiaTeks,
+                    foto: linkFotoRaw 
+                });
+            }
         }
 
-        isiDropdownAdmin('filter-anggota-tahun', Array.from(daftarTahunLahir).sort());
         terapkanFilterAnggota();
     } catch (e) {
         console.error("Gagal memuat database anggota", e);
         const tBody = document.getElementById('data-tabel-anggota');
-        if (tBody) tBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan link TSV Google Sheets valid.</td></tr>`;
+        if (tBody) tBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Gagal memuat data dari database.</td></tr>`;
     }
 }
 
+// Logika Filter (Hanya Berdasarkan Kolom Pencarian Nama / NIM)
 window.terapkanFilterAnggota = function() {
-    const thnInput = document.getElementById('filter-anggota-tahun');
     const cariInput = document.getElementById('input-cari-anggota');
+    if(!cariInput) return;
 
-    if(!thnInput || !cariInput) return;
-
-    const thn = thnInput.value;
     const cari = cariInput.value.toLowerCase();
 
     dataAnggotaTersaring = dataAnggotaGlobal.filter(item => {
-        return (thn === "Semua" || item.tahun === thn) && 
-               (item.nama.toLowerCase().includes(cari) || item.nim.toLowerCase().includes(cari));
+        return item.nama.toLowerCase().includes(cari) || item.nim.toLowerCase().includes(cari);
     });
 
     halAnggotaSaatIni = 1; 
@@ -98,7 +94,7 @@ function renderTabelAnggota() {
     if (!tbody) return;
 
     if (dataAnggotaTersaring.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">Data anggota tidak ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;"><strong>Data anggota tidak ditemukan.</strong></td></tr>`;
         return;
     }
 
@@ -106,8 +102,8 @@ function renderTabelAnggota() {
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
     let html = dataPerHalaman.map(i => {
+        // Konversi Foto
         let urlFotoTampil = "images/mms.png"; 
-        
         if (i.foto && i.foto !== "" && i.foto !== "-") {
             if (i.foto.includes("id=")) {
                 let idFile = i.foto.split("id=")[1].split("&")[0];
@@ -120,50 +116,35 @@ function renderTabelAnggota() {
             }
         }
 
-        // Klasifikasi Generasi Lengkap (Boomer - Masa Depan)
+        // Klasifikasi Generasi Sesuai Standard Internasional
         let generasi = "-";
-        const thnLahir = parseInt(i.tahun, 10);
-        
-        if (!isNaN(thnLahir)) {
-            if (thnLahir <= 1964) {
-                // Baby Boomers (1946 - 1964) & sebelumnya
-                generasi = '<span style="background-color: #5D4037; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Baby Boomer</span>';
-            } 
-            else if (thnLahir >= 1965 && thnLahir <= 1980) {
-                // Generation X (1965 - 1980)
-                generasi = '<span style="background-color: #7B1FA2; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen X</span>';
-            } 
-            else if (thnLahir >= 1981 && thnLahir <= 1996) {
-                // Millennials / Gen Y (1981 - 1996)
-                generasi = '<span style="background-color: #0288D1; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Millennial</span>';
-            } 
-            else if (thnLahir >= 1997 && thnLahir <= 2012) {
-                // Generation Z (1997 - 2012)
-                generasi = '<span style="background-color: #388E3C; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Z</span>';
-            } 
-            else if (thnLahir >= 2013 && thnLahir <= 2024) {
-                // Generation Alpha (2013 - 2024)
-                generasi = '<span style="background-color: #F57C00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Alpha</span>';
-            } 
-            else if (thnLahir >= 2025) {
-                // Generation Beta (2025 ke atas)
-                generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
-            }
+        if (i.tahunLahirInt <= 1964) {
+            generasi = '<span style="background-color: #5D4037; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Baby Boomer</span>';
+        } else if (i.tahunLahirInt >= 1965 && i.tahunLahirInt <= 1980) {
+            generasi = '<span style="background-color: #7B1FA2; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen X</span>';
+        } else if (i.tahunLahirInt >= 1981 && i.tahunLahirInt <= 1996) {
+            generasi = '<span style="background-color: #0288D1; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Millennial</span>';
+        } else if (i.tahunLahirInt >= 1997 && i.tahunLahirInt <= 2012) {
+            generasi = '<span style="background-color: #388E3C; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Z</span>';
+        } else if (i.tahunLahirInt >= 2013 && i.tahunLahirInt <= 2024) {
+            generasi = '<span style="background-color: #F57C00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Alpha</span>';
+        } else if (i.tahunLahirInt >= 2025) {
+            generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
         }
 
         return `
             <tr style="height: 90px; vertical-align: middle;"> 
-                <td style="font-size: 14px;"><strong>${i.nim}</strong></td>
+                <td style="font-size: 14px; font-weight: bold; color: #555;">${i.nim}</td>
                 
-                <td style="padding: 8px 0;">
-                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;">
+                <td style="padding: 10px 0;">
+                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;" onerror="this.src='images/mms.png'">
                 </td>
                 
                 <td style="text-align: left; padding-left: 20px; font-size: 15px; font-weight: 600; color: #333;">
                     <i class="fa-solid fa-user" style="color:#E53935; margin-right:8px; font-size: 13px;"></i> ${i.nama}
                 </td>
                 
-                <td><span class="badge-usia" style="font-size: 13px; padding: 4px 10px;">${i.usia}</span></td>
+                <td><span class="badge-usia" style="font-size: 13px; font-weight: 600; padding: 4px 10px;">${i.usia}</span></td>
                 <td>${generasi}</td>
             </tr>
         `;
@@ -192,15 +173,3 @@ window.navAnggota = (arah) => {
     renderTabelAnggota(); 
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
-
-function isiDropdownAdmin(id, dataArray) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = `<option value="Semua">All Tahun</option>`;
-    dataArray.forEach(item => {
-        let opt = document.createElement("option");
-        opt.value = item; 
-        opt.text = item;
-        el.appendChild(opt);
-    });
-}
