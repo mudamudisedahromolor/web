@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Muda Mudi Sedahromo Lor</title>
+    <title>Struktur Keanggotaan - Muda Mudi Sedahromo Lor</title>
     
     <link rel="icon" href="images/mms.png" type="image/png">
     <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
@@ -20,7 +20,7 @@
     <header class="site-header">
         <div class="top-header">
             <div class="header-logo-area">
-                <a href="index.html" class="logo-wrapper" target="_blank">
+                <a href="index.html" class="logo-wrapper">
                     <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
                     <div class="header-text">
                         <span class="brand-title">MUDA MUDI</span>
@@ -46,74 +46,128 @@
         </div> 
         <nav class="main-navbar">
             <ul class="nav-list">
+                <li class="nav-item"><a href="index.html">BERANDA</a></li>
                 <li class="nav-item">
-                    <a href="#">BENDAHARA</a>
+                    <a href="#">PROFIL</a>
                     <ul class="submenu">
-                        <li class="submenu-item"><a href="pencatatan-laporan-keuangan.html">PENCATAT LAPORAN KEUANGAN</a></li>
+                        <li class="submenu-item"><a href="struktur.html">STRUKTUR KEANGGOTAAN</a></li>
+                        <li class="submenu-item"><a href="visi-misi.html">VISI & MISI</a></li>
                     </ul>
                 </li>
                <li class="nav-item">
-                    <a href="#">SEKRETARIS</a>
+                    <a href="#">KEGIATAN</a>
                     <ul class="submenu">
-                        <li class="submenu-item"><a href="notulen-rapat.html">NOTULEN RAPAT</a></li>
+                        <li class="submenu-item"><a href="rapat-hasilrapat.html">RAPAT BULANAN</a></li>
+                        <li class="submenu-item"><a href="dokumentasi-kegiatan.html">DOKUMENTASI</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#">MEDIA & PRODUKSI</a>
+                    <a href="#">LAPORAN</a>
                     <ul class="submenu">
-                        <li class="submenu-item"><a href="upload-dokumentasi.html">UPLOAD DOKUMENTASI</a></li>
+                        <li class="submenu-item"><a href="laporan-keuangan.html">KEUANGAN</a></li>
+                        <li class="submenu-item"><a href="#">PERTANGGUNG JAWABAN</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
-   
 
-    <div class="finance-page-wrapper">
-        <div class="content-box" style="max-width: 1100px; width: 95%;">
-            <h2 class="box-title">DAFTAR ANGGOTA</h2>
+    <div class="structure-page-wrapper">
+        <div class="content-box-structure">
+            <h2 class="box-title">STRUKTUR PENGURUS INTI</h2>
             <hr class="box-divider">
-            <p style="text-align: center; margin-bottom: 30px;">
-                 Daftar Anggota Muda Mudi Sedahromo Lor 05
+            
+            <p class="swipe-instruction">
+                <i class="fa-solid fa-left-right"></i> Geser untuk melihat detail pengurus
             </p>
+            
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/sek2.jpg" alt="Sekretaris II">
+                            <h4>[Nama Sek II]</h4>
+                            <p>Sekretaris II</p>
+                            <p class="nim-text">NIM: 2026004</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="filter-container" style="justify-content: space-between; align-items: center;">
-                <div style="font-size: 14px; color: #555; font-weight: bold;">
-                    <i class="fa-solid fa-folder-open"></i> DATABASE ANGGOTA
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select id="filter-rapat-tahun" class="filter-box" onchange="terapkanFilterRapat()">
-                        <option value="Semua">Semua Tahun</option>
-                    </select>
-                    
-                    <select id="filter-rapat-bulan" class="filter-box" onchange="terapkanFilterRapat()">
-                        <option value="Semua">Semua Bulan</option>
-                    </select>
-                    
-                    <input type="text" id="input-cari-rapat" class="filter-box" style="width: 220px;" placeholder="Cari topik atau pembahasan..." onkeyup="terapkanFilterRapat()">
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/sek1.jpg" alt="Sekretaris I">
+                            <h4>Febiola Giska Putri</h4>
+                            <p>Sekretaris I</p>
+                            <p class="nim-text">NIM: 2026003</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card ketua-card">
+                            <img src="images/ketua.jpg" alt="Ketua">
+                            <h4>Muhammad Kevin Maulana</h4>
+                            <p>Ketua</p>
+                            <p class="nim-text">NIM: 2026001</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/wakil.jpg" alt="Wakil Ketua">
+                            <h4>Muhammad David Adnawan</h4>
+                            <p>Wakil Ketua</p>
+                            <p class="nim-text">NIM: 2026002</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/ben1.jpg" alt="Bendahara I">
+                            <h4>Kadarini Setyowati</h4>
+                            <p>Bendahara I</p>
+                            <p class="nim-text">NIM: 2026005</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-card">
+                            <img src="images/ben2.jpg" alt="Bendahara II">
+                            <h4>[Nama Ben II]</h4>
+                            <p>Bendahara II</p>
+                            <p class="nim-text">NIM: 2026006</p>
+                            <div class="team-socials">
+                                <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+        </div>
+    </div>
 
-                        <div class="table-responsive">
-                <table class="finance-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 15%;">NIM</th>
-                            <th style="width: 25%;">NAMA</th>
-                            <th style="width: 45%;">TANGGAL LAHIR</th>
-                            <th style="width: 15%;">USIA</th>
-                        </tr>
-                         <tbody id="data-tabel-rapat">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Arsip Google Sheets...
-                            </td></tr>
-                    </tbody>
-                    </thead>
-                    </table>
-            
-
-<script src="admin.js"></script>
- 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="script.js?v=1"></script>
 </body>
 </html>
