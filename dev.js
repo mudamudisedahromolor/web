@@ -102,8 +102,10 @@ function renderTabelAnggota() {
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
     let html = dataPerHalaman.map(i => {
-        // Konversi Foto
-        let urlFotoTampil = "images/mms.png"; 
+        // DEFAULT FOTO: Avatar Inisial Nama Otomatis (Warna Merah MMS)
+        let linkDefaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(i.nama)}&background=E53935&color=fff&size=150&bold=true`;
+        let urlFotoTampil = linkDefaultAvatar; 
+        
         if (i.foto && i.foto !== "" && i.foto !== "-") {
             if (i.foto.includes("id=")) {
                 let idFile = i.foto.split("id=")[1].split("&")[0];
@@ -137,7 +139,7 @@ function renderTabelAnggota() {
                 <td style="font-size: 14px; font-weight: bold; color: #555;">${i.nim}</td>
                 
                 <td style="padding: 10px 0;">
-                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;" onerror="this.src='images/mms.png'">
+                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;" onerror="this.src='${linkDefaultAvatar}'">
                 </td>
                 
                 <td style="text-align: left; padding-left: 20px; font-size: 15px; font-weight: 600; color: #333;">
