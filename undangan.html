@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Broadcast Undangan MMS</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* ==========================================================================
+           RESET DASAR & SINKRONISASI CSS WEB UTAMA
+           ========================================================================== */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f4f4f4; 
+        }
+
+        /* HEADER & NAVBAR (SAMA PERSIS DENGAN WEB UTAMA) */
+        .site-header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+        }
+
+        .top-header { 
+            background-color: #fff; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 40px; 
+        }
+
+        .header-logo-area { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+
+        .logo-wrapper {
+            text-decoration: none; 
+            color: inherit; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+
+        .mini-logo { 
+            width: 45px; 
+            height: auto; 
+        }
+
+        .header-text { 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .brand-title { 
+            color: #333; 
+            font-weight: bold; 
+            font-size: 18px; 
+            letter-spacing: 0.5px; 
+        }
+
+        .brand-subtitle { 
+            color: #666; 
+            font-size: 13px; 
+        }
+
+        .main-navbar { 
+            background-color: #E53935; 
+            padding: 0 40px; 
+        }
+
+        .nav-list { 
+            display: flex; 
+            list-style: none; 
+        }
+
+        .nav-item a { 
+            display: block; 
+            padding: 14px 20px; 
+            color: #fff; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 14px; 
+        }
+
+        /* AREA KONTEN (MENGGUNAKAN LAYOUT PUTIH WEB UTAMA) */
+        .finance-page-wrapper { 
+            padding-top: 100px; 
+            padding-bottom: 60px; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        .content-box {
+            position: relative; 
+            z-index: 2; 
+            background-color: #ffffff;
+            width: 95%; 
+            max-width: 800px; 
+            padding: 40px 50px; 
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            text-align: left;
+            color: #333333; 
+            margin: 0 auto;
+        }
+
+        .box-title {
+            color: #E53935 !important; 
+            font-size: 28px !important; 
+            margin-bottom: 15px !important;
+            text-align: center; 
+            text-shadow: none !important;
+            font-weight: 700;
+        }
+
+        .box-divider {
+            border: 0; 
+            height: 3px; 
+            background-color: #E53935; 
+            width: 60px;
+            margin: 0 auto 30px auto; 
+            border-radius: 2px;
+        }
+
+        /* STYLING ELEMEN FORM INPUT APPS SCRIPT */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #555; 
+            font-size: 14px; 
+        }
+        
+        .form-input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            font-family: 'Poppins', sans-serif; 
+            font-size: 14px; 
+            outline: none; 
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        
+        .form-input:focus { 
+            border-color: #E53935; 
+        }
+
+        .btn-kirim { 
+            background-color: #E53935; 
+            color: white; 
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px; 
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-kirim:hover { 
+            background-color: #C62828; 
+        }
+
+        /* TABEL BROADCAST WA */
+        .table-responsive { 
+            width: 100%; 
+            overflow-x: auto; 
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .finance-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left; 
+            font-size: 14px; 
+        }
+        
+        .finance-table th { 
+            background-color: #E53935; 
+            color: white; 
+            padding: 12px 15px; 
+            white-space: nowrap; 
+        }
+        
+        .finance-table td { 
+            padding: 12px 15px; 
+            border-bottom: 1px solid #eee; 
+        }
+        
+        .finance-table tr:nth-child(even) { 
+            background-color: #fafafa; 
+        }
+
+        .btn-wa-aksi {
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .btn-wa-aksi:hover {
+            background-color: #128C7E;
+        }
+        
+        #status-notif { 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 20px; 
+            text-align: center; 
+            display: none; 
+            font-weight: bold; 
+            font-size: 14px;
+        }
+        
+        .notif-sukses { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb;
+        }
+
+        /* RESPONSIVE HEADERS UNTUK LAYAR HP */
+        @media screen and (max-width: 768px) {
+            .top-header { flex-direction: column; padding: 15px 20px; text-align: center; }
+            .header-logo-area { margin-bottom: 0px; }
+            .main-navbar { padding: 0 10px; }
+            .nav-list { justify-content: center; }
+            .finance-page-wrapper { padding-top: 190px; }
+            .content-box { padding: 25px; width: 95%; }
+            .box-title { font-size: 22px !important; }
+        }
+    </style>
+</head>
+<body> 
+    
+       <header class="site-header">
+        <div class="top-header">
+            <div class="header-logo-area">
+                <a href="https://mudamudisedahromolor.github.io/website/admin" class="logo-wrapper">
+                  <img src="<img src="<img src="https://docs.google.com/uc?export=view&id=1UP7auwgTYVVNU6GUyhH8U_gdhLaOt_15" alt="Logo MMS" class="mini-logo">" alt="Logo MMS" class="mini-logo">" alt="Logo MMS" class="mini-logo">
+                    <div class="header-text">
+                        <span class="brand-title">MUDA MUDI</span>
+                        <span class="brand-subtitle">Sedahromo Lor 05</span>
+                    </div>
+                </a>
+            </div>
+        </div> 
+        <nav class="main-navbar">
+            <ul class="nav-list">
+                 <li class="nav-item">
+                    <a href="#"><i class="fa-solid fa-bullhorn"></i> PANEL BROADCAST UNDANGAN SEKRETARIS</a>
+                 </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="finance-page-wrapper">
+        <div class="content-box">
+            <h2 class="box-title">KIRIM UNDANGAN MASSAL</h2>
+            <hr class="box-divider">
+            
+            <p style="text-align: center; margin-bottom: 30px; font-size: 14px; color: #666;">
+                 Satu form untuk broadcast email otomatis ke seluruh anggota & menyiapkan asisten link WhatsApp.
+            </p>
+
+            <div class="form-group">
+                <label class="input-label">Subjek / Perihal Undangan:</label>
+                <input type="text" id="subjek" class="form-input" placeholder="Contoh: Undangan Pertemuan Rutin Pemuda">
+            </div>
+
+            <div class="form-group">
+                <label class="input-label">Isi Pesan Undangan:</label>
+                <textarea id="pesan" class="form-input" style="height: 160px; resize: vertical;" placeholder="Tulis rincian lengkap acara (Hari, Tanggal, Jam, Lokasi, Agenda)..."></textarea>
+            </div>
+
+            <button class="btn-kirim" onclick="prosesBroadcast()">
+                <i class="fa-solid fa-paper-plane"></i> JALANKAN BROADCAST SEKARANG
+            </button>
+
+            <div id="status-notif"></div>
+
+            <div class="table-responsive" id="areaTabelWa">
+                <table class="finance-table" style="text-align: center;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding-left: 20px;">NAMA ANGGOTA</th>
+                            <th style="width: 200px; text-align: center;">AKSI KIRIM WA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listTargetWa">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+            
+    <script>
+        let dataAnggota = [];
+
+        // Tarik data nama, wa, dan email dari spreadsheet sesaat setelah halaman termuat
+        window.onload = function() {
+            google.script.run.withSuccessHandler(function(hasil) {
+                dataAnggota = hasil;
+            }).ambilDataAnggota();
+        };
+
+        function prosesBroadcast() {
+            const subjek = document.getElementById('subjek').value;
+            const pesan = document.getElementById('pesan').value;
+            const notif = document.getElementById('status-notif');
+            
+            if(!subjek || !pesan) {
+                alert("Harap isi Subjek dan Isi Pesan undangan terlebih dahulu!");
+                return;
+            }
+
+            notif.style.display = "block";
+            notif.className = "notif-sukses";
+            notif.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Sedang memproses pengiriman email otomatis ke seluruh pengurus & anggota...";
+
+            let listEmail = dataAnggota.map(a => a.email);
+
+            // Tembak fungsi kirim email massal di server Google
+            google.script.run.withSuccessHandler(function(jumlahTerkirim) {
+                notif.innerHTML = "<i class='fa-solid fa-circle-check'></i> Sukses! Email berhasil terkirim ke " + jumlahTerkirim + " anggota. Silakan lanjutkan broadcast via WhatsApp di bawah.";
+                tampilkanDaftarWa(pesan);
+            }).kirimEmailMassal(subjek, pesan, listEmail);
+        }
+
+        function tampilkanDaftarWa(pesanSekretaris) {
+            const tbody = document.getElementById('listTargetWa');
+            const containerTabel = document.getElementById('areaTabelWa');
+            const teksWaEncoded = encodeURIComponent(pesanSekretaris);
+            
+            tbody.innerHTML = "";
+            
+            dataAnggota.forEach(function(item) {
+                // Ekstraksi nomor WhatsApp dari link di Kolom B
+                let nomorHp = item.linkWa.split("phone=")[1];
+                let linkFinal = "https://api.whatsapp.com/send?phone=" + nomorHp + "&text=" + teksWaEncoded;
+
+                let row = `<tr>
+                    <td style="text-align: left; padding-left: 20px; font-weight: 600; color: #333;">
+                        <i class="fa-solid fa-user" style="color:#E53935; margin-right:8px; font-size: 13px;"></i> ${item.nama}
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="${linkFinal}" target="_blank" class="btn-wa-aksi">
+                            <i class="fa-brands fa-whatsapp"></i> KIRIM WA
+                        </a>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            containerTabel.style.display = "block";
+            
+            // Berikan efek scroll halus otomatis mengarah ke tabel daftar nama target
+            setTimeout(() => { containerTabel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+        }
+    </script> 
+</body>
+</html>
