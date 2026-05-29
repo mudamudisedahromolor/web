@@ -120,15 +120,34 @@ function renderTabelAnggota() {
             }
         }
 
+        // Klasifikasi Generasi Lengkap (Boomer - Masa Depan)
         let generasi = "-";
         const thnLahir = parseInt(i.tahun, 10);
+        
         if (!isNaN(thnLahir)) {
-            if (thnLahir >= 1981 && thnLahir <= 1996) {
-                generasi = '<span style="background-color: #0277bd; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Millennial</span>';
-            } else if (thnLahir >= 1997 && thnLahir <= 2009) {
-                generasi = '<span style="background-color: #2e7d32; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Z</span>';
-            } else if (thnLahir >= 2010 && thnLahir <= 2024) {
-                generasi = '<span style="background-color: #ef6c00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Alpha</span>';
+            if (thnLahir <= 1964) {
+                // Baby Boomers (1946 - 1964) & sebelumnya
+                generasi = '<span style="background-color: #5D4037; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Baby Boomer</span>';
+            } 
+            else if (thnLahir >= 1965 && thnLahir <= 1980) {
+                // Generation X (1965 - 1980)
+                generasi = '<span style="background-color: #7B1FA2; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen X</span>';
+            } 
+            else if (thnLahir >= 1981 && thnLahir <= 1996) {
+                // Millennials / Gen Y (1981 - 1996)
+                generasi = '<span style="background-color: #0288D1; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Millennial</span>';
+            } 
+            else if (thnLahir >= 1997 && thnLahir <= 2012) {
+                // Generation Z (1997 - 2012)
+                generasi = '<span style="background-color: #388E3C; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Z</span>';
+            } 
+            else if (thnLahir >= 2013 && thnLahir <= 2024) {
+                // Generation Alpha (2013 - 2024)
+                generasi = '<span style="background-color: #F57C00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Alpha</span>';
+            } 
+            else if (thnLahir >= 2025) {
+                // Generation Beta (2025 ke atas)
+                generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
             }
         }
 
