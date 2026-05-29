@@ -35,11 +35,17 @@ async function loadAnggotaDariDrive() {
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
+            // DIUBAH: Batas minimal panjang kolom dinaikkan jika ada penambahan kolom foto di kanan
             if (kolom.length < 10) continue; 
 
             let nim = kolom[4] ? kolom[4].trim() : "-";          // Kolom E (Nomer) digunakan sebagai NIM/ID
             let nama = kolom[2] ? kolom[2].trim() : "-";         // Kolom C (Nama Lengkap)
             let tglLahirRaw = kolom[6] ? kolom[6].trim() : "";   // Kolom G (Tanggal Lahir)
+            
+            // 📍 DI SINI POSISI UNTUK MEMASUKKAN LINK FOTO DRIVE:
+            // Jika kolom foto berada di paling kanan (misal kolom N), gunakan indeks [13].
+            // Jika posisinya bergeser, silakan ganti angka 13 di bawah ini sesuai urutan indeks kolom Anda (A=0, B=1, dst.)
+            let linkFotoRaw = kolom[14] ? kolom[14].trim() : ""; 
             
             if (!tglLahirRaw || tglLahirRaw === "-") continue;
 
@@ -58,12 +64,14 @@ async function loadAnggotaDariDrive() {
                 usia = tahunSekarang - parseInt(thn, 10) + " Tahun";
             }
 
+            // DIUBAH: Menyisipkan properti `foto` ke dalam objek global anggota
             dataAnggotaGlobal.push({ 
                 nim: nim, 
                 nama: nama, 
                 tanggalLahir: tglLahirRaw, 
                 tahun: thn, 
-                usia: usia 
+                usia: usia,
+                foto: linkFotoRaw // <- Data foto masuk ke sini
             });
             
             if (thn && thn !== "Semua") daftarTahunLahir.add(thn);
@@ -76,7 +84,7 @@ async function loadAnggotaDariDrive() {
     } catch (e) {
         console.error("Gagal memuat database anggota", e);
         const tBody = document.getElementById('data-tabel-anggota');
-        if (tBody) tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan link TSV Google Sheets valid.</td></tr>`;
+        if (tBody) tBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Gagal memuat data dari database. Pastikan link TSV Google Sheets valid.</td></tr>`;
     }
 }
 
@@ -99,49 +107,68 @@ window.terapkanFilterAnggota = function() {
     renderTabelAnggota();
 }
 
-// 3. Render Baris ke Struktur Tabel HTML & Pagination 7 Baris (Generasi di Akhir Kolom)
+// 3. Render Baris ke Struktur Tabel HTML (Versi Foto Dominan & Besar)
 function renderTabelAnggota() {
     const tbody = document.getElementById('data-tabel-anggota');
     if (!tbody) return;
 
     if (dataAnggotaTersaring.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#666;">Data anggota tidak ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">Data anggota tidak ditemukan.</td></tr>`;
         return;
     }
 
-    // Ambil subset data sesuai rentang indeks halaman aktif
     const start = (halAnggotaSaatIni - 1) * barisAnggotaPerHal;
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
     let html = dataPerHalaman.map(i => {
-        // Tentukan Nama Generasi berdasarkan Tahun Lahir secara otomatis di latar belakang
-let generasi = "-";
-const thnLahir = parseInt(i.tahun, 10);
+        // 1. Logika Konversi URL Google Drive ke URL Gambar Terbuka
+        let urlFotoTampil = "images/mms.png"; // Foto default logo MMS jika kosong
+        
+        if (i.foto && i.foto !== "" && i.foto !== "-") {
+            if (i.foto.includes("id=")) {
+                let idFile = i.foto.split("id=")[1].split("&")[0];
+                urlFotoTampil = `https://docs.google.com/uc?export=view&id=${idFile}`;
+            } else if (i.foto.includes("/d/")) {
+                let idFile = i.foto.split("/d/")[1].split("/")[0];
+                urlFotoTampil = `https://docs.google.com/uc?export=view&id=${idFile}`;
+            } else if (i.foto.startsWith("http")) {
+                urlFotoTampil = i.foto;
+            }
+        }
 
-if (!isNaN(thnLahir)) {
-    if (thnLahir >= 1981 && thnLahir <= 1996) {
-        // Millennial pakai warna Biru Ocean
-        generasi = '<span style="background-color: #0277bd; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Millennial</span>';
-    } else if (thnLahir >= 1997 && thnLahir <= 2009) {
-        // Gen Z pakai warna Hijau Daun (Sesuai mayoritas muda-mudi)
-        generasi = '<span style="background-color: #2e7d32; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Z</span>';
-    } else if (thnLahir >= 2010 && thnLahir <= 2024) {
-        // Gen Alpha pakai warna Jingga/Orange Hangat
-        generasi = '<span style="background-color: #ef6c00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Alpha</span>';
-    }
-}
+        // 2. Logika Penentu Generasi (Kelahiran Gen Z sesuai database MMS)
+        let generasi = "-";
+        const thnLahir = parseInt(i.tahun, 10);
+        if (!isNaN(thnLahir)) {
+            if (thnLahir >= 1981 && thnLahir <= 1996) {
+                generasi = '<span style="background-color: #0277bd; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Millennial</span>';
+            } else if (thnLahir >= 1997 && thnLahir <= 2009) {
+                generasi = '<span style="background-color: #2e7d32; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Z</span>';
+            } else if (thnLahir >= 2010 && thnLahir <= 2024) {
+                generasi = '<span style="background-color: #ef6c00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 80px; text-align: center;">Gen Alpha</span>';
+            }
+        }
 
-        // Urutan `<td>` disesuaikan dengan `<thead>` HTML yang baru
+        // 3. Susun Baris Tabel dengan Ukuran Foto yang Paling Besar & Jelas
         return `
-            <tr>
-                <td><strong>${i.nim}</strong></td>
-                <td style="text-align: left; padding-left: 15px;"><i class="fa-solid fa-user" style="color:#E53935; margin-right:8px;"></i> ${i.nama}</td>
-                <td><span class="badge-usia">${i.usia}</span></td>
-                <td>${generasi}</td> </tr>
+            <tr style="height: 90px; vertical-align: middle;"> 
+                <td style="font-size: 14px;"><strong>${i.nim}</strong></td>
+                
+                <td style="padding: 8px 0;">
+                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto;">
+                </td>
+                
+                <td style="text-align: left; padding-left: 20px; font-size: 15px; font-weight: 600; color: #333;">
+                    <i class="fa-solid fa-user" style="color:#E53935; margin-right:8px; font-size: 13px;"></i> ${i.nama}
+                </td>
+                
+                <td><span class="badge-usia" style="font-size: 13px; padding: 4px 10px;">${i.usia}</span></td>
+                <td>${generasi}</td>
+            </tr>
         `;
     }).join('');
 
-    // Injeksi tombol kontrol navigasi jika total baris > 7
+    // Bagian Logika Navigasi Halaman (Pagination 7 baris)
     const totalHal = Math.ceil(dataAnggotaTersaring.length / barisAnggotaPerHal);
     if (totalHal > 1) {
         let tombolNav = "";
@@ -154,7 +181,7 @@ if (!isNaN(thnLahir)) {
         } else {
             tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
-        html += `<tr><td colspan="4" style="padding:12px; background:#f9f9f9; border-top:1px solid #eee;">${tombolNav}</td></tr>`;
+        html += `<tr><td colspan="5" style="padding:12px; background:#f9f9f9; border-top:1px solid #eee;">${tombolNav}</td></tr>`;
     }
     
     tbody.innerHTML = html;
@@ -164,7 +191,6 @@ if (!isNaN(thnLahir)) {
 window.navAnggota = (arah) => { 
     halAnggotaSaatIni += arah; 
     renderTabelAnggota(); 
-    // Gulir halus layar kembali ke bagian atas tabel setelah menekan tombol navigasi
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
 
