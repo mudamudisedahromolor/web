@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Muda Mudi Sedahromo Lor</title>
+    
+    <link rel="icon" href="images/mms.png" type="image/png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="style.css?v=101">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body> 
+    
+    <header class="site-header">
+        <div class="top-header">
+            <div class="header-logo-area">
+                <a href="index.html" class="logo-wrapper" target="_blank">
+                    <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
+                    <div class="header-text">
+                        <span class="brand-title">MUDA MUDI</span>
+                        <span class="brand-subtitle">Sedahromo Lor 05</span>
+                    </div>
+                </a>
+            </div>
+            <div class="header-right-stuff">
+                <form class="search-box" action="#" method="GET">
+                    <input type="text" placeholder="Cari informasi..." name="search">
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+                <div class="header-socials">
+                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.tiktok.com/@mudamudisedahromolor05?is_from_webapp=1&sender_device=pc" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+                <button class="menu-toggle" id="mobile-menu-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div> 
+        </div> 
+        <nav class="main-navbar">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#">BENDAHARA</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="pencatatan-laporan-keuangan.html">INPUT LAPORAN KEUANGAN</a></li>
+                        <li class="submenu-item"><a href="pencatatan-laporan-keuangan.html">INPUT KAS BULANAN</a></li>
+                    </ul>
+                </li>
+               <li class="nav-item">
+                    <a href="#">SEKRETARIS</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="notulen-rapat.html">INPUT NOTULEN RAPAT</a></li>
+                        <li class="submenu-item"><a href="notulen-rapat.html">INPUT DATA ANGGOTA</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">MEDIA & HUMAS</a>
+                    <ul class="submenu">
+                        <li class="submenu-item"><a href="upload-dokumentasi.html">UPLOAD DOKUMENTASI</a></li>
+                        <li class="submenu-item"><a href="notulen-rapat.html">INPUT UNDANGAN</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+   
+
+    <div class="finance-page-wrapper">
+        <div class="content-box" style="max-width: 1100px; width: 95%;">
+            <h2 class="box-title">DAFTAR ANGGOTA</h2>
+            <hr class="box-divider">
+            <p style="text-align: center; margin-bottom: 30px;">
+                 Daftar Anggota Muda Mudi Sedahromo Lor 05
+            </p>
+
+                            <div class="filter-container" style="justify-content: space-between; align-items: center;">
+                <div style="font-size: 14px; color: #555; font-weight: bold;">
+                    <i class="fa-solid fa-folder-open"></i> DATABASE ANGGOTA
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filter-rapat-tahun" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Tahun</option>
+                    </select>
+                    
+                    <select id="filter-rapat-bulan" class="filter-box" onchange="terapkanFilterRapat()">
+                        <option value="Semua">Semua Bulan</option>
+                    </select>
+                    
+                    <input type="text" id="input-cari-rapat" class="filter-box" style="width: 220px;" placeholder="Cari topik atau pembahasan..." onkeyup="terapkanFilterRapat()">
+                </div>
+            </div>
+
+                        <div class="table-responsive">
+                <table class="finance-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">NIM</th>
+                            <th style="width: 25%;">NAMA</th>
+                            <th style="width: 45%;">TANGGAL LAHIR</th>
+                            <th style="width: 15%;">USIA</th>
+                        </tr>
+                         <tbody id="data-tabel-rapat">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Arsip Google Sheets...
+                            </td></tr>
+                    </tbody>
+                    </thead>
+                    </table>
+            
+
+<script src="script.js?v=1"></script>
+<script src="admin.js></script>
+ 
+</body>
+</html>
