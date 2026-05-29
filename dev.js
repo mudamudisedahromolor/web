@@ -99,7 +99,7 @@ window.terapkanFilterAnggota = function() {
     renderTabelAnggota();
 }
 
-// 3. Render Baris ke Struktur Tabel HTML & Pagination 7 Baris
+// 3. Render Baris ke Struktur Tabel HTML & Pagination 7 Baris (Generasi di Akhir Kolom)
 function renderTabelAnggota() {
     const tbody = document.getElementById('data-tabel-anggota');
     if (!tbody) return;
@@ -113,14 +113,30 @@ function renderTabelAnggota() {
     const start = (halAnggotaSaatIni - 1) * barisAnggotaPerHal;
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
-    let html = dataPerHalaman.map(i => `
-        <tr>
-            <td><strong>${i.nim}</strong></td>
-            <td style="text-align: left; padding-left: 15px;"><i class="fa-solid fa-user" style="color:#E53935; margin-right:8px;"></i> ${i.nama}</td>
-            <td><i class="fa-regular fa-calendar-days" style="color:#666; margin-right:5px;"></i> ${i.tanggalLahir}</td>
-            <td><span class="badge-usia">${i.usia}</span></td>
-        </tr>
-    `).join('');
+    let html = dataPerHalaman.map(i => {
+        // Tentukan Nama Generasi berdasarkan Tahun Lahir secara otomatis di latar belakang
+        let generasi = "-";
+        const thnLahir = parseInt(i.tahun, 10);
+        
+        if (!isNaN(thnLahir)) {
+            if (thnLahir >= 1981 && thnLahir <= 1996) {
+                generasi = '<span style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Millennial</span>';
+            } else if (thnLahir >= 1997 && thnLahir <= 2012) {
+                generasi = '<span style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Gen Z</span>';
+            } else if (thnLahir >= 2013) {
+                generasi = '<span style="background: #FF9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Gen Alpha</span>';
+            }
+        }
+
+        // Urutan `<td>` disesuaikan dengan `<thead>` HTML yang baru
+        return `
+            <tr>
+                <td><strong>${i.nim}</strong></td>
+                <td style="text-align: left; padding-left: 15px;"><i class="fa-solid fa-user" style="color:#E53935; margin-right:8px;"></i> ${i.nama}</td>
+                <td><span class="badge-usia">${i.usia}</span></td>
+                <td>${generasi}</td> </tr>
+        `;
+    }).join('');
 
     // Injeksi tombol kontrol navigasi jika total baris > 7
     const totalHal = Math.ceil(dataAnggotaTersaring.length / barisAnggotaPerHal);
