@@ -38,9 +38,9 @@ async function loadAnggotaDariDrive() {
             // DIUBAH: Batas minimal panjang kolom dinaikkan jika ada penambahan kolom foto di kanan
             if (kolom.length < 10) continue; 
 
-            let nim = kolom[4] ? kolom[4].trim() : "-";          // Kolom E (Nomer) digunakan sebagai NIM/ID
-            let nama = kolom[2] ? kolom[2].trim() : "-";         // Kolom C (Nama Lengkap)
-            let tglLahirRaw = kolom[6] ? kolom[6].trim() : "";   // Kolom G (Tanggal Lahir)
+            let nim = kolom[5] ? kolom[5].trim() : "-";          // Kolom E (Nomer) digunakan sebagai NIM/ID
+            let nama = kolom[3] ? kolom[3].trim() : "-";         // Kolom C (Nama Lengkap)
+            let tglLahirRaw = kolom[7] ? kolom[7].trim() : "";   // Kolom G (Tanggal Lahir)
             
             // 📍 DI SINI POSISI UNTUK MEMASUKKAN LINK FOTO DRIVE:
             // Jika kolom foto berada di paling kanan (misal kolom N), gunakan indeks [13].
