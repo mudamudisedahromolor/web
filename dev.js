@@ -1,6 +1,6 @@
 /* ==========================================================================
    NAMA ORGANISASI : MUDA MUDI SEDAHROMO LOR 05
-   BERKAS KHUSUS   : ADMIN.JS (DATABASE ANGGOTA & HITUNG USIA OTOMATIS)
+   BERKAS KHUSUS   : DEV.JS (DATABASE ANGGOTA & FOTO)
    ========================================================================== */
 
 // PENTING: Ganti dengan link publish TSV dari spreadsheet Biodata Anda
@@ -9,17 +9,13 @@ const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysP
 let dataAnggotaGlobal = [];
 let dataAnggotaTersaring = [];
 let halAnggotaSaatIni = 1;
-const barisAnggotaPerHal = 7; // Batas sesuai instruksi: 7 baris per halaman
+const barisAnggotaPerHal = 7; 
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Jalankan navigasi mobile jika ada fungsi global bawaan template Anda
     if (typeof initNavigasiMobile === 'function') initNavigasiMobile();
-    
-    // Tarik data biodata dari cloud
     loadAnggotaDariDrive();
 });
 
-// 1. Mengambil Data Anggota & Menghitung Usia Real-time
 async function loadAnggotaDariDrive() {
     try {
         const response = await fetch(`${linkTsvAnggota}&cache=${new Date().getTime()}`);
@@ -29,57 +25,48 @@ async function loadAnggotaDariDrive() {
         dataAnggotaGlobal = [];
         let daftarTahunLahir = new Set();
 
-        // Membaca dari baris indeks ke-1 (melewati header spreadsheet)
         for (let i = 1; i < baris.length; i++) {
             const barisBersih = baris[i].trim();
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            // DIUBAH: Batas minimal panjang kolom dinaikkan jika ada penambahan kolom foto di kanan
-            if (kolom.length < 10) continue; 
-
-            let nim = kolom[5] ? kolom[5].trim() : "-";          // Kolom E (Nomer) digunakan sebagai NIM/ID
-            let nama = kolom[3] ? kolom[3].trim() : "-";         // Kolom C (Nama Lengkap)
-            let tglLahirRaw = kolom[7] ? kolom[7].trim() : "";   // Kolom G (Tanggal Lahir)
             
-            // 📍 DI SINI POSISI UNTUK MEMASUKKAN LINK FOTO DRIVE:
-            // Jika kolom foto berada di paling kanan (misal kolom N), gunakan indeks [13].
-            // Jika posisinya bergeser, silakan ganti angka 13 di bawah ini sesuai urutan indeks kolom Anda (A=0, B=1, dst.)
-            let linkFotoRaw = kolom[14] ? kolom[14].trim() : ""; 
+            // HAPUS syarat batas kolom agar data warga yang isiannya kosong sebagian tetap masuk
+            // if (kolom.length < 10) continue; 
+
+            // INDEKS YANG BENAR BERDASARKAN SCREENSHOT SPREADSHEET ANDA:
+            let nim = kolom[4] ? kolom[4].trim() : "-";          // Kolom E (Tempat Lahir) jadi NIM
+            let nama = kolom[2] ? kolom[2].trim() : "-";         // Kolom C (Nama Lengkap)
+            let tglLahirRaw = kolom[5] ? kolom[5].trim() : "";   // Kolom F (Tanggal Lahir)
+            let linkFotoRaw = kolom[14] ? kolom[14].trim() : ""; // Kolom O (Upload Foto)
             
             if (!tglLahirRaw || tglLahirRaw === "-") continue;
 
             let thn = "Semua";
             let usia = "-";
 
-            // Deteksi format tanggal menggunakan pemisah spasi atau garis miring
             let partTgl = tglLahirRaw.split(/[\s/]+/);
             if (partTgl.length >= 3) {
                 thn = partTgl[2].trim();
-                // Normalisasi jika tahun diinput 2 digit (misal: 97 menjadi 1997)
                 if(thn.length === 2) thn = parseInt(thn, 10) < 30 ? "20" + thn : "19" + thn; 
                 
-                // Kalkulasi usia dinamis berdasarkan tahun berjalan saat ini
                 const tahunSekarang = new Date().getFullYear();
                 usia = tahunSekarang - parseInt(thn, 10) + " Tahun";
             }
 
-            // DIUBAH: Menyisipkan properti `foto` ke dalam objek global anggota
             dataAnggotaGlobal.push({ 
                 nim: nim, 
                 nama: nama, 
                 tanggalLahir: tglLahirRaw, 
                 tahun: thn, 
                 usia: usia,
-                foto: linkFotoRaw // <- Data foto masuk ke sini
+                foto: linkFotoRaw 
             });
             
             if (thn && thn !== "Semua") daftarTahunLahir.add(thn);
         }
 
-        // Isi elemen dropdown filter tahun otomatis
         isiDropdownAdmin('filter-anggota-tahun', Array.from(daftarTahunLahir).sort());
-        
         terapkanFilterAnggota();
     } catch (e) {
         console.error("Gagal memuat database anggota", e);
@@ -88,7 +75,6 @@ async function loadAnggotaDariDrive() {
     }
 }
 
-// 2. Logika Saring Data Pencarian Real-time
 window.terapkanFilterAnggota = function() {
     const thnInput = document.getElementById('filter-anggota-tahun');
     const cariInput = document.getElementById('input-cari-anggota');
@@ -103,11 +89,10 @@ window.terapkanFilterAnggota = function() {
                (item.nama.toLowerCase().includes(cari) || item.nim.toLowerCase().includes(cari));
     });
 
-    halAnggotaSaatIni = 1; // Kembalikan fokus ke halaman 1 saat pencarian berubah
+    halAnggotaSaatIni = 1; 
     renderTabelAnggota();
 }
 
-// 3. Render Baris ke Struktur Tabel HTML (Versi Foto Dominan & Besar)
 function renderTabelAnggota() {
     const tbody = document.getElementById('data-tabel-anggota');
     if (!tbody) return;
@@ -121,8 +106,7 @@ function renderTabelAnggota() {
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
     let html = dataPerHalaman.map(i => {
-        // 1. Logika Konversi URL Google Drive ke URL Gambar Terbuka
-        let urlFotoTampil = "images/mms.png"; // Foto default logo MMS jika kosong
+        let urlFotoTampil = "images/mms.png"; 
         
         if (i.foto && i.foto !== "" && i.foto !== "-") {
             if (i.foto.includes("id=")) {
@@ -136,7 +120,6 @@ function renderTabelAnggota() {
             }
         }
 
-        // 2. Logika Penentu Generasi (Kelahiran Gen Z sesuai database MMS)
         let generasi = "-";
         const thnLahir = parseInt(i.tahun, 10);
         if (!isNaN(thnLahir)) {
@@ -149,7 +132,6 @@ function renderTabelAnggota() {
             }
         }
 
-        // 3. Susun Baris Tabel dengan Ukuran Foto yang Paling Besar & Jelas
         return `
             <tr style="height: 90px; vertical-align: middle;"> 
                 <td style="font-size: 14px;"><strong>${i.nim}</strong></td>
@@ -168,7 +150,6 @@ function renderTabelAnggota() {
         `;
     }).join('');
 
-    // Bagian Logika Navigasi Halaman (Pagination 7 baris)
     const totalHal = Math.ceil(dataAnggotaTersaring.length / barisAnggotaPerHal);
     if (totalHal > 1) {
         let tombolNav = "";
@@ -187,14 +168,12 @@ function renderTabelAnggota() {
     tbody.innerHTML = html;
 }
 
-// 4. Trigger Aksi Pindah Halaman Manual
 window.navAnggota = (arah) => { 
     halAnggotaSaatIni += arah; 
     renderTabelAnggota(); 
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
 
-// 5. Fungsi Penunjang Isian Dropdown
 function isiDropdownAdmin(id, dataArray) {
     const el = document.getElementById(id);
     if (!el) return;
