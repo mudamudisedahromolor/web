@@ -185,3 +185,22 @@ window.navAnggota = (arah) => {
     renderTabelAnggota(); 
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
+
+// =========================================================
+// MESIN POPUP FOTO (TIDAK PINDAH TAB)
+// =========================================================
+window.bukaFotoFull = function(urlGambar) {
+    const modal = document.getElementById('modal-foto-full');
+    const imgModal = document.getElementById('img-modal-tampil');
+    if(modal && imgModal) {
+        imgModal.src = urlGambar; // Suntikkan gambar ke dalam kotak popup
+        modal.style.display = 'flex'; // Munculkan layar gelapnya
+    }
+}
+
+window.tutupFoto = function() {
+    const modal = document.getElementById('modal-foto-full');
+    if(modal) {
+        modal.style.display = 'none'; // Sembunyikan kembali layar gelapnya
+    }
+}
