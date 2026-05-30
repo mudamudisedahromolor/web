@@ -159,7 +159,7 @@ window.currentSlide = function(n) {
 
 
 /* ==========================================================================
-   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV - AKTUAL)
+   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV)
    ========================================================================== */
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqiCluDyXYQijRAElBYLeYPzrT7ENOPtbaxnoHfyZXFFMMxnO1pnZuOAKJaaVgSvFs6eKacEAd4w5I/pub?gid=1216205715&single=true&output=tsv";
 let dataKeuanganGlobal = [];
@@ -171,68 +171,77 @@ async function loadKeuanganDariDrive() {
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
         const teksData = await response.text();
-        const baris = teksData.split("\n");
+        
+        // Memecah database berdasarkan baris enter (\n atau \r)
+        const baris = teksData.split(/\r?\n/);
         
         dataKeuanganGlobal = [];
         let daftarTahun = new Set();
         let daftarBulan = new Set();
 
+        // Looping dimulai dari indeks 1 (mengabaikan Baris Judul Header Kolom)
         for (let i = 1; i < baris.length; i++) {
             const barisBersih = baris[i].trim();
-            if (!barisBersih) continue;
+            if (!barisBersih) continue; // Lewati jika ada baris kosong di paling bawah
             
+            // Memecah baris menjadi kolom-kolom menggunakan pemisah Tab (\t)
             const kolom = barisBersih.split("\t");
-            if (kolom.length < 4) continue; // Minimal memiliki kolom A, B, C, D
+            if (kolom.length < 4) continue; // Memastikan baris data valid (minimal ada 4 kolom)
 
-            // --- DEKLARASI PENYEMATAN KOLOM BARU (SESUAI ATURAN BARU) ---
-            let tglRaw = kolom[0] ? kolom[0].trim() : "";       // Kolom A: Tanggal
-            let ketTransaksi = kolom[1] ? kolom[1].trim() : ""; // Kolom B: Keterangan Transaksi
-            let linkNota = kolom[5] ? kolom[5].trim() : "";     // Kolom F: Bukti Nota
+            // INSTRUKSI 1: Ambil data dasar sesuai urutan kolom baru di Google Sheets
+            // [0]=Tanggal (A), [1]=Keterangan (B), [2]=Pemasukan (C), [3]=Pengeluaran (D), [5]=Bukti Nota (F)
+            let tglRaw = kolom[0] ? kolom[0].trim() : "";       
+            let ketTransaksi = kolom[1] ? kolom[1].trim() : ""; 
+            let linkNotaRaw = kolom[5] ? kolom[5].trim() : "";  
             
-            if (!tglRaw || tglRaw === "Tanggal") continue; // Pengaman header ganda
+            // Pengaman jika baris header atau teks "TOTAL" tidak sengaja ketarik
+            if (!tglRaw || tglRaw === "Tanggal" || ketTransaksi.toUpperCase() === "TOTAL") continue; 
 
-            // Bersihkan teks atau string format ribuan agar murni menjadi angka logis komputer
-            let nilaiC = kolom[2] ? parseFloat(kolom[2].replace(/[^0-9.-]+/g, "")) || 0 : 0; // Kolom C: Pemasukan
-            let nilaiD = kolom[3] ? parseFloat(kolom[3].replace(/[^0-9.-]+/g, "")) || 0 : 0; // Kolom D: Pengeluaran
+            // INSTRUKSI 2: Konversi teks nominal mentah di kolom C & D menjadi angka murni
+            // Karakter seperti Titik (.), Rp, atau spasi dibuang total agar tidak merusak matematika JS
+            let nilaiC = kolom[2] ? parseFloat(kolom[2].replace(/[^0-9-]/g, "")) || 0 : 0; // Kolom C (Pemasukan)
+            let nilaiD = kolom[3] ? parseFloat(kolom[3].replace(/[^0-9-]/g, "")) || 0 : 0; // Kolom D (Pengeluaran)
 
             let statusTipe = "";
             let nominalFix = 0;
 
-            // --- LOGIKA KONDISIONAL PENENTUAN KATEGORI & NOMINAL JUMLAH (C / D) ---
+            // INSTRUKSI 3: Logika Kondisional Penentu Kolom Kategori & Jumlah Uang (Rp)
+            // Jika Kolom C terisi angka (>0) dan Kolom D kosong (0), maka ini Uang Masuk
             if (nilaiC > 0 && nilaiD === 0) {
-                statusTipe = "masuk"; // Kategori Pemasukan
-                nominalFix = nilaiC;  // Ambil nilai dari Kolom C
-            } else if (nilaiD > 0 && nilaiC === 0) {
-                statusTipe = "keluar"; // Kategori Pengeluaran
-                nominalFix = nilaiD;   // Ambil nilai dari Kolom D
-            } else if (nilaiC > 0 && nilaiD > 0) {
-                // Kasus cadangan jika dua kolom terisi (masuk sebagai pemasukan utama)
-                statusTipe = "masuk";
-                nominalFix = nilaiC;
-            } else {
-                continue; // Skip jika baris data tidak memuat angka transaksi valid (0 berbanding 0)
+                statusTipe = "masuk"; 
+                nominalFix = nilaiC;  
+            } 
+            // Jika Kolom D terisi angka (>0) dan Kolom C kosong (0), maka ini Uang Keluar
+            else if (nilaiD > 0 && nilaiC === 0) {
+                statusTipe = "keluar"; 
+                nominalFix = nilaiD;   
+            } 
+            // Kondisi pengaman (jika baris kosong/bernilai 0 semua, abaikan dan jangan dimasukkan ke tabel)
+            else {
+                continue; 
             }
 
-            // Ekstraksi data penanggalan untuk kebutuhan pengelompokan Dropdown filter HTML
+            // INSTRUKSI 4: Ekstraksi data Bulan & Tahun untukDropdown Filter
             let tglSplit = tglRaw.split("/");
-            let thn = tglSplit[2] || "2026";
+            let thn = tglSplit[2] ? tglSplit[2].trim() : "2026";
             let bln = namaBulanIndo[parseInt(tglSplit[1], 10) - 1] || "Semua";
 
             daftarTahun.add(thn);
             daftarBulan.add(bln);
 
-            // Masukkan objek data yang telah disesuaikan ke array global pembentuk tabel
+            // INSTRUKSI 5: Bungkus seluruh data rapi ke dalam Array global utama
             dataKeuanganGlobal.push({ 
                 tanggal: tglRaw, 
                 bulan: bln, 
                 tahun: thn, 
                 keterangan: ketTransaksi, 
                 tipe: statusTipe, 
-                jumlah: nominalFix.toString(), 
-                linkNota: linkNota
+                jumlah: nominalFix.toString(), // Disimpan dalam bentuk teks string angka bersih
+                linkNota: linkNotaRaw
             });
         }
 
+        // Mengisi dropdown filter otomatis berdasarkan tahun & bulan yang terdeteksi di database
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
         isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
         
@@ -257,6 +266,7 @@ window.terapkanFilter = function() {
     const kat = katInput.value;
     const cari = cariInput.value.toLowerCase();
 
+    // Menyaring data berdasarkan filter aktif (Tahun, Bulan, Jenis, & Kolom Pencarian)
     dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
         return (thn === "Semua" || item.tahun === thn) && 
                (bln === "Semua" || item.bulan === bln) && 
@@ -264,14 +274,16 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
+    // INSTRUKSI 6: Hitung ulang kalkulasi nominal untuk 3 Teks Kotak Card di bagian atas
     let m = 0, k = 0;
     let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
     dataUntukKartu.forEach(i => {
-        let n = parseInt(i.jumlah.replace(/[^0-9]/g, '')) || 0;
+        let n = parseInt(i.jumlah) || 0; // Membaca nominal angka murni yang sudah dibersihkan
         i.tipe === 'masuk' ? m += n : k += n;
     });
 
+    // Menampilkan hasil kalkulasi ke elemen teks HTML masing-masing card
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-keluar').innerText = formatRupiah(k);
     
@@ -293,27 +305,30 @@ function renderTabel() {
         return;
     }
 
+    // Mengatur batasan indeks data yang tampil (Paginasi: 7 baris per halaman)
     const start = (halamanSaatIni - 1) * barisPerHalaman;
     const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
     
+    // INSTRUKSI 7: Merender data baris demi baris menjadi tag tabel HTML `<tr><td>`
     let html = pageData.map(i => `
         <tr>
             <td>${i.tanggal}</td>
             <td>
                 ${i.keterangan}
-                ${i.linkNota && i.linkNota !== "-" ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
+                ${i.linkNota && i.linkNota !== "-" && i.linkNota.trim() !== "" ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
             </td>
             <td style="font-weight:bold;">
-                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
+                ${i.tipe === 'masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
             </td>
-            <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
+            <td><strong>${formatRupiah(parseInt(i.jumlah) || 0)}</strong></td>
         </tr>
     `).join('');
 
+    // Membuat tombol navigasi Halaman Sebelumnya / Halaman Selanjutnya secara dinamis
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
         let tombolNav = "";
-        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer;";
+        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px;";
         
         if (halamanSaatIni === 1) {
             tombolNav = `<div style="text-align:right;"><button onclick="nav(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
@@ -322,7 +337,7 @@ function renderTabel() {
         } else {
             tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="nav(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="nav(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
-        html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
+        html += `<tr><td colspan="4" style="padding:15px; background:#f9f9f9; border-top:1px solid #eee;">${tombolNav}</td></tr>`;
     }
     tbody.innerHTML = html;
 }
