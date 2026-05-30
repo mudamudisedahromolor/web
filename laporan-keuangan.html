@@ -112,4 +112,42 @@
                     <option value="Semua">Semua Tahun</option>
                 </select>
                 
-                <select id="filter-bulan"
+                <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
+                    <option value="Semua">Semua Bulan</option>
+                </select>
+                
+                <input type="text" id="input-cari" class="filter-box" style="width: 200px;" placeholder="Cari transaksi..." onkeyup="terapkanFilter()">
+                
+                <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTqiCluDyXYQijRAElBYLeYPzrT7ENOPtbaxnoHfyZXFFMMxnO1pnZuOAKJaaVgSvFs6eKacEAd4w5I/pub?gid=1216205715&output=pdf&size=A4&portrait=true&fitw=true&gridlines=true" 
+                   download="Rekening_Koran_Kas_Muda_Mudi_Sedahromo.pdf" 
+                   class="btn-cetak-mutasi" 
+                   target="_blank">
+                    <i class="fa-solid fa-file-pdf"></i> Cetak Mutasi
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="finance-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Keterangan Transaksi</th>
+                            <th>Kategori</th>
+                            <th>Jumlah (Rp)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-tabel-keuangan">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database Real-time...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=1"></script>
+</body>
+</html>
