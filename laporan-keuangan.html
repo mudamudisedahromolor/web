@@ -44,8 +44,7 @@
             </div> 
         </div> 
 
-
-  <nav class="main-navbar">
+        <nav class="main-navbar">
             <ul class="nav-list">
                 <li class="nav-item"><a href="index.html">BERANDA</a></li>
                 <li class="nav-item">
@@ -54,7 +53,6 @@
                         <li class="submenu-item"><a href="struktur.html"> - STRUKTUR KEANGGOTAAN</a></li>
                         <li class="submenu-item"><a href="visi-misi.html"> - VISI & MISI</a></li>
                         <li class="submenu-item"><a href="daftar-anggota"> - DAFTAR ANGGOTA</a></li>
-                        
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -71,7 +69,7 @@
                         <li class="submenu-item"><a href="#"> - PERTANGGUNG JAWABAN</a></li>
                     </ul>
                 </li>
-                 <li class="nav-item">
+                <li class="nav-item">
                     <a href="#">INFORMASI</a>
                     <ul class="submenu">
                         <li class="submenu-item"><a href="laporan-keuangan.html"> - BERITA</a></li>
@@ -103,46 +101,15 @@
                 </div>
             </div>
 
-           <div class="filter-container">
-    <select id="filter-kategori" class="filter-box" onchange="terapkanFilter()">
-        <option value="Semua">Semua Kategori</option>
-        <option value="masuk">Pemasukan</option>
-        <option value="keluar">Pengeluaran</option>
-    </select>
-    
-    <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
-        <option value="Semua">Semua Tahun</option>
-    </select>
-    
-    <select id="filter-bulan" class="filter-box" onchange="terapkanFilter()">
-        <option value="Semua">Semua Bulan</option>
-    </select>
-    
-    <input type="text" id="input-cari" class="filter-box" style="width: 200px;" placeholder="Cari transaksi..." onkeyup="terapkanFilter()">
-</div>
-
-            <div class="table-responsive">
-                <table class="finance-table">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Keterangan Transaksi</th>
-                            <th>Kategori</th>
-                            <th>Jumlah (Rp)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-tabel-keuangan">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database Real-time...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js?v=1"></script>
-</body>
-</html>
+            <div class="filter-container">
+                <select id="filter-kategori" class="filter-box" onchange="terapkanFilter()">
+                    <option value="Semua">Semua Kategori</option>
+                    <option value="masuk">Pemasukan</option>
+                    <option value="keluar">Pengeluaran</option>
+                </select>
+                
+                <select id="filter-tahun" class="filter-box" onchange="terapkanFilter()">
+                    <option value="Semua">Semua Tahun</option>
+                </select>
+                
+                <select id="filter-bulan"
