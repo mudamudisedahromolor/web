@@ -159,7 +159,7 @@ window.currentSlide = function(n) {
 
 
 /* ==========================================================================
-   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV - KODE DISYNC)
+   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV)
    ========================================================================== */
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqiCluDyXYQijRAElBYLeYPzrT7ENOPtbaxnoHfyZXFFMMxnO1pnZuOAKJaaVgSvFs6eKacEAd4w5I/pub?gid=1216205715&single=true&output=tsv";
 let dataKeuanganGlobal = [];
@@ -167,7 +167,7 @@ let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 7;
 
-// INSTRUKSI A: Mengubah string teks tanggal "DD/MM/YYYY" menjadi objek waktu asli untuk sorting akurat
+// Fungsi pembantu mengubah string "DD/MM/YYYY" menjadi objek waktu JS untuk sorting
 function parseTanggalKeObjek(strTanggal) {
     if (!strTanggal) return new Date(0);
     const bagian = strTanggal.split("/");
@@ -175,14 +175,11 @@ function parseTanggalKeObjek(strTanggal) {
     return new Date(parseInt(bagian[2], 10), parseInt(bagian[1], 10) - 1, parseInt(bagian[0], 10));
 }
 
-// INSTRUKSI B: Pembersih nominal super ketat untuk mendeteksi teks rupiah format khusus Google Sheets
+// Pembersih nominal dari format rupiah khusus Google Sheets
 function bersihkanNominal(teksNominal) {
     if (!teksNominal) return 0;
-    // Buang tulisan Rp dan seluruh spasi
     let bersih = teksNominal.toString().replace(/Rp/gi, "").replace(/\s/g, "");
-    // Hilangkan semua tanda titik ribuan agar menyatu utuh kembali
     bersih = bersih.replace(/[\.\,]/g, "");
-    // Saring hanya digit angka murni
     bersih = bersih.replace(/[^0-9-]/g, "");
     return parseInt(bersih, 10) || 0;
 }
@@ -191,7 +188,6 @@ async function loadKeuanganDariDrive() {
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
         const teksData = await response.text();
-        
         const baris = teksData.split(/\r?\n/);
         
         dataKeuanganGlobal = [];
@@ -211,9 +207,8 @@ async function loadKeuanganDariDrive() {
             
             if (!tglRaw || tglRaw === "Tanggal" || ketTransaksi.toUpperCase() === "TOTAL") continue; 
 
-            // Gunakan pembersih baru untuk mengamankan parsing angka dari Sheets
-            let nilaiC = kolom[2] ? bersihkanNominal(kolom[2]) : 0; // Pemasukan
-            let nilaiD = kolom[3] ? bersihkanNominal(kolom[3]) : 0; // Pengeluaran
+            let nilaiC = kolom[2] ? bersihkanNominal(kolom[2]) : 0; 
+            let nilaiD = kolom[3] ? bersihkanNominal(kolom[3]) : 0; 
 
             let statusTipe = "";
             let nominalFix = 0;
@@ -246,7 +241,7 @@ async function loadKeuanganDariDrive() {
             });
         }
 
-        // AUTO-SORTING: Mengurutkan mutasi murni dari tanggal terbaru ke tanggal terlama
+        // 🛠️ PERBAIKAN 1: Urutkan data awal dari tanggal TERBARU ke TERLAMA
         dataKeuanganGlobal.sort((a, b) => {
             return parseTanggalKeObjek(b.tanggal) - parseTanggalKeObjek(a.tanggal);
         });
@@ -282,12 +277,12 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
-    // Menjaga agar urutan data tersaring tetap memunculkan data terbaru di paling atas
+    // 🛠️ PERBAIKAN 2: Pastikan data hasil filter tetap terurut dari tanggal TERBARU ke TERLAMA
     dataTersaringGlobal.sort((a, b) => {
         return parseTanggalKeObjek(b.tanggal) - parseTanggalKeObjek(a.tanggal);
     });
 
-    // REKALKULASI KARTU SALDO ATAS: Menghitung akumulasi riil keseluruhan/per tahun tanpa distorsi teks Rp
+    // Rekalkulasi nominal kartu atas
     let m = 0, k = 0;
     let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
