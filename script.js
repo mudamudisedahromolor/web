@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById('data-tabel-keuangan')) loadKeuanganDariDrive();
     if (document.getElementById('data-tabel-rapat')) loadRapatDariDrive();
     if (document.getElementById('data-tabel-dokumentasi')) loadDokumentasiDariDrive();
+    if (document.getElementById('data-tabel-anggota')) loadAnggotaDariDrive(); // Deteksi otomatis Halaman Anggota
 });
 
 /* ==========================================================================
@@ -85,7 +86,6 @@ function initCarouselOrganisasi() {
 }
 
 // --- B. Slider Otomatis Halaman Beranda (index.html) ---
-// Data untuk slider halaman utama (edit isi di sini tiap minggu/kegiatan baru)
 const kegiatanData = [
     {
         gambar: "images/foto-tirakatan.jpg", 
@@ -110,10 +110,8 @@ function initHeroSlider() {
     const sliderContainer = document.getElementById('slider-container');
     const dotsContainer = document.getElementById('dots-container');
     
-    // Jika elemen slider tidak ditemukan (bukan di halaman index), batalkan fungsi ini
     if (!sliderContainer || !dotsContainer) return;
 
-    // 1. Merakit HTML untuk gambar slide dan titik navigasi (dots)
     let slidesHTML = "", dotsHTML = "";
     kegiatanData.forEach((item, index) => {
         slidesHTML += `
@@ -129,7 +127,6 @@ function initHeroSlider() {
     sliderContainer.innerHTML = slidesHTML;
     dotsContainer.innerHTML = dotsHTML;
 
-    // Jalankan animasi slide otomatis
     showSlides(slideIndex);
     autoSlide();
 }
@@ -138,29 +135,26 @@ function showSlides(n) {
     let slides = document.getElementsByClassName("slide");
     let dots = document.getElementsByClassName("dot");
     
-    if (slides.length === 0) return; // Pengaman jika tidak ada slide
+    if (slides.length === 0) return;
 
     if (n > slides.length) slideIndex = 1;    
     if (n < 1) slideIndex = slides.length;
     
-    // Reset semua kelas 'aktif'
     Array.from(slides).forEach(s => s.classList.remove("aktif"));
     Array.from(dots).forEach(d => d.classList.remove("aktif"));
     
-    // Tampilkan slide yang sedang aktif
     slides[slideIndex-1].classList.add("aktif");  
     dots[slideIndex-1].classList.add("aktif");
 }
 
 function autoSlide() {
-    slideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, 5000); // Ganti gambar tiap 5 detik
+    slideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, 5000);
 }
 
-// Terpicu ketika user mengeklik titik navigasi manual
 window.currentSlide = function(n) { 
     showSlides(slideIndex = n); 
-    clearInterval(slideTimer); // Hentikan timer otomatis sementara
-    autoSlide(); // Mulai ulang timer otomatis
+    clearInterval(slideTimer);
+    autoSlide();
 }
 
 
@@ -173,7 +167,6 @@ let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 7;
 
-// Mengambil Data dari Live Google Spreadsheet
 async function loadKeuanganDariDrive() {
     try {
         const response = await fetch(`${linkTsvKeuangan}&cache=${new Date().getTime()}`);
@@ -205,7 +198,6 @@ async function loadKeuanganDariDrive() {
             });
         }
 
-        // Auto-fill dropdown filter
         isiDropdown('filter-tahun', Array.from(daftarTahun).sort().reverse());
         isiDropdown('filter-bulan', Array.from(daftarBulan).sort((a,b) => namaBulanIndo.indexOf(a) - namaBulanIndo.indexOf(b)));
         
@@ -217,7 +209,6 @@ async function loadKeuanganDariDrive() {
     }
 }
 
-// Proses Filter & Penjumlahan Kartu Saldo
 window.terapkanFilter = function() {
     const thnInput = document.getElementById('filter-tahun');
     const blnInput = document.getElementById('filter-bulan');
@@ -231,7 +222,6 @@ window.terapkanFilter = function() {
     const kat = katInput.value;
     const cari = cariInput.value.toLowerCase();
 
-    // Saring data berdasarkan input user
     dataTersaringGlobal = dataKeuanganGlobal.filter(item => {
         return (thn === "Semua" || item.tahun === thn) && 
                (bln === "Semua" || item.bulan === bln) && 
@@ -239,7 +229,6 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
-    // Hitung nominal Pemasukan, Pengeluaran, Saldo
     let m = 0, k = 0;
     let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
@@ -248,7 +237,6 @@ window.terapkanFilter = function() {
         i.tipe === 'masuk' ? m += n : k += n;
     });
 
-    // Render hasil kalkulasi ke HTML
     document.getElementById('total-masuk').innerText = formatRupiah(m);
     document.getElementById('total-keluar').innerText = formatRupiah(k);
     
@@ -257,11 +245,10 @@ window.terapkanFilter = function() {
     
     document.getElementById('saldo-akhir').innerText = formatRupiah(m - k);
 
-    halamanSaatIni = 1; // Reset halaman saat filter diubah
+    halamanSaatIni = 1; 
     renderTabel();
 }
 
-// Rendering Baris Tabel Keuangan
 function renderTabel() {
     const tbody = document.getElementById('data-tabel-keuangan');
     if (!tbody) return;
@@ -271,25 +258,23 @@ function renderTabel() {
         return;
     }
 
-    // Pagination Limit
     const start = (halamanSaatIni - 1) * barisPerHalaman;
     const pageData = dataTersaringGlobal.slice(start, start + barisPerHalaman);
     
-let html = pageData.map(i => `
-    <tr>
-        <td>${i.tanggal}</td>
-        <td>
-            ${i.keterangan}
-            ${i.linkNota ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
-        </td>
-        <td style="font-weight:bold;">
-            ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
-        </td>
-        <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
-    </tr>
-`).join('');
+    let html = pageData.map(i => `
+        <tr>
+            <td>${i.tanggal}</td>
+            <td>
+                ${i.keterangan}
+                ${i.linkNota ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
+            </td>
+            <td style="font-weight:bold;">
+                ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
+            </td>
+            <td><strong>${formatRupiah(parseInt(i.jumlah)||0)}</strong></td>
+        </tr>
+    `).join('');
 
-    // Tambah Tombol Navigasi Halaman jika data melebihi limit
     const totalHal = Math.ceil(dataTersaringGlobal.length / barisPerHalaman);
     if (totalHal > 1) {
         let tombolNav = "";
@@ -307,7 +292,6 @@ let html = pageData.map(i => `
     tbody.innerHTML = html;
 }
 
-// Aksi Tombol Navigasi Keuangan
 window.nav = (dir) => { 
     halamanSaatIni += dir; 
     renderTabel(); 
@@ -323,7 +307,6 @@ let dataRapatTersaring = [];
 let halRapatSaatIni = 1;
 const barisRapatPerHal = 5; 
 
-// Mengambil Arsip Berita Acara dari Drive
 async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
@@ -368,7 +351,6 @@ async function loadRapatDariDrive() {
     }
 }
 
-// Fungsi Filter Notulen Rapat
 window.terapkanFilterRapat = function() {
     const thn = document.getElementById('filter-rapat-tahun').value;
     const bln = document.getElementById('filter-rapat-bulan').value;
@@ -380,11 +362,10 @@ window.terapkanFilterRapat = function() {
                (item.agenda.toLowerCase().includes(cari) || item.hasil.toLowerCase().includes(cari) || item.lokasi.toLowerCase().includes(cari));
     });
 
-    halRapatSaatIni = 1; // Reset halaman
+    halRapatSaatIni = 1; 
     renderTabelRapat();
 }
 
-// Rendering Tabel Notulen Rapat
 function renderTabelRapat() {
     const tbody = document.getElementById('data-tabel-rapat');
     if (!tbody) return;
@@ -423,7 +404,6 @@ function renderTabelRapat() {
     tbody.innerHTML = html;
 }
 
-// Aksi Tombol Navigasi Rapat
 window.navRapat = (dir) => { 
     halRapatSaatIni += dir; 
     renderTabelRapat(); 
@@ -433,17 +413,12 @@ window.navRapat = (dir) => {
 
 /* ==========================================================================
    6. SISTEM DOKUMENTASI & GALERI KEGIATAN
-   --------------------------------------------------------------------------
-   Instruksi: Sistem cerdas yang mengurutkan data dokumentasi otomatis
-   berdasarkan Tanggal Nyata Kegiatan, menangani upload lebih dari 1 file 
-   sekaligus, dan memecah tautan Google Drive agar rapi berjajar vertikal.
    ========================================================================== */
 const linkTsvDokumentasi = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGNBxjdguHX3DyMAm4824Cw9Nv6t83MDuqojSZUcwftKAKyuC2jRLtPGId7FdK7w1asPeEVVtdSqqN/pub?gid=600804245&single=true&output=tsv";
 let dataDokumentasiGlobal = [];
 let dataDokumentasiTersaring = [];
-
 let halDokSaatIni = 1;
-const barisDokPerHal = 5; // Batas galeri per halaman
+const barisDokPerHal = 5; 
 
 async function loadDokumentasiDariDrive() {
     try {
@@ -462,7 +437,6 @@ async function loadDokumentasiDariDrive() {
             const kolom = barisBersih.split("\t");
             if (kolom.length < 5) continue; 
 
-            // Penataan Indeks Kolom Tabel Dokumentasi
             let tglRaw = kolom[1] ? kolom[1].trim() : ""; 
             let agendaRaw = kolom[2] ? kolom[2].trim() : "-";
             let kegiatanRaw = kolom[3] ? kolom[3].trim() : "-";
@@ -482,17 +456,10 @@ async function loadDokumentasiDariDrive() {
             if(bln && bln !== "Semua") daftarBulanDok.add(bln);
 
             dataDokumentasiGlobal.push({ 
-                tanggal: tglRaw, 
-                bulan: bln, 
-                tahun: thn, 
-                agenda: agendaRaw, 
-                kegiatan: kegiatanRaw, 
-                subjek: subjekRaw, 
-                linkAsli: linkFotoAsli 
+                tanggal: tglRaw, bulan: bln, tahun: thn, agenda: agendaRaw, kegiatan: kegiatanRaw, subjek: subjekRaw, linkAsli: linkFotoAsli 
             });
         }
 
-        // Pengurutan Otomatis (Dari Terbaru ke Terlama)
         dataDokumentasiGlobal.sort((itemA, itemB) => {
             let splitA = itemA.tanggal.includes("/") ? itemA.tanggal.split("/") : itemA.tanggal.split("-");
             let splitB = itemB.tanggal.includes("/") ? itemB.tanggal.split("/") : itemB.tanggal.split("-");
@@ -522,7 +489,7 @@ window.terapkanFilterDokumentasi = function() {
                (item.agenda.toLowerCase().includes(cari) || item.kegiatan.toLowerCase().includes(cari) || item.subjek.toLowerCase().includes(cari));
     });
 
-    halDokSaatIni = 1; // Reset halaman
+    halDokSaatIni = 1; 
     renderTabelDokumentasi();
 }
 
@@ -541,7 +508,6 @@ function renderTabelDokumentasi() {
     let html = pageData.map(i => {
         let kolomMedia = "";
         
-        // Logika Multi-Gambar (Memotong string tautan ganda)
         if (i.linkAsli) {
             let daftarLink = i.linkAsli.split(",").map(link => link.trim());
             kolomMedia = `<div style="display: flex; flex-direction: column; gap: 14px; align-items: center;">`;
@@ -552,7 +518,6 @@ function renderTabelDokumentasi() {
                 let renderUrl = linkSingle;
                 let isImg = false;
                 
-                // Konversi URL Drive
                 if (linkSingle.includes("id=")) {
                     let idFile = linkSingle.split("id=")[1].split("&")[0];
                     renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
@@ -597,7 +562,6 @@ function renderTabelDokumentasi() {
         `;
     }).join('');
 
-    // Navigasi Pagination Dokumentasi
     const totalHal = Math.ceil(dataDokumentasiTersaring.length / barisDokPerHal);
     if (totalHal > 1) {
         let tombolNav = "";
@@ -612,24 +576,210 @@ function renderTabelDokumentasi() {
         }
         html += `<tr><td colspan="5" style="padding:15px; background:#f9f9f9;">${tombolNav}</td></tr>`;
     }
-
     tbody.innerHTML = html;
 }
 
-// Aksi Tombol Navigasi Dokumentasi
 window.navDok = (dir) => { 
     halDokSaatIni += dir; 
     renderTabelDokumentasi(); 
     setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
 
+
 /* ==========================================================================
-   7. FUNGSI UTILITAS & PEMBANTU UMUM
+   8. MODUL KHUSUS: DATABASE ANGGOTA, UMUR JUJUR & FOTO POPUP
+   ========================================================================== */
+const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
+let dataAnggotaGlobal = [];
+let dataAnggotaTersaring = [];
+let halAnggotaSaatIni = 1;
+const barisAnggotaPerHal = 7; 
+
+async function loadAnggotaDariDrive() {
+    try {
+        const response = await fetch(`${linkTsvAnggota}&cache=${new Date().getTime()}`);
+        const teksData = await response.text();
+        const baris = teksData.split("\n");
+        
+        dataAnggotaGlobal = [];
+
+        for (let i = 1; i < baris.length; i++) {
+            const barisBersih = baris[i].trim();
+            if (!barisBersih) continue;
+            
+            const kolom = barisBersih.split("\t");
+            
+            let nama = kolom[2] ? kolom[2].trim() : "-";         
+            let nim = kolom[4] ? kolom[4].trim() : "-";          
+            let tglLahirRaw = kolom[6] ? kolom[6].trim() : "";   
+            let linkFotoRaw = kolom[13] ? kolom[13].trim() : ""; 
+            
+            let usiaTeks = "-";
+            let tahunLahirInt = 0;
+
+            let matchTahun = tglLahirRaw.match(/\b(19\d{2}|20\d{2})\b/);
+            if (matchTahun) {
+                tahunLahirInt = parseInt(matchTahun[0], 10);
+            }
+
+            if (tahunLahirInt > 0) {
+                let tglInggris = tglLahirRaw.toLowerCase()
+                    .replace('mei', 'may').replace('agu', 'aug').replace('okt', 'oct').replace('des', 'dec');
+                
+                let tglLahirObj = new Date(tglInggris);
+                let hariIni = new Date();
+                let umur = hariIni.getFullYear() - tahunLahirInt;
+
+                if (!isNaN(tglLahirObj.getTime())) {
+                    let bulanSelisih = hariIni.getMonth() - tglLahirObj.getMonth();
+                    if (bulanSelisih < 0 || (bulanSelisih === 0 && hariIni.getDate() < tglLahirObj.getDate())) {
+                        umur--; 
+                    }
+                }
+                usiaTeks = umur + " Tahun";
+            }
+
+            if (tahunLahirInt > 0) {
+                dataAnggotaGlobal.push({ 
+                    nim: nim, nama: nama, tahunLahirInt: tahunLahirInt, usia: usiaTeks, foto: linkFotoRaw 
+                });
+            }
+        }
+        terapkanFilterAnggota();
+    } catch (e) {
+        console.error("Gagal memuat database anggota", e);
+        const tBody = document.getElementById('data-tabel-anggota');
+        if (tBody) tBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Gagal memuat data dari database.</td></tr>`;
+    }
+}
+
+window.terapkanFilterAnggota = function() {
+    const cariInput = document.getElementById('input-cari-anggota');
+    if(!cariInput) return;
+
+    const cari = cariInput.value.toLowerCase();
+
+    dataAnggotaTersaring = dataAnggotaGlobal.filter(item => {
+        return item.nama.toLowerCase().includes(cari) || item.nim.toLowerCase().includes(cari);
+    });
+
+    halAnggotaSaatIni = 1; 
+    renderTabelAnggota();
+}
+
+function renderTabelAnggota() {
+    const tbody = document.getElementById('data-tabel-anggota');
+    if (!tbody) return;
+
+    if (dataAnggotaTersaring.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#666;"><strong>Data anggota tidak ditemukan.</strong></td></tr>`;
+        return;
+    }
+
+    const start = (halAnggotaSaatIni - 1) * barisAnggotaPerHal;
+    const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
+    
+    let html = dataPerHalaman.map(i => {
+        let linkDefaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(i.nama)}&background=E53935&color=fff&size=150&bold=true`;
+        let urlFotoTampil = linkDefaultAvatar; 
+        
+        if (i.foto && i.foto !== "" && i.foto !== "-") {
+            let idFile = "";
+            if (i.foto.includes("id=")) {
+                idFile = i.foto.split("id=")[1].split("&")[0];
+            } else if (i.foto.includes("/d/")) {
+                idFile = i.foto.split("/d/")[1].split("/")[0];
+            }
+            
+            if (idFile !== "") {
+                urlFotoTampil = `https://drive.google.com/thumbnail?id=${idFile}&sz=w800`;
+            } else if (i.foto.startsWith("http")) {
+                urlFotoTampil = i.foto;
+            }
+        }
+
+        let generasi = "-";
+        if (i.tahunLahirInt <= 1964) {
+            generasi = '<span style="background-color: #5D4037; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Baby Boomer</span>';
+        } else if (i.tahunLahirInt >= 1965 && i.tahunLahirInt <= 1980) {
+            generasi = '<span style="background-color: #7B1FA2; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen X</span>';
+        } else if (i.tahunLahirInt >= 1981 && i.tahunLahirInt <= 1996) {
+            generasi = '<span style="background-color: #0288D1; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Millennial</span>';
+        } else if (i.tahunLahirInt >= 1997 && i.tahunLahirInt <= 2012) {
+            generasi = '<span style="background-color: #388E3C; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Z</span>';
+        } else if (i.tahunLahirInt >= 2013 && i.tahunLahirInt <= 2024) {
+            generasi = '<span style="background-color: #F57C00; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Alpha</span>';
+        } else if (i.tahunLahirInt >= 2025) {
+            generasi = '<span style="background-color: #D32F2F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Gen Beta</span>';
+        } 
+
+        return `
+            <tr style="height: 90px; vertical-align: middle;"> 
+                <td style="font-size: 14px; font-weight: bold; color: #555;">${i.nim}</td>
+                <td style="padding: 10px 0;">
+                    <img src="${urlFotoTampil}" alt="Foto ${i.nama}" 
+                         style="width: 75px; height: 75px; object-fit: cover; border-radius: 50%; border: 3px solid #E53935; box-shadow: 0 4px 8px rgba(0,0,0,0.15); background-color: #fafafa; display: block; margin: 0 auto; cursor: pointer; position: relative; z-index: 10;" 
+                         onerror="this.src='${linkDefaultAvatar}'"
+                         onclick="event.stopPropagation(); window.bukaFotoFull('${urlFotoTampil}');">
+                </td>
+                <td style="text-align: left; padding-left: 20px; font-size: 15px; font-weight: 600; color: #333;">
+                    <i class="fa-solid fa-user" style="color:#E53935; margin-right:8px; font-size: 13px;"></i> ${i.nama}
+                </td>
+                <td><span class="badge-usia" style="font-size: 13px; font-weight: 600; padding: 4px 10px;">${i.usia}</span></td>
+                <td>${generasi}</td>
+            </tr>
+        `;
+    }).join('');
+
+    const totalHal = Math.ceil(dataAnggotaTersaring.length / barisAnggotaPerHal);
+    if (totalHal > 1) {
+        let tombolNav = "";
+        const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px;";
+        
+        if (halAnggotaSaatIni === 1) {
+            tombolNav = `<div style="text-align:right;"><button onclick="window.navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        } else if (halAnggotaSaatIni === totalHal) {
+            tombolNav = `<div style="text-align:left;"><button onclick="window.navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
+        } else {
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="window.navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="window.navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+        }
+        html += `<tr><td colspan="5" style="padding:12px; background:#f9f9f9; border-top:1px solid #eee;">${tombolNav}</td></tr>`;
+    }
+    tbody.innerHTML = html;
+}
+
+window.navAnggota = function(arah) { 
+    halAnggotaSaatIni += arah; 
+    renderTabelAnggota(); 
+    setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+};
+
+window.bukaFotoFull = function(url) {
+    const modal = document.getElementById('modal-foto-full');
+    const imgModal = document.getElementById('img-modal-tampil');
+    if(modal && imgModal) {
+        imgModal.src = url; 
+        modal.style.display = 'flex'; 
+    } else {
+        alert("Kode HTML Popup (modal-foto-full) belum dipasang di file daftar-anggota.html");
+    }
+}
+
+window.tutupFoto = function() {
+    const modal = document.getElementById('modal-foto-full');
+    if(modal) {
+        modal.style.display = 'none'; 
+    }
+}
+
+
+/* ==========================================================================
+   9. FUNGSI UTILITAS & PEMBANTU UMUM
    ========================================================================== */
 function isiDropdown(id, dataArray) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerHTML = el.options[0].outerHTML; // Simpan opsi default "Semua"
+    el.innerHTML = el.options[0].outerHTML; 
     dataArray.forEach(item => {
         let opt = document.createElement("option");
         opt.value = item; 
