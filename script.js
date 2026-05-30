@@ -167,7 +167,6 @@ let dataTersaringGlobal = [];
 let halamanSaatIni = 1;
 const barisPerHalaman = 7;
 
-// Fungsi pembantu mengubah string "DD/MM/YYYY" menjadi objek waktu JS untuk sorting
 function parseTanggalKeObjek(strTanggal) {
     if (!strTanggal) return new Date(0);
     const bagian = strTanggal.split("/");
@@ -175,7 +174,6 @@ function parseTanggalKeObjek(strTanggal) {
     return new Date(parseInt(bagian[2], 10), parseInt(bagian[1], 10) - 1, parseInt(bagian[0], 10));
 }
 
-// Pembersih nominal dari format rupiah khusus Google Sheets
 function bersihkanNominal(teksNominal) {
     if (!teksNominal) return 0;
     let bersih = teksNominal.toString().replace(/Rp/gi, "").replace(/\s/g, "");
@@ -241,7 +239,6 @@ async function loadKeuanganDariDrive() {
             });
         }
 
-        // 🛠️ PERBAIKAN 1: Urutkan data awal dari tanggal TERBARU ke TERLAMA
         dataKeuanganGlobal.sort((a, b) => {
             return parseTanggalKeObjek(b.tanggal) - parseTanggalKeObjek(a.tanggal);
         });
@@ -277,12 +274,10 @@ window.terapkanFilter = function() {
                (item.keterangan.toLowerCase().includes(cari) || item.tanggal.toLowerCase().includes(cari));
     });
 
-    // 🛠️ PERBAIKAN 2: Pastikan data hasil filter tetap terurut dari tanggal TERBARU ke TERLAMA
     dataTersaringGlobal.sort((a, b) => {
         return parseTanggalKeObjek(b.tanggal) - parseTanggalKeObjek(a.tanggal);
     });
 
-    // Rekalkulasi nominal kartu atas
     let m = 0, k = 0;
     let dataUntukKartu = thn === "Semua" ? dataKeuanganGlobal : dataKeuanganGlobal.filter(item => item.tahun === thn);
 
@@ -350,7 +345,6 @@ window.nav = (dir) => {
     halamanSaatIni += dir; 
     renderTabel(); 
 };
-
 
 /* ==========================================================================
    5. SISTEM NOTULEN & HASIL MUSYAWARAH RAPAT BULANAN
@@ -507,7 +501,6 @@ window.navRapat = (dir) => {
     renderTabelRapat(); 
     setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
-
 
 /* ==========================================================================
    6. SISTEM DOKUMENTASI & GALERI KEGIATAN
@@ -682,7 +675,6 @@ window.navDok = (dir) => {
     renderTabelDokumentasi(); 
     setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100);
 };
-
 
 /* ==========================================================================
    8. MODUL KHUSUS: DATABASE ANGGOTA, UMUR JUJUR & FOTO POPUP
@@ -869,7 +861,6 @@ window.tutupFoto = function() {
         modal.style.display = 'none'; 
     }
 }
-
 
 /* ==========================================================================
    9. FUNGSI UTILITAS & PEMBANTU UMUM
