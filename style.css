@@ -371,9 +371,40 @@ body {
 .card-box.keluar .amount { color: #E53935; }
 .card-box.saldo .amount { color: #1565c0; }
 
-.filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
-.filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; }
+.filter-container { display: flex; gap: 15px; justify-content: flex-end; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; height: 40px; }
 .filter-box:focus { border-color: #E53935; }
+
+/* Komponen Tambahan: Tombol Cetak Mutasi Berkas Rekening Koran */
+.btn-cetak-mutasi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #E53935;
+    color: #ffffff !important;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none !important;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.btn-cetak-mutasi:hover {
+    background-color: #c62828;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+.btn-cetak-mutasi i {
+    margin-right: 8px;
+    font-size: 14px;
+}
 
 .table-responsive { width: 100%; overflow-x: auto; }
 .finance-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
@@ -624,4 +655,12 @@ body {
 
     /* Embed Frame Drive HP */
     .drive-embed-container { height: 450px; }
+
+    /* Pengaturan Khusus Tombol Cetak Mutasi saat dibuka di Layar Ponsel (HP) */
+    .btn-cetak-mutasi {
+        display: flex;
+        width: 100%;
+        margin-top: 5px;
+        height: 40px;
+    }
 }
