@@ -159,7 +159,7 @@ window.currentSlide = function(n) {
 
 
 /* ==========================================================================
-   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV)
+   4. SISTEM TRANSPARANSI KAS KEUANGAN (GOOGLE SHEETS TSV - AKTUAL)
    ========================================================================== */
 const linkTsvKeuangan = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHz5_a7dbmp1ujG-mDiWyf6paJIEvbvdm2FrdCvwfCDo9iAu_WDA2Cf-TvddO5S8oU-AvJ19dkBVS3/pub?gid=988078683&single=true&output=tsv";
 let dataKeuanganGlobal = [];
@@ -182,10 +182,38 @@ async function loadKeuanganDariDrive() {
             if (!barisBersih) continue;
             
             const kolom = barisBersih.split("\t");
-            if (kolom.length < 5) continue;
+            if (kolom.length < 4) continue; // Minimal memiliki kolom A, B, C, D
 
-            let statusTipe = kolom[1].toLowerCase().includes("masuk") ? "masuk" : "keluar";
-            let tglRaw = kolom[2]; 
+            // --- DEKLARASI PENYEMATAN KOLOM BARU (SESUAI ATURAN BARU) ---
+            let tglRaw = kolom[0] ? kolom[0].trim() : "";       // Kolom A: Tanggal
+            let ketTransaksi = kolom[1] ? kolom[1].trim() : ""; // Kolom B: Keterangan Transaksi
+            let linkNota = kolom[5] ? kolom[5].trim() : "";     // Kolom F: Bukti Nota
+            
+            if (!tglRaw || tglRaw === "Tanggal") continue; // Pengaman header ganda
+
+            // Bersihkan teks atau string format ribuan agar murni menjadi angka logis komputer
+            let nilaiC = kolom[2] ? parseFloat(kolom[2].replace(/[^0-9.-]+/g, "")) || 0 : 0; // Kolom C: Pemasukan
+            let nilaiD = kolom[3] ? parseFloat(kolom[3].replace(/[^0-9.-]+/g, "")) || 0 : 0; // Kolom D: Pengeluaran
+
+            let statusTipe = "";
+            let nominalFix = 0;
+
+            // --- LOGIKA KONDISIONAL PENENTUAN KATEGORI & NOMINAL JUMLAH (C / D) ---
+            if (nilaiC > 0 && nilaiD === 0) {
+                statusTipe = "masuk"; // Kategori Pemasukan
+                nominalFix = nilaiC;  // Ambil nilai dari Kolom C
+            } else if (nilaiD > 0 && nilaiC === 0) {
+                statusTipe = "keluar"; // Kategori Pengeluaran
+                nominalFix = nilaiD;   // Ambil nilai dari Kolom D
+            } else if (nilaiC > 0 && nilaiD > 0) {
+                // Kasus cadangan jika dua kolom terisi (masuk sebagai pemasukan utama)
+                statusTipe = "masuk";
+                nominalFix = nilaiC;
+            } else {
+                continue; // Skip jika baris data tidak memuat angka transaksi valid (0 berbanding 0)
+            }
+
+            // Ekstraksi data penanggalan untuk kebutuhan pengelompokan Dropdown filter HTML
             let tglSplit = tglRaw.split("/");
             let thn = tglSplit[2] || "2026";
             let bln = namaBulanIndo[parseInt(tglSplit[1], 10) - 1] || "Semua";
@@ -193,8 +221,15 @@ async function loadKeuanganDariDrive() {
             daftarTahun.add(thn);
             daftarBulan.add(bln);
 
+            // Masukkan objek data yang telah disesuaikan ke array global pembentuk tabel
             dataKeuanganGlobal.push({ 
-                tanggal: tglRaw, bulan: bln, tahun: thn, keterangan: kolom[3], tipe: statusTipe, jumlah: kolom[4] || "0", linkNota: kolom[5] || ""
+                tanggal: tglRaw, 
+                bulan: bln, 
+                tahun: thn, 
+                keterangan: ketTransaksi, 
+                tipe: statusTipe, 
+                jumlah: nominalFix.toString(), 
+                linkNota: linkNota
             });
         }
 
@@ -266,7 +301,7 @@ function renderTabel() {
             <td>${i.tanggal}</td>
             <td>
                 ${i.keterangan}
-                ${i.linkNota ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
+                ${i.linkNota && i.linkNota !== "-" ? `<br><a href="${i.linkNota}" target="_blank" style="color:#E53935; font-size:10px; font-weight:bold; text-decoration:underline;">[Lihat Nota]</a>` : ""}
             </td>
             <td style="font-weight:bold;">
                 ${i.tipe==='masuk' ? '<span style="color:#2e7d32;"><i class="fa-solid fa-arrow-down"></i> Pemasukan</span>' : '<span style="color:#E53935;"><i class="fa-solid fa-arrow-up"></i> Pengeluaran</span>'}
@@ -316,7 +351,6 @@ async function loadRapatDariDrive() {
         let daftarTahunRapat = new Set();
         let daftarBulanRapat = new Set();
 
-        // 1. ATURAN BARU: Deteksi pemisah baris tabel yang asli secara presisi
         let baris = [];
         let barisSaatIni = [];
         let diDalamKutip = false;
@@ -327,12 +361,12 @@ async function loadRapatDariDrive() {
             let nextChar = teksData[i + 1];
 
             if (char === '"') {
-                diDalamKutip = !diDalamKutip; // Tandai jika sedang berada di dalam sel ber-enter
+                diDalamKutip = !diDalamKutip; 
             } else if (char === '\t' && !diDalamKutip) {
                 barisSaatIni.push(penampungTeks.trim());
                 penampungTeks = "";
             } else if ((char === '\n' || char === '\r') && !diDalamKutip) {
-                if (char === '\r' && nextChar === '\n') i++; // Lewati \n jika format Windows \r\n
+                if (char === '\r' && nextChar === '\n') i++; 
                 barisSaatIni.push(penampungTeks.trim());
                 if (barisSaatIni.length > 0) baris.push(barisSaatIni);
                 barisSaatIni = [];
@@ -346,7 +380,6 @@ async function loadRapatDariDrive() {
             baris.push(barisSaatIni);
         }
 
-        // 2. Loop data yang sudah dipisahkan dengan benar
         for (let i = 1; i < baris.length; i++) {
             let kolom = baris[i];
             if (kolom.length < 5) continue;
@@ -354,7 +387,6 @@ async function loadRapatDariDrive() {
             let tglRaw = kolom[1] || ""; 
             let agendaRaw = kolom[2] || "-";
             
-            // Ambil kolom D, dan ubah paksa enter di dalam sel menjadi tag <br>
             let hasilRaw = kolom[3] || "-";
             let hasilFormatBaris = hasilRaw
                 .replace(/\r\n/g, '<br>')
@@ -567,11 +599,11 @@ function renderTabelDokumentasi() {
                 
                 if (linkSingle.includes("id=")) {
                     let idFile = linkSingle.split("id=")[1].split("&")[0];
-                    renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
+                    renderUrl = `https://drive.google.com/thumbnail?id=${idFile}&sz=w800`;
                     isImg = true;
                 } else if (linkSingle.includes("/d/")) {
                     let idFile = linkSingle.split("/d/")[1].split("/")[0];
-                    renderUrl = `https://lh3.googleusercontent.com/d/${idFile}`;
+                    renderUrl = `https://drive.google.com/thumbnail?id=${idFile}&sz=w800`;
                     isImg = true;
                 } else if (linkSingle.match(/\.(jpeg|jpg|gif|png)$/) != null) {
                     isImg = true;
@@ -636,7 +668,7 @@ window.navDok = (dir) => {
 /* ==========================================================================
    8. MODUL KHUSUS: DATABASE ANGGOTA, UMUR JUJUR & FOTO POPUP
    ========================================================================== */
-const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
+const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR44-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
 let dataAnggotaGlobal = [];
 let dataAnggotaTersaring = [];
 let halAnggotaSaatIni = 1;
