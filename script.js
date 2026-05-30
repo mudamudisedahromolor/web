@@ -32,7 +32,7 @@ function initNavigasiMobile() {
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navBar = document.querySelector('.main-navbar');
     
-    // A. Tombol Hamburger (Buka/Tutup Navigasi Utama)
+    // A. Tombol Hamburger (Buka/Tutup Navigasi Utama) - Diisolasi agar selalu aman
     if (menuBtn && navBar) {
         menuBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -40,7 +40,7 @@ function initNavigasiMobile() {
         });
     }
 
-    // B. Trigger Dropdown Kegiatan (Bulanan & Tahunan)
+    // B. Trigger Dropdown Kegiatan (Diberi pengaman 'if' ketat per baris agar tidak freeze)
     const btnBulanan = document.getElementById('btn-bulanan');
     const menuRapat = document.getElementById('menu-rapat');
     const btnTahunan = document.getElementById('btn-tahunan');
@@ -49,7 +49,7 @@ function initNavigasiMobile() {
     if (btnBulanan && menuRapat) {
         btnBulanan.addEventListener('click', function(e) {
             e.preventDefault(); e.stopPropagation();
-            if (menu17an) menu17an.classList.remove('buka'); // Tutup menu lain agar tidak bertumpuk
+            if (menu17an) menu17an.classList.remove('buka'); 
             menuRapat.classList.toggle('buka');
         });
     }
@@ -57,7 +57,7 @@ function initNavigasiMobile() {
     if (btnTahunan && menu17an) {
         btnTahunan.addEventListener('click', function(e) {
             e.preventDefault(); e.stopPropagation();
-            if (menuRapat) menuRapat.classList.remove('buka'); // Tutup menu lain agar tidak bertumpuk
+            if (menuRapat) menuRapat.classList.remove('buka'); 
             menu17an.classList.toggle('buka');
         });
     }
