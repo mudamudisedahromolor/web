@@ -1,177 +1,70 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Anggota - Muda Mudi Sedahromo Lor</title>
-    
-    <link rel="icon" href="images/mms.png" type="image/png">
-    <link rel="icon" type="image/png" sizes="192x192" href="images/mms.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="images/mms.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="images/mms.png">
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <link rel="stylesheet" href="style.css?v=101">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-</head>
-<body> 
-    
-    <header class="site-header">
-        <div class="top-header">
-            <div class="header-logo-area">
-                <a href="index.html" class="logo-wrapper" target="_blank">
-                    <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
-                    <div class="header-text">
-                        <span class="brand-title">MUDA MUDI</span>
-                        <span class="brand-subtitle">Sedahromo Lor 05</span>
-                    </div>
-                </a>
-            </div>
-            <div class="header-right-stuff">
-                <form class="search-box" action="#" method="GET">
-                    <input type="text" placeholder="Cari informasi..." name="search">
-                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-                </form>
-                <div class="header-socials">
-                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="https://www.tiktok.com/@mudamudisedahromolor05?is_from_webapp=1&sender_device=pc" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+<header class="site-header">
+    <div class="top-header">
+        <div class="header-logo-area">
+            <a href="index.html" class="logo-wrapper">
+                <img src="images/mms.png" alt="Logo MMS" class="mini-logo">
+                <div class="header-text">
+                    <span class="brand-title">MUDA MUDI</span>
+                    <span class="brand-subtitle">Sedahromo Lor 05</span>
                 </div>
-                <button class="menu-toggle" id="mobile-menu-btn">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div> 
-        </div> 
+            </a>
+        </div>
         
-  <nav class="main-navbar">
-            <ul class="nav-list">
-                <li class="nav-item"><a href="index.html">BERANDA</a></li>
-                <li class="nav-item">
-                    <a href="#">PROFIL</a>
-                    <ul class="submenu">
-                        <li class="submenu-item"><a href="struktur.html"> - STRUKTUR KEANGGOTAAN</a></li>
-                        <li class="submenu-item"><a href="visi-misi.html"> - VISI & MISI</a></li>
-                        <li class="submenu-item"><a href="daftar-anggota"> - DAFTAR ANGGOTA</a></li>
-                        
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#">KEGIATAN</a>
-                    <ul class="submenu">
-                        <li class="submenu-item"><a href="rapat-hasilrapat.html"> - RAPAT BULANAN</a></li>
-                        <li class="submenu-item"><a href="dokumentasi-kegiatan.html"> - DOKUMENTASI</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#">LAPORAN</a>
-                    <ul class="submenu">
-                        <li class="submenu-item"><a href="laporan-keuangan.html"> - KEUANGAN</a></li>
-                        <li class="submenu-item"><a href="#"> - PERTANGGUNG JAWABAN</a></li>
-                    </ul>
-                </li>
-                 <li class="nav-item">
-                    <a href="#">INFORMASI</a>
-                    <ul class="submenu">
-                        <li class="submenu-item"><a href=""> - BERITA</a></li>
-                        <li class="submenu-item"><a href="#"> - KESEHATAN</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
-   
-
-    <div class="finance-page-wrapper">
-        <div class="content-box" style="max-width: 1100px; width: 95%;">
-            <h2 class="box-title">DAFTAR ANGGOTA</h2>
-            <hr class="box-divider">
-            <p style="text-align: center; margin-bottom: 30px;">
-                 Daftar Anggota Muda Mudi Sedahromo Lor 05
-            </p>
-
-
-            
-            <div class="filter-container" style="justify-content: flex-end; align-items: center; display: flex; margin-bottom: 20px;">
-                <div style="width: 100%; max-width: 350px; position: relative;">
-                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888;"></i>
-                    <input type="text" id="input-cari-anggota" class="filter-box" style="width: 100%; padding-left: 40px; height: 45px; border-radius: 25px; border: 1px solid #ccc;" placeholder="Cari nama atau NIM anggota..." onkeyup="terapkanFilterAnggota()">
-                </div>
-            </div>
-
-
-            
-            <div class="table-responsive">
-                <table class="finance-table" style="text-align: center;">
-                    <thead>
-                        <tr>
-                            <th style="width: 15%;">NIM</th>
-                            <th style="width: 20%;">FOTO</th>
-                            <th style="width: 35%; text-align: left; padding-left: 15px;">NAMA</th>
-                            <th style="width: 15%;">USIA</th>
-                            <th style="width: 15%;">GENERASI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-tabel-anggota">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Database Anggota...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="header-right-stuff">
+            <div class="header-socials">
+                <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://www.tiktok.com/@mudamudisedahromolor05?is_from_webapp=1&sender_device=pc" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
             </div>
         </div>
-    </div>
 
+        <button class="menu-toggle" id="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div> 
 
-           <style>
-        .modal-foto-mms {
-            display: none; /* Disembunyikan secara default */
-            position: fixed; 
-            z-index: 9999; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0,0,0,0.85); /* Latar gelap transparan */
-            backdrop-filter: blur(5px); /* Efek blur ala iPhone */
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .modal-foto-mms img {
-            max-width: 90%;
-            max-height: 80%;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: zoomInModal 0.3s ease;
-        }
-        @keyframes zoomInModal {
-            from {transform: scale(0.8); opacity: 0;}
-            to {transform: scale(1); opacity: 1;}
-        }
-        .close-modal-mms {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .close-modal-mms:hover { color: #E53935; }
-    </style>
+    <nav class="main-navbar">
+        <ul class="nav-list">
+            <li class="nav-item"><a href="index.html">BERANDA</a></li>
+            <li class="nav-item">
+                <a href="#">PROFIL</a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="struktur.html"> - STRUKTUR KEANGGOTAAN</a></li>
+                    <li class="submenu-item"><a href="visi-misi.html"> - VISI & MISI</a></li>
+                    <li class="submenu-item"><a href="daftar-anggota"> - DAFTAR ANGGOTA</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#">KEGIATAN</a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="rapat-hasilrapat.html"> - RAPAT BULANAN</a></li>
+                    <li class="submenu-item"><a href="dokumentasi-kegiatan.html"> - DOKUMENTASI</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#">LAPORAN</a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="laporan-keuangan.html"> - KEUANGAN</a></li>
+                    <li class="submenu-item"><a href="#"> - PERTANGGUNG JAWABAN</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#">INFORMASI</a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="laporan-keuangan.html"> - BERITA</a></li>
+                    <li class="submenu-item"><a href="#"> - KESEHATAN</a></li>
+                </ul>
+            </li>
+        </ul>
 
-    <div id="modal-foto-full" class="modal-foto-mms" onclick="tutupFoto()">
-        <span class="close-modal-mms">&times;</span>
-        <img id="img-modal-tampil" src="">
-        <p style="color: white; margin-top: 15px; font-size: 14px;">Ketuk di mana saja untuk menutup</p>
-    </div>
-
-     <script src="script.js?v=1"></script> 
-    
-</body>
-</html>
+        <div class="navbar-mobile-only">
+            <div class="header-socials">
+                <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://www.tiktok.com/@mudamudisedahromolor05?is_from_webapp=1&sender_device=pc" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+        </div>
+    </nav>
+</header>
