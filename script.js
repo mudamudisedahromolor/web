@@ -310,33 +310,40 @@ const barisRapatPerHal = 5;
 async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
-        const teksData = await response.text();
+        let teksData = await response.text();
         
         dataRapatGlobal = [];
         let daftarTahunRapat = new Set();
         let daftarBulanRapat = new Set();
 
-        // LOGIKA BARU: Ekspresi reguler untuk memotong baris asli tanpa merusak Enter di dalam sel
-        const baris = teksData.match(/(?:[^\n\r"]+|"[^"]*")+/g) || [];
+        // Mengatasi variasi pembungkus baris bawaan Windows/Unix di Google Sheets
+        teksData = teksData.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
-        // Mulai looping dari indeks 1 (melewati baris header)
+        // Memotong baris utama data berdasarkan karakter baris baru yang valid di luar tanda kutip
+        const baris = teksData.match(/(?:[^\n"]+|"[^"]*")+/g) || [];
+
         for (let i = 1; i < baris.length; i++) {
             let barisBersih = baris[i].trim();
             if (!barisBersih) continue;
 
-            // Memisahkan kolom berdasarkan karakter Tab (\t)
             let kolom = barisBersih.split("\t");
             if (kolom.length < 5) continue;
 
             let tglRaw = kolom[1] ? kolom[1].replace(/^"|"$/g, '').trim() : ""; 
             let agendaRaw = kolom[2] ? kolom[2].replace(/^"|"$/g, '').trim() : "-";
             
-            // Ambil data Kolom D, bersihkan tanda kutip pembungkus bawaan TSV, dan ubah Enter menjadi <br>
-            let hasilRaw = kolom[3] ? kolom[3].replace(/^"|"$/g, '').trim() : "-";
+            // AMBIL DATA KOLOM D: Bersihkan tanda kutip pembungkus sel
+            let hasilRaw = kolom[3] ? kolom[3].trim() : "-";
+            if (hasilRaw.startsWith('"') && hasilRaw.endsWith('"')) {
+                hasilRaw = hasilRaw.substring(1, hasilRaw.length - 1);
+            }
+
+            // OPERASI UTAMA: Paksa konversi semua bentuk jeda baris/karakter enter menjadi tag <br>
             let hasilFormatBaris = hasilRaw
-                .replace(/\r\n/g, '<br>')
-                .replace(/\n/g, '<br>')
-                .replace(/\r/g, '<br>');
+                .split('\n')
+                .map(barisTeks => barisTeks.trim())
+                .filter(barisTeks => barisTeks.length > 0)
+                .join('<br>');
 
             let lokasiRaw = kolom[4] ? kolom[4].replace(/^"|"$/g, '').trim() : "-";
 
@@ -355,7 +362,7 @@ async function loadRapatDariDrive() {
                 bulan: bln, 
                 tahun: thn, 
                 agenda: agendaRaw, 
-                hasil: hasilFormatBaris, // Sudah dalam bentuk format HTML <br>
+                hasil: hasilFormatBaris, // Hasil dipastikan sudah berupa string HTML ber-tag <br>
                 lokasi: lokasiRaw 
             });
         }
@@ -367,7 +374,7 @@ async function loadRapatDariDrive() {
     } catch (e) {
         console.error("Gagal memuat arsip rapat", e);
         const tBodyRapat = document.getElementById('data-tabel-rapat');
-        if (tBodyRapat) tBodyRapat.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat database rapat. Pastikan spreadsheet telah dipublikasikan ke web.</td></tr>`;
+        if (tBodyRapat) tBodyRapat.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat database rapat.</td></tr>`;
     }
 }
 
