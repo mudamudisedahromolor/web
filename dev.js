@@ -1,6 +1,6 @@
 /* ==========================================================================
    NAMA ORGANISASI : MUDA MUDI SEDAHROMO LOR 05
-   BERKAS KHUSUS   : DEV.JS (DATABASE ANGGOTA & FOTO & POPUP)
+   BERKAS KHUSUS   : DEV.JS (DATABASE ANGGOTA, UMUR JUJUR & FOTO POPUP)
    ========================================================================== */
 
 const linkTsvAnggota = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR45-ysPdK4uVibwJQbXKvaGGA2zlX3m2GnAS2392fiSDwENSz9ABffImneI-u4ZGmErvHbdM5RJoDi/pub?gid=992968433&single=true&output=tsv";
@@ -33,33 +33,44 @@ async function loadAnggotaDariDrive() {
             let nama = kolom[2] ? kolom[2].trim() : "-";         
             let nim = kolom[4] ? kolom[4].trim() : "-";          
             let tglLahirRaw = kolom[6] ? kolom[6].trim() : "";   
-            let usiaDariSheet = kolom[7] ? kolom[7].trim() : ""; // Backup dari kolom H
             let linkFotoRaw = kolom[13] ? kolom[13].trim() : ""; 
             
-            let thn = 0;
             let usiaTeks = "-";
+            let tahunLahirInt = 0;
 
-            // Ekstrak 4 Digit Tahun Langsung dari Teks Tanggal
-            let cariTahun = tglLahirRaw.match(/\b(19\d{2}|20\d{2})\b/);
-            
-            if (cariTahun) {
-                thn = parseInt(cariTahun[0], 10);
+            // 1. Amankan angka tahun (4 digit) terlebih dahulu
+            let matchTahun = tglLahirRaw.match(/\b(19\d{2}|20\d{2})\b/);
+            if (matchTahun) {
+                tahunLahirInt = parseInt(matchTahun[0], 10);
             }
 
-            // Hitung Usia 
-            if (thn > 0) {
-                usiaTeks = (new Date().getFullYear() - thn) + " Tahun";
-            } else if (usiaDariSheet && !isNaN(parseInt(usiaDariSheet, 10))) {
-                usiaTeks = usiaDariSheet + " Tahun";
-                thn = new Date().getFullYear() - parseInt(usiaDariSheet, 10); 
+            // 2. LOGIKA UMUR JUJUR (Baru nambah usia jika tanggal ultah sudah lewat)
+            if (tahunLahirInt > 0) {
+                // Terjemahkan bulan Indonesia ke Inggris agar terbaca oleh sistem
+                let tglInggris = tglLahirRaw.toLowerCase()
+                    .replace('mei', 'may').replace('agu', 'aug').replace('okt', 'oct').replace('des', 'dec');
+                
+                let tglLahirObj = new Date(tglInggris);
+                let hariIni = new Date();
+                let umur = hariIni.getFullYear() - tahunLahirInt;
+
+                // Cek presisi sampai ke bulan dan tanggal (jika tanggal valid)
+                if (!isNaN(tglLahirObj.getTime())) {
+                    let bulanSelisih = hariIni.getMonth() - tglLahirObj.getMonth();
+                    if (bulanSelisih < 0 || (bulanSelisih === 0 && hariIni.getDate() < tglLahirObj.getDate())) {
+                        umur--; // Kurangi 1 tahun jika belum waktunya tiup lilin
+                    }
+                }
+                
+                usiaTeks = umur + " Tahun";
             }
 
-            // Hanya masukkan ke tabel jika ada informasi tahun/usianya
-            if (thn > 0) {
+            // Masukkan ke array global
+            if (tahunLahirInt > 0) {
                 dataAnggotaGlobal.push({ 
                     nim: nim, 
                     nama: nama, 
-                    tahunLahirInt: thn, 
+                    tahunLahirInt: tahunLahirInt, 
                     usia: usiaTeks,
                     foto: linkFotoRaw 
                 });
@@ -74,7 +85,9 @@ async function loadAnggotaDariDrive() {
     }
 }
 
-// Logika Filter (Hanya Berdasarkan Kolom Pencarian Nama / NIM)
+// =========================================================
+// LOGIKA PENCARIAN & FILTER
+// =========================================================
 window.terapkanFilterAnggota = function() {
     const cariInput = document.getElementById('input-cari-anggota');
     if(!cariInput) return;
@@ -89,6 +102,9 @@ window.terapkanFilterAnggota = function() {
     renderTabelAnggota();
 }
 
+// =========================================================
+// RENDER TABEL HTML
+// =========================================================
 function renderTabelAnggota() {
     const tbody = document.getElementById('data-tabel-anggota');
     if (!tbody) return;
@@ -102,11 +118,11 @@ function renderTabelAnggota() {
     const dataPerHalaman = dataAnggotaTersaring.slice(start, start + barisAnggotaPerHal);
     
     let html = dataPerHalaman.map(i => {
-        // DEFAULT FOTO: Avatar Inisial Nama
+        // DEFAULT FOTO: Avatar Inisial Nama (Otomatis menyesuaikan nama)
         let linkDefaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(i.nama)}&background=E53935&color=fff&size=150&bold=true`;
         let urlFotoTampil = linkDefaultAvatar; 
         
-        // LOGIKA PENARIKAN FOTO ANTI-BLOKIR GOOGLE DRIVE (Satu URL untuk tabel & popup)
+        // LOGIKA PENARIKAN FOTO ANTI-BLOKIR (Satu URL)
         if (i.foto && i.foto !== "" && i.foto !== "-") {
             let idFile = "";
             if (i.foto.includes("id=")) {
@@ -116,13 +132,14 @@ function renderTabelAnggota() {
             }
             
             if (idFile !== "") {
+                // Resolusi w800 agar tajam saat di-zoom popup
                 urlFotoTampil = `https://drive.google.com/thumbnail?id=${idFile}&sz=w800`;
             } else if (i.foto.startsWith("http")) {
                 urlFotoTampil = i.foto;
             }
         }
 
-        // Klasifikasi Generasi Sesuai Standard Internasional
+        // KLASIFIKASI GENERASI
         let generasi = "-";
         if (i.tahunLahirInt <= 1964) {
             generasi = '<span style="background-color: #5D4037; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; min-width: 85px; text-align: center;">Baby Boomer</span>';
@@ -159,17 +176,18 @@ function renderTabelAnggota() {
         `;
     }).join('');
 
+    // RENDER TOMBOL NAVIGASI
     const totalHal = Math.ceil(dataAnggotaTersaring.length / barisAnggotaPerHal);
     if (totalHal > 1) {
         let tombolNav = "";
         const styleBtn = "padding:8px 16px; background:#E53935; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px;";
         
         if (halAnggotaSaatIni === 1) {
-            tombolNav = `<div style="text-align:right;"><button onclick="navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="text-align:right;"><button onclick="window.navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         } else if (halAnggotaSaatIni === totalHal) {
-            tombolNav = `<div style="text-align:left;"><button onclick="navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
+            tombolNav = `<div style="text-align:left;"><button onclick="window.navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button></div>`;
         } else {
-            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
+            tombolNav = `<div style="display:flex; justify-content:space-between;"><button onclick="window.navAnggota(-1)" style="${styleBtn}"><i class="fa-solid fa-chevron-left"></i> Halaman Sebelumnya</button><button onclick="window.navAnggota(1)" style="${styleBtn}">Halaman Selanjutnya <i class="fa-solid fa-chevron-right"></i></button></div>`;
         }
         html += `<tr><td colspan="5" style="padding:12px; background:#f9f9f9; border-top:1px solid #eee;">${tombolNav}</td></tr>`;
     }
@@ -177,14 +195,14 @@ function renderTabelAnggota() {
     tbody.innerHTML = html;
 }
 
-window.navAnggota = (arah) => { 
+window.navAnggota = function(arah) { 
     halAnggotaSaatIni += arah; 
     renderTabelAnggota(); 
     setTimeout(() => { document.querySelector('.finance-table').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 };
 
 // =========================================================
-// FUNGSI KONTROL POPUP FOTO (LIGHTBOX)
+// MESIN POPUP FOTO MELAYANG (LIGHTBOX)
 // =========================================================
 window.bukaFotoFull = function(url) {
     const modal = document.getElementById('modal-foto-full');
@@ -192,6 +210,8 @@ window.bukaFotoFull = function(url) {
     if(modal && imgModal) {
         imgModal.src = url; 
         modal.style.display = 'flex'; 
+    } else {
+        alert("Kode HTML Popup (modal-foto-full) belum dipasang di file daftar-anggota.html");
     }
 }
 
