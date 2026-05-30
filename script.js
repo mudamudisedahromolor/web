@@ -378,16 +378,29 @@ function renderTabelRapat() {
     const start = (halRapatSaatIni - 1) * barisRapatPerHal;
     const pageData = dataRapatTersaring.slice(start, start + barisRapatPerHal);
     
-    let html = pageData.map(i => `
-        <tr>
-            <td style="font-weight: 500; color: #333; vertical-align: top;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
-            <td style="font-weight: bold; color: #E53935; vertical-align: top;">${i.agenda}</td>
-            <td style="vertical-align: top; padding-right: 20px;">
-                <div style="line-height: 1.6; white-space: pre-wrap !important; word-break: break-word; text-align: left; color: #333;">${i.hasil}</div>
-            </td>
-            <td style="vertical-align: top;"><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
-        </tr>
-    `).join('');
+    let html = pageData.map(i => {
+        // PENGAMAN: Ubah paksa setiap enter nyata dari spreadsheet (\n atau \r) menjadi tag <br> HTML
+        let hasilFormatBaris = "";
+        if (i.hasil) {
+            hasilFormatBaris = i.hasil
+                .replace(/\r\n/g, '<br>')
+                .replace(/\n/g, '<br>')
+                .replace(/\r/g, '<br>');
+        }
+
+        return `
+            <tr>
+                <td style="font-weight: 500; color: #333; vertical-align: top;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
+                <td style="font-weight: bold; color: #E53935; vertical-align: top;">${i.agenda}</td>
+                <td style="vertical-align: top; padding-right: 20px;">
+                    <div style="line-height: 1.6; text-align: left; color: #333; display: block; width: 100%;">
+                        ${hasilFormatBaris}
+                    </div>
+                </td>
+                <td style="vertical-align: top;"><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
+            </tr>
+        `;
+    }).join('');
 
     const totalHal = Math.ceil(dataRapatTersaring.length / barisRapatPerHal);
     if (totalHal > 1) {
