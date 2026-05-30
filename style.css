@@ -673,3 +673,50 @@ body {
         padding-left: 0; /* Matikan efek geser horizontal di mobile agar stabil */
     }
 }
+
+
+/* ==========================================================================
+   10. MODAL POPUP FOTO PROFILE / DOKUMENTASI OVERLAY
+   ========================================================================== */
+.modal-foto-mms {
+    display: none; /* Disembunyikan secara default */
+    position: fixed; 
+    z-index: 9999; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.85); /* Latar gelap transparan */
+    backdrop-filter: blur(5px); /* Efek blur ala iPhone */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modal-foto-mms img {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: zoomInModal 0.3s ease;
+}
+
+@keyframes zoomInModal {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.close-modal-mms {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-modal-mms:hover { 
+    color: #E53935; 
+}
