@@ -310,42 +310,58 @@ const barisRapatPerHal = 5;
 async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
-        let teksData = await response.text();
+        const teksData = await response.text();
         
         dataRapatGlobal = [];
         let daftarTahunRapat = new Set();
         let daftarBulanRapat = new Set();
 
-        // Mengatasi variasi pembungkus baris bawaan Windows/Unix di Google Sheets
-        teksData = teksData.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        // 1. ATURAN BARU: Deteksi pemisah baris tabel yang asli secara presisi
+        let baris = [];
+        let barisSaatIni = [];
+        let diDalamKutip = false;
+        let penampungTeks = "";
 
-        // Memotong baris utama data berdasarkan karakter baris baru yang valid di luar tanda kutip
-        const baris = teksData.match(/(?:[^\n"]+|"[^"]*")+/g) || [];
+        for (let i = 0; i < teksData.length; i++) {
+            let char = teksData[i];
+            let nextChar = teksData[i + 1];
 
+            if (char === '"') {
+                diDalamKutip = !diDalamKutip; // Tandai jika sedang berada di dalam sel ber-enter
+            } else if (char === '\t' && !diDalamKutip) {
+                barisSaatIni.push(penampungTeks.trim());
+                penampungTeks = "";
+            } else if ((char === '\n' || char === '\r') && !diDalamKutip) {
+                if (char === '\r' && nextChar === '\n') i++; // Lewati \n jika format Windows \r\n
+                barisSaatIni.push(penampungTeks.trim());
+                if (barisSaatIni.length > 0) baris.push(barisSaatIni);
+                barisSaatIni = [];
+                penampungTeks = "";
+            } else {
+                penampungTeks += char;
+            }
+        }
+        if (penampungTeks) {
+            barisSaatIni.push(penampungTeks.trim());
+            baris.push(barisSaatIni);
+        }
+
+        // 2. Loop data yang sudah dipisahkan dengan benar
         for (let i = 1; i < baris.length; i++) {
-            let barisBersih = baris[i].trim();
-            if (!barisBersih) continue;
-
-            let kolom = barisBersih.split("\t");
+            let kolom = baris[i];
             if (kolom.length < 5) continue;
 
-            let tglRaw = kolom[1] ? kolom[1].replace(/^"|"$/g, '').trim() : ""; 
-            let agendaRaw = kolom[2] ? kolom[2].replace(/^"|"$/g, '').trim() : "-";
+            let tglRaw = kolom[1] || ""; 
+            let agendaRaw = kolom[2] || "-";
             
-            // AMBIL DATA KOLOM D: Bersihkan tanda kutip pembungkus sel
-            let hasilRaw = kolom[3] ? kolom[3].trim() : "-";
-            if (hasilRaw.startsWith('"') && hasilRaw.endsWith('"')) {
-                hasilRaw = hasilRaw.substring(1, hasilRaw.length - 1);
-            }
-
-            // OPERASI UTAMA: Paksa konversi semua bentuk jeda baris/karakter enter menjadi tag <br>
+            // Ambil kolom D, dan ubah paksa enter di dalam sel menjadi tag <br>
+            let hasilRaw = kolom[3] || "-";
             let hasilFormatBaris = hasilRaw
-                .split('\n')
-                .map(barisTeks => barisTeks.trim())
-                .filter(barisTeks => barisTeks.length > 0)
-                .join('<br>');
+                .replace(/\r\n/g, '<br>')
+                .replace(/\n/g, '<br>')
+                .replace(/\r/g, '<br>');
 
-            let lokasiRaw = kolom[4] ? kolom[4].replace(/^"|"$/g, '').trim() : "-";
+            let lokasiRaw = kolom[4] || "-";
 
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
             let thn = tglSplit[2] || tglSplit[0] || "2026";
@@ -362,7 +378,7 @@ async function loadRapatDariDrive() {
                 bulan: bln, 
                 tahun: thn, 
                 agenda: agendaRaw, 
-                hasil: hasilFormatBaris, // Hasil dipastikan sudah berupa string HTML ber-tag <br>
+                hasil: hasilFormatBaris, 
                 lokasi: lokasiRaw 
             });
         }
