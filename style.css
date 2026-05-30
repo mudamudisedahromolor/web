@@ -13,7 +13,7 @@ body {
 }
 
 /* ==========================================================================
-   1. GLOBAL HEADER & NAVBAR (DESKTOP / DEFAULT)
+   1. GLOBAL HEADER & NAVBAR (DESKTOP DEFAULT - RAMPIANG & ELEGAN)
    ========================================================================== */
 .site-header { 
     position: fixed; 
@@ -21,7 +21,7 @@ body {
     left: 0; 
     width: 100%; 
     z-index: 1000; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
 }
 
 .top-header { 
@@ -72,37 +72,6 @@ body {
     display: flex; 
     align-items: center; 
     gap: 25px; 
-}
-
-.search-box { 
-    display: flex; 
-    align-items: center; 
-    border: 1px solid #ccc; 
-    border-radius: 20px; 
-    overflow: hidden; 
-    background-color: #f9f9f9; 
-}
-
-.search-box input { 
-    border: none; 
-    padding: 8px 15px; 
-    outline: none; 
-    font-size: 13px; 
-    width: 180px; 
-    background: transparent; 
-}
-
-.search-box button { 
-    border: none; 
-    background: transparent; 
-    padding: 8px 12px; 
-    color: #666; 
-    cursor: pointer; 
-    transition: color 0.2s; 
-}
-
-.search-box button:hover { 
-    color: #E53935; 
 }
 
 .header-socials { 
@@ -159,7 +128,11 @@ body {
     background-color: #C62828; 
 }
 
-/* Layer 2: Dropdown Menu (Profil, Kegiatan, Laporan) */
+.navbar-mobile-only {
+    display: none;
+}
+
+/* Layer 2: Dropdown Menu */
 .submenu { 
     display: none; 
     position: absolute; 
@@ -187,12 +160,10 @@ body {
     background-color: #C62828; 
 }
 
-/* Munculkan Layer 2 saat Hover di Komputer */
 .nav-item:hover > .submenu { 
     display: block; 
 }
 
-/* Layer 3: Sub-submenu Dalam */
 .sub-submenu-dalam {
     display: none; 
     list-style: none; 
@@ -264,7 +235,6 @@ body {
     text-shadow: 1px 1px 3px rgba(0,0,0,0.8); 
 }
 
-/* Kotak Halaman Putih Standard */
 .content-box {
     position: relative; 
     z-index: 2; 
@@ -375,7 +345,6 @@ body {
 .filter-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; outline: none; height: 40px; }
 .filter-box:focus { border-color: #E53935; }
 
-/* Komponen Tambahan: Tombol Cetak Mutasi Berkas Rekening Koran */
 .btn-cetak-mutasi {
     display: inline-flex;
     align-items: center;
@@ -416,251 +385,109 @@ body {
 /* ==========================================================================
    5. HALAMAN STRUKTUR PENGURUS INTI & SWIPER CAROUSEL
    ========================================================================== */
-.structure-page-wrapper { 
-    padding-top: 170px; 
-    padding-bottom: 60px; 
-    display: flex; 
-    justify-content: center; 
-}
-
-.content-box-structure {
-    position: relative; 
-    z-index: 2; 
-    background-color: #ffffff;
-    width: 95%; 
-    max-width: 1000px; 
-    padding: 40px; 
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    margin: 0 auto;
-}
-
-.swipe-instruction {
-    text-align: center; 
-    color: #666; 
-    margin-bottom: 20px; 
-    font-size: 14px;
-}
-
-.swiper { 
-    width: 100%; 
-    padding: 20px 0 50px 0; 
-}
-
-.swiper-slide { 
-    transition: transform 0.3s ease, opacity 0.3s ease; 
-    opacity: 0.5; 
-    transform: scale(0.85); 
-}
-
-.swiper-slide-active { 
-    opacity: 1; 
-    transform: scale(1.05); 
-    z-index: 10; 
-}
-
-/* Desain Kartu Kepengurusan */
-.team-card {
-    background: #fff; 
-    padding: 30px 20px; 
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-    text-align: center;
-    display: flex; 
-    flex-direction: column; 
-    align-items: center;
-    border: 1px solid #eee; 
-    min-height: 280px;
-}
-
-.team-card img { 
-    width: 110px; 
-    height: 110px; 
-    border-radius: 50%; 
-    object-fit: cover; 
-    margin-bottom: 15px; 
-    border: 3px solid #ddd; 
-}
-
-/* Modifikasi Khusus Kartu Ketua */
-.team-card.ketua-card img { 
-    border-color: #E53935; 
-    width: 130px; 
-    height: 130px; 
-}
-
-.team-card h4 { 
-    color: #333; 
-    font-size: 16px; 
-    margin-bottom: 5px; 
-    font-weight: bold; 
-}
-
-.team-card p { 
-    color: #E53935; 
-    font-weight: 600; 
-    font-size: 13px; 
-    text-transform: uppercase; 
-    margin-bottom: 5px; 
-}
-
-.nim-text { 
-    font-size: 11px !important; 
-    color: #888 !important; 
-    text-transform: none !important; 
-    font-weight: normal !important; 
-    margin-bottom: 15px !important; 
-}
-
-.team-socials { 
-    display: flex; 
-    justify-content: center; 
-    gap: 15px; 
-    margin-top: auto; 
-}
-
-.team-socials a { 
-    color: #555; 
-    font-size: 18px; 
-    transition: 0.3s; 
-}
-
-.team-socials a:hover { 
-    color: #E53935; 
-    transform: scale(1.2); 
-}
+.structure-page-wrapper { padding-top: 170px; padding-bottom: 60px; display: flex; justify-content: center; }
+.content-box-structure { position: relative; z-index: 2; background-color: #ffffff; width: 95%; max-width: 1000px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 0 auto; }
+.swipe-instruction { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+.swiper { width: 100%; padding: 20px 0 50px 0; }
+.swiper-slide { transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0.5; transform: scale(0.85); }
+.swiper-slide-active { opacity: 1; transform: scale(1.05); z-index: 10; }
+.team-card { background: #fff; padding: 30px 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; align-items: center; border: 1px solid #eee; min-height: 280px; }
+.team-card img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #ddd; }
+.team-card.ketua-card img { border-color: #E53935; width: 130px; height: 130px; }
+.team-card h4 { color: #333; font-size: 16px; margin-bottom: 5px; font-weight: bold; }
+.team-card p { color: #E53935; font-weight: 600; font-size: 13px; text-transform: uppercase; margin-bottom: 5px; }
+.nim-text { font-size: 11px !important; color: #888 !important; text-transform: none !important; font-weight: normal !important; margin-bottom: 15px !important; }
+.team-socials { display: flex; justify-content: center; gap: 15px; margin-top: auto; }
+.team-socials a { color: #555; font-size: 18px; transition: 0.3s; }
+.team-socials a:hover { color: #E53935; transform: scale(1.2); }
 
 /* ==========================================================================
    6. HALAMAN DOKUMENTASI (GOOGLE DRIVE EMBED & AUTOMATED TABLE)
    ========================================================================== */
-.gallery-page-wrapper {
-    padding-top: 170px;
-    padding-bottom: 60px;
-    display: flex;
-    justify-content: center;
-}
-
-.content-box-gallery {
-    position: relative;
-    z-index: 2;
-    background-color: #ffffff;
-    width: 95%;
-    max-width: 1100px;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    margin: 0 auto;
-}
-
-.gallery-desc {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 14px;
-}
-
-/* Kotak Frame Drive Lama */
-.drive-embed-container {
-    position: relative;
-    width: 100%;
-    height: 600px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #fafafa;
-}
-
-.drive-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-/* Penyelarasan Render Gambar dari Form Ke Dalam Tabel */
-#data-tabel-dokumentasi img {
-    max-width: 180px;
-    max-height: 120px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    border: 1px solid #ddd;
-    transition: transform 0.2s ease-in-out;
-}
-
-#data-tabel-dokumentasi img:hover {
-    transform: scale(1.04);
-}
+.gallery-page-wrapper { padding-top: 170px; padding-bottom: 60px; display: flex; justify-content: center; }
+.content-box-gallery { position: relative; z-index: 2; background-color: #ffffff; width: 95%; max-width: 1100px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 0 auto; }
+.gallery-desc { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+.drive-embed-container { position: relative; width: 100%; height: 600px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fafafa; }
+.drive-iframe { width: 100%; height: 100%; border: none; }
+#data-tabel-dokumentasi img { max-width: 180px; max-height: 120px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); border: 1px solid #ddd; transition: transform 0.2s ease-in-out; }
+#data-tabel-dokumentasi img:hover { transform: scale(1.04); }
 
 /* ==========================================================================
    7. MEDIA QUERIES KHUSUS DESKTOP / LAPTOP (PC)
    ========================================================================== */
 @media screen and (min-width: 769px) {
-    .submenu-item:hover > .sub-submenu-dalam {
-        display: block;
-    }
-    .sub-submenu-dalam {
-        position: absolute;
-        top: 0;
-        left: 100%; 
-        min-width: 200px;
-        box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
-    }
-    .sub-submenu-dalam li a {
-        padding-left: 20px !important;
-    }
-    .menu-toggle {
-        display: none;
-    }
+    .submenu-item:hover > .sub-submenu-dalam { display: block; }
+    .sub-submenu-dalam { position: absolute; top: 0; left: 100%; min-width: 200px; box-shadow: 2px 4px 6px rgba(0,0,0,0.15); }
+    .sub-submenu-dalam li a { padding-left: 20px !important; }
 }
 
 /* ==========================================================================
-   8. MEDIA QUERIES SATU PINTU KHUSUS MOBILE (HP)
+   8. MEDIA QUERIES SATU PINTU KHUSUS MOBILE (HP - KANAL JABARPROV MERAH SOLID)
    ========================================================================== */
 @media screen and (max-width: 768px) {
-    /* Header HP */
-    .top-header { flex-direction: column; padding: 15px 20px; position: relative; }
-    .header-logo-area { margin-bottom: 15px; }
-    .header-right-stuff { flex-direction: column; gap: 15px; width: 100%; }
-    .search-box { width: 100%; max-width: 100%; }
-    .menu-toggle { display: block; position: absolute; top: 15px; right: 20px; }
-  
-    /* Aturan Buka Tutup Menu Samping/Gorden di HP */
-    .main-navbar { display: none; padding: 0; width: 100%; }
-    .main-navbar.aktif { display: block; }
-    .nav-list { flex-direction: column; }
-    .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.1); }
-    
-    .submenu { position: static; box-shadow: none; padding-left: 15px; }
-
-    /* Penyelarasan Dropdown Kegiatan Lapisan ke-3 di HP */
-    .sub-submenu-dalam { position: static !important; box-shadow: none !important; left: auto !important; top: auto !important; width: 100% !important; }
-    .sub-submenu-dalam.buka { display: block !important; }
-    .sub-submenu-dalam li a { padding-left: 25px !important; background-color: #a11f1d !important; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: block !important; width: 100% !important; }
-
-    /* Konten Layout Utama HP */
-    .hero-title-box { flex-direction: column; gap: 5px; }
-    .hero-title-box h1 { font-size: 28px; text-align: center; }
-    .hero-content h2 { font-size: 18px; }
-    .hero-description { font-size: 14px; }
-    
-    /* Box Isi Konten di HP */
-    .content-box, .content-box-structure, .content-box-gallery { padding: 25px; width: 95%; }
-    .box-title { font-size: 24px !important; }
-
-    /* Slider Berita HP */
-    .slider-wrapper { margin: -40px 20px 40px; }
-    .slide.aktif { flex-direction: column; } 
-    .slide-img { width: 100%; height: 200px; min-height: auto; }
-    .slide-content { width: 100%; padding: 25px; }
-    .slide-content h3 { font-size: 20px; }
-
-    /* Embed Frame Drive HP */
-    .drive-embed-container { height: 450px; }
-
-    /* Pengaturan Khusus Tombol Cetak Mutasi saat dibuka di Layar Ponsel (HP) */
-    .btn-cetak-mutasi {
-        display: flex;
-        width: 100%;
-        margin-top: 5px;
-        height: 40px;
+    /* Header tipis satu baris horizontal lurus berwarna merah solid, persis JabarProv */
+    .top-header { 
+        background-color: #E53935 !important; 
+        flex-direction: row !important; 
+        padding: 12px 20px !important; 
+        position: relative !important; 
     }
+    
+    .header-logo-area { margin-bottom: 0 !important; }
+    .mini-logo { width: 34px !important; }
+    
+    /* Teks logo berubah menjadi putih kontras di atas dasar merah */
+    .logo-wrapper { color: #ffffff !important; }
+    .brand-title { font-size: 14px !important; }
+    .brand-subtitle { font-size: 10px !important; color: rgba(255, 255, 255, 0.8) !important; }
+    
+    /* Sembunyikan elemen bawaan kanan desktop di layar HP */
+    .top-header .header-right-stuff { 
+        display: none !important; 
+    }
+    
+    /* Tombol Hamburger nempel lurus rata kanan warna putih */
+    .menu-toggle { 
+        display: block !important; 
+        position: static !important; 
+        color: #ffffff !important;
+    }
+  
+    /* Navbar Gorden HP yang meluncur turun saat diklik */
+    .main-navbar { display: none; padding: 5px 0; width: 100%; flex-direction: column; align-items: stretch; background-color: #C62828; }
+    .main-navbar.aktif { display: flex; }
+    .nav-list { flex-direction: column; }
+    .nav-item a { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 12px 20px; font-size: 13px; }
+    
+    .submenu { position: static; box-shadow: none; padding-left: 15px; background-color: #B71C1C; }
+
+    /* Kotak Medsos masuk bersembunyi rapi di dalam gorden paling bawah */
+    .navbar-mobile-only { 
+        display: flex !important; 
+        flex-direction: column; 
+        padding: 15px 20px; 
+        background-color: #B71C1C; 
+        border-top: 1px solid rgba(255,255,255,0.1); 
+    }
+    .navbar-mobile-only .header-socials { justify-content: center; width: 100%; gap: 24px; }
+    .navbar-mobile-only .header-socials a { color: #ffffff !important; font-size: 18px; }
+
+    /* Mengurangi jarak padding atas halaman agar pas (Header Jabar lebih tipis) */
+    .finance-page-wrapper, .structure-page-wrapper, .gallery-page-wrapper, .hero-container { padding-top: 75px !important; }
+
+    /* Komponen Utama Box Kas HP */
+    .content-box, .content-box-structure, .content-box-gallery { padding: 20px; width: 95%; }
+    .box-title { font-size: 22px !important; }
+    .summary-cards { gap: 10px; }
+    .card-box { padding: 15px; }
+    .card-box .amount { font-size: 18px; }
+
+    /* Slider Berita Utama Beranda HP */
+    .slider-wrapper { margin: -20px 10px 30px; }
+    .slide.aktif { flex-direction: column; } 
+    .slide-img { width: 100%; height: 185px; }
+    .slide-content { width: 100%; padding: 20px; }
+
+    /* Tombol Cetak Mutasi PDF di HP otomatis full lebar */
+    .btn-cetak-mutasi { display: flex; width: 100%; margin-top: 5px; height: 40px; }
 }
