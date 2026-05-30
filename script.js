@@ -380,10 +380,12 @@ function renderTabelRapat() {
     
     let html = pageData.map(i => `
         <tr>
-            <td style="font-weight: 500; color: #333;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
+            <td style="font-weight: 500; color: #333; vertical-align: top;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
             <td style="font-weight: bold; color: #E53935; vertical-align: top;">${i.agenda}</td>
-            <td style="line-height: 1.6; white-space: pre-line; text-align: justify; padding-right:20px;">${i.hasil}</td>
-            <td><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
+            <td style="vertical-align: top; padding-right: 20px;">
+                <div style="line-height: 1.6; white-space: pre-wrap !important; word-break: break-word; text-align: left; color: #333;">${i.hasil}</div>
+            </td>
+            <td style="vertical-align: top;"><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
         </tr>
     `).join('');
 
