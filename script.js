@@ -311,20 +311,35 @@ async function loadRapatDariDrive() {
     try {
         const response = await fetch(`${linkTsvRapat}&cache=${new Date().getTime()}`);
         const teksData = await response.text();
-        const baris = teksData.split("\n");
         
         dataRapatGlobal = [];
         let daftarTahunRapat = new Set();
         let daftarBulanRapat = new Set();
 
+        // LOGIKA BARU: Ekspresi reguler untuk memotong baris asli tanpa merusak Enter di dalam sel
+        const baris = teksData.match(/(?:[^\n\r"]+|"[^"]*")+/g) || [];
+
+        // Mulai looping dari indeks 1 (melewati baris header)
         for (let i = 1; i < baris.length; i++) {
-            const barisBersih = baris[i].trim();
+            let barisBersih = baris[i].trim();
             if (!barisBersih) continue;
-            
-            const kolom = barisBersih.split("\t");
+
+            // Memisahkan kolom berdasarkan karakter Tab (\t)
+            let kolom = barisBersih.split("\t");
             if (kolom.length < 5) continue;
 
-            let tglRaw = kolom[1]; 
+            let tglRaw = kolom[1] ? kolom[1].replace(/^"|"$/g, '').trim() : ""; 
+            let agendaRaw = kolom[2] ? kolom[2].replace(/^"|"$/g, '').trim() : "-";
+            
+            // Ambil data Kolom D, bersihkan tanda kutip pembungkus bawaan TSV, dan ubah Enter menjadi <br>
+            let hasilRaw = kolom[3] ? kolom[3].replace(/^"|"$/g, '').trim() : "-";
+            let hasilFormatBaris = hasilRaw
+                .replace(/\r\n/g, '<br>')
+                .replace(/\n/g, '<br>')
+                .replace(/\r/g, '<br>');
+
+            let lokasiRaw = kolom[4] ? kolom[4].replace(/^"|"$/g, '').trim() : "-";
+
             let tglSplit = tglRaw.includes("/") ? tglRaw.split("/") : tglRaw.split("-");
             let thn = tglSplit[2] || tglSplit[0] || "2026";
             if(thn.length > 4) thn = thn.substring(0,4); 
@@ -336,7 +351,12 @@ async function loadRapatDariDrive() {
             if(bln && bln !== "Semua") daftarBulanRapat.add(bln);
 
             dataRapatGlobal.push({ 
-                tanggal: tglRaw, bulan: bln, tahun: thn, agenda: kolom[2], hasil: kolom[3], lokasi: kolom[4] 
+                tanggal: tglRaw, 
+                bulan: bln, 
+                tahun: thn, 
+                agenda: agendaRaw, 
+                hasil: hasilFormatBaris, // Sudah dalam bentuk format HTML <br>
+                lokasi: lokasiRaw 
             });
         }
 
@@ -378,29 +398,18 @@ function renderTabelRapat() {
     const start = (halRapatSaatIni - 1) * barisRapatPerHal;
     const pageData = dataRapatTersaring.slice(start, start + barisRapatPerHal);
     
-    let html = pageData.map(i => {
-        // PENGAMAN: Ubah paksa setiap enter nyata dari spreadsheet (\n atau \r) menjadi tag <br> HTML
-        let hasilFormatBaris = "";
-        if (i.hasil) {
-            hasilFormatBaris = i.hasil
-                .replace(/\r\n/g, '<br>')
-                .replace(/\n/g, '<br>')
-                .replace(/\r/g, '<br>');
-        }
-
-        return `
-            <tr>
-                <td style="font-weight: 500; color: #333; vertical-align: top;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
-                <td style="font-weight: bold; color: #E53935; vertical-align: top;">${i.agenda}</td>
-                <td style="vertical-align: top; padding-right: 20px;">
-                    <div style="line-height: 1.6; text-align: left; color: #333; display: block; width: 100%;">
-                        ${hasilFormatBaris}
-                    </div>
-                </td>
-                <td style="vertical-align: top;"><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
-            </tr>
-        `;
-    }).join('');
+    let html = pageData.map(i => `
+        <tr>
+            <td style="font-weight: 500; color: #333; vertical-align: top;"><i class="fa-regular fa-calendar-days" style="color:#E53935; margin-right:5px;"></i> ${i.tanggal}</td>
+            <td style="font-weight: bold; color: #E53935; vertical-align: top;">${i.agenda}</td>
+            <td style="vertical-align: top; padding-right:20px;">
+                <div style="line-height: 1.6; text-align: left; color: #333; display: block; white-space: normal;">
+                    ${i.hasil}
+                </div>
+            </td>
+            <td style="vertical-align: top;"><i class="fa-solid fa-location-dot" style="color: #666; margin-right:4px;"></i> ${i.lokasi}</td>
+        </tr>
+    `).join('');
 
     const totalHal = Math.ceil(dataRapatTersaring.length / barisRapatPerHal);
     if (totalHal > 1) {
